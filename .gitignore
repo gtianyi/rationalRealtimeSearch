@@ -1,5 +1,12 @@
-.vscode/
-.vscode/launch.json
-.vscode/c_cpp_properties.json
-.vscode/settings.json
-.vscode/tasks.json
+.ycm_extra_conf.py
+.clang-format
+plots/
+results/
+worlds/
+distributions/
+backupTestsAS
+backupTestsDFS
+expansionTests
+generateTrees
+lastIncremental
+

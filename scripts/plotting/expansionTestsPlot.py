@@ -38,7 +38,7 @@ def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue, order
 markers=["o", "v", "s", "<", "p", "h", "^", "D", "X", ">", "o", "v", "s", "<", "p", "h", "^", "D", "X", ">"]
 
 # Hard coded result directories
-resultDirs = {"b2d100"}
+resultDirs = {"4x4"}
 limits = [3, 10, 30, 100, 300, 1000]
 algorithms = ["A*", "F-Hat", "BFS", "Risk", "LSS-LRTA*", "Confidence"]
 
@@ -51,8 +51,8 @@ differenceCost = []
 print("reading in data...")
 
 for dir in resultDirs:
-    for file in listdir("../../results/TreeWorld/expansionTests/Nancy/" + dir):
-        with open("../../results/TreeWorld/expansionTests/Nancy/" + dir + "/" + file) as json_data:
+    for file in listdir("../../results/SlidingTilePuzzle/expansionTests/Nancy/" + dir):
+        with open("../../results/SlidingTilePuzzle/expansionTests/Nancy/" + dir + "/" + file) as json_data:
             resultData = json.load(json_data)
             for algo in algorithms:
                 instance.append(str(dir))
@@ -79,7 +79,7 @@ algorithmsExpA = ["A*", "F-Hat"]
 
 algorithmsExpB = ["A*", "F-Hat", "BFS"]
 
-algorithmsExpC = ["A*", "F-Hat", "BFS", "Risk"]
+algorithmsExpC = ["A*", "F-Hat", "BFS", "Risk", "LSS-LRTA*"]
 
 print("building plots...")
 
