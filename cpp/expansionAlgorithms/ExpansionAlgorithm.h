@@ -3,6 +3,7 @@
 #include <functional>
 #include <memory>
 #include "../utility/PriorityQueue.h"
+#include "../utility/ResultContainer.h"
 
 template <class Domain, class Node, class TopLevelAction>
 class ExpansionAlgorithm
