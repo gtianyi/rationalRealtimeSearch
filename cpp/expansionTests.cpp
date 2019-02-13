@@ -2,6 +2,7 @@
 #include <string>
 #include <fstream>
 #include "RealTimeSearch.h"
+#include "utility/DiscreteDistribution.h"
 #include "decisionAlgorithms/KBestBackup.h"
 #include "expansionAlgorithms/AStar.h"
 #include "expansionAlgorithms/BreadthFirst.h"
@@ -34,17 +35,22 @@ int main(int argc, char** argv)
 	ResultContainer fhatRes;
 	ResultContainer riskRes;
     ResultContainer confidenceRes;
-	ResultContainer lsslrtaRes;
+    ResultContainer lsslrtaRes;
 
-	if (domain == "TreeWorld")
-	{
-		// Make a tree world
-		TreeWorld world = TreeWorld(cin);
+    DiscreteDistribution::readData();
 
-		RealTimeSearch<TreeWorld> bfs(world, "bfs", "none", "k-best", lookaheadDepth, 1, "normal");
-		RealTimeSearch<TreeWorld> astar(world, "a-star", "none", "k-best", lookaheadDepth, 1, "normal");
-		RealTimeSearch<TreeWorld> fhat(world, "f-hat", "none", "k-best", lookaheadDepth, 1, "normal");
-		RealTimeSearch<TreeWorld> risk(world, "risk", "none", "k-best", lookaheadDepth, 1, "normal");
+    if (domain == "TreeWorld") {
+        // Make a tree world
+        TreeWorld world = TreeWorld(cin);
+
+        RealTimeSearch<TreeWorld> bfs(
+                world, "bfs", "none", "k-best", lookaheadDepth, 1, "normal");
+        RealTimeSearch<TreeWorld> astar(
+                world, "a-star", "none", "k-best", lookaheadDepth, 1, "normal");
+        RealTimeSearch<TreeWorld> fhat(
+                world, "f-hat", "none", "k-best", lookaheadDepth, 1, "normal");
+        RealTimeSearch<TreeWorld> risk(
+                world, "risk", "none", "k-best", lookaheadDepth, 1, "normal");
         RealTimeSearch<TreeWorld> confidence(world, "confidence", "learn", "k-best", lookaheadDepth, 1, "normal");
 		RealTimeSearch<TreeWorld> lsslrta(world, "a-star", "none", "minimin", lookaheadDepth);
 
