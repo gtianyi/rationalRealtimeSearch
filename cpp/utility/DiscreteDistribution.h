@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <map>
 #include <set>
+#include <unordered_map>
 
 using namespace std;
 
@@ -65,6 +66,8 @@ class DiscreteDistribution
 	set<ProbabilityNode> distribution;
 	int maxSamples;
 	double var;
+
+	static unordered_map<double, set<ProbabilityNode>> hValueTable;
 
 	double probabilityDensityFunction(double x, double mu, double var)
 	{
@@ -546,5 +549,14 @@ public:
 	set<ProbabilityNode>::iterator end()
 	{
 		return distribution.end();
+	}
+
+	//below are code added by tianyi
+	static void readData(){
+
+	}
+
+	DiscreteDistribution(double g, double h){
+
 	}
 };

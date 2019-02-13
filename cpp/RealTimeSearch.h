@@ -175,7 +175,7 @@ public:
 	};
 
 	RealTimeSearch(Domain& domain, string expansionModule, string learningModule,
-		string decisionModule, double lookahead, double k = 1, string belief = "normal")
+		string decisionModule, double lookahead, double k = 1, string belief = "data")
 		: domain(domain), expansionPolicy(expansionModule), learningPolicy(learningModule),
 		decisionPolicy(decisionModule), lookahead(lookahead)
 	{
@@ -246,6 +246,8 @@ public:
 
 	ResultContainer search()
 	{
+		DiscreteDistribution::readData();
+
 		domain.initialize(expansionPolicy, lookahead);
 
 		ResultContainer res;
@@ -449,8 +451,20 @@ private:
 			TopLevelAction tla;
 			tla.topLevelNode = childNode;
 
-			childNode->distribution = DiscreteDistribution(100, childNode->getFValue(), childNode->getFHatValue(), 
-				childNode->getDValue(), childNode->getFHatValue() - childNode->getFValue());
+
+            string beliefType = "data";
+
+            if (beliefType == "normal") {
+                childNode->distribution = DiscreteDistribution(100,
+                        childNode->getFValue(),
+                        childNode->getFHatValue(),
+                        childNode->getDValue(),
+                        childNode->getFHatValue() - childNode->getFValue());
+            } else if (beliefType == "data") {
+                childNode->distribution = DiscreteDistribution(
+                        childNode->getGValue(),
+                        childNode->getFValue() - childNode->getGValue());
+            }
 
 			tla.expectedMinimumPathCost = childNode->distribution.expectedCost();
 
