@@ -547,13 +547,4 @@ public:
 	{
 		return distribution.end();
 	}
-
-	//below are code added by tianyi
-	static void readData(){
-
-	}
-
-	DiscreteDistribution(double g, double h){
-
-	}
 };
