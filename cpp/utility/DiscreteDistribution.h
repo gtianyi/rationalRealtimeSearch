@@ -529,7 +529,7 @@ public:
                 "../results/SlidingTilePuzzle/sampleData/w2-statSummary.txt";
         ifstream f(fileName);
 
-        cout << "reading h data\n";
+        //cout << "reading h data\n";
         string line;
 
         double h, valueCount, hs, hsCount;
@@ -539,6 +539,10 @@ public:
 
             ss >> h;
             ss >> valueCount;
+
+			if (valueCount < 10) {
+				continue;
+			}
 
             if (hValueTable.find(h) != hValueTable.end()) {
                 cout << "error: duplicate h from data " << h << "\n";
@@ -555,7 +559,7 @@ public:
 
 		f.close();
 
-        cout << "total h " << hValueTable.size() << "\n";
+        //cout << "total h " << hValueTable.size() << "\n";
     }
 
     DiscreteDistribution(double g, double h, bool& retSuccess) {
@@ -568,10 +572,10 @@ public:
 
         for (auto& probNode : probNodeList) {
             probNode.cost += g;
-			distribution.insert(probNode);
+            distribution.insert(probNode);
         }
 
-		retSuccess = true;
+        retSuccess = true;
     }
 };
 

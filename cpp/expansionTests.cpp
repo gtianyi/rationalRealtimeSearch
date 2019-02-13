@@ -34,6 +34,7 @@ int main(int argc, char** argv)
 	ResultContainer astarRes;
 	ResultContainer fhatRes;
 	ResultContainer riskRes;
+	ResultContainer riskddRes;
     ResultContainer confidenceRes;
     ResultContainer lsslrtaRes;
 
@@ -99,6 +100,7 @@ int main(int argc, char** argv)
 		RealTimeSearch<SlidingTilePuzzle> astar(world, "a-star", "learn", "k-best", lookaheadDepth, 1, "normal");
 		RealTimeSearch<SlidingTilePuzzle> fhat(world, "f-hat", "learn", "k-best", lookaheadDepth, 1, "normal");
 		RealTimeSearch<SlidingTilePuzzle> risk(world, "risk", "learn", "k-best", lookaheadDepth, 1, "normal");
+		RealTimeSearch<SlidingTilePuzzle> riskdd(world, "risk", "learn", "k-best", lookaheadDepth, 1, "data");
         //RealTimeSearch<SlidingTilePuzzle> confidence(world, "confidence", "learn", "k-best", lookaheadDepth, 1, "normal");
 		RealTimeSearch<SlidingTilePuzzle> lsslrta(world, "a-star", "learn", "minimin", lookaheadDepth);
 
@@ -113,6 +115,12 @@ int main(int argc, char** argv)
         if (!world.validatePath(riskRes.path))
         {
             cout << "Invalid path detected from risk search!" << endl;
+            exit(1);
+        }
+    	riskddRes = riskdd.search();
+        if (!world.validatePath(riskddRes.path))
+        {
+            cout << "Invalid path detected from riskdd search!" << endl;
             exit(1);
         }
         
@@ -148,6 +156,7 @@ int main(int argc, char** argv)
         ", \"A*\": " + to_string(astarRes.solutionCost) + 
         ", \"F-Hat\": " + to_string(fhatRes.solutionCost) +
 		", \"Risk\": " + to_string(riskRes.solutionCost) + 
+		", \"Riskdd\": " + to_string(riskddRes.solutionCost) + 
         ", \"Confidence\": " + to_string(confidenceRes.solutionCost) +
         ", \"LSS-LRTA*\": " + to_string(lsslrtaRes.solutionCost) +
 		", \"Lookahead\": " + to_string(lookaheadDepth) + " }";

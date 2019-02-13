@@ -175,9 +175,9 @@ public:
 	};
 
 	RealTimeSearch(Domain& domain, string expansionModule, string learningModule,
-		string decisionModule, double lookahead, double k = 1, string belief = "normal")
+		string decisionModule, double lookahead, double k = 1, string beliefType = "normal")
 		: domain(domain), expansionPolicy(expansionModule), learningPolicy(learningModule),
-		decisionPolicy(decisionModule), lookahead(lookahead)
+		decisionPolicy(decisionModule), lookahead(lookahead), beliefType(beliefType)
 	{
 		if (expansionModule == "a-star")
 		{
@@ -231,7 +231,7 @@ public:
 		}
 		else if (decisionModule == "k-best")
 		{
-			decisionAlgo = make_shared<KBestBackup<Domain, Node, TopLevelAction> >(domain, k, belief, lookahead);
+			decisionAlgo = make_shared<KBestBackup<Domain, Node, TopLevelAction> >(domain, k, beliefType, lookahead);
 		}
         else
         {
@@ -255,19 +255,29 @@ public:
 		shared_ptr<Node> start = make_shared<Node>(0, domain.heuristic(domain.getStartState()), domain.distance(domain.getStartState()),
 			domain.distanceErr(domain.getStartState()), domain.epsilonHGlobal(), domain.epsilonDGlobal(), 
 			domain.getStartState(), nullptr, -1);
+		
+		//int count=0;
 
 		while (1)
 		{
             // mark this node as the start of the current search (to prevent state pruning based on label)
             start->markStart();
 
-			// Check if a goal has been reached
-			if (domain.isGoal(start->getState()))
-			{
-				// Calculate path cost and return solution
-				calculateCost(start, res);
+			//count++;
 
-				return res;
+            //if (beliefType == "data") {
+                //cout << "rl loop " << count << "h "
+                     //<< start->getFValue() - start->getGValue() << endl;
+            //}
+
+            // Check if a goal has been reached
+            if (domain.isGoal(start->getState())) {
+                // Calculate path cost and return solution
+                calculateCost(start, res);
+
+				//cout<<"count "<<count<<"\n";
+
+                return res;
 			}
 			
 			restartLists(start);
@@ -450,9 +460,6 @@ private:
 			TopLevelAction tla;
 			tla.topLevelNode = childNode;
 
-
-            string beliefType = "normal";
-
             if (beliefType == "normal") {
                 childNode->distribution = DiscreteDistribution(100,
                         childNode->getFValue(),
@@ -466,7 +473,14 @@ private:
                                 childNode->getFValue() - childNode->getGValue(),
                                 hInData);
                 if (!hInData) {
-                    continue;
+                /*    cout << "Never see h "*/
+                         //<< childNode->getFValue() - childNode->getGValue()
+                         /*<< "\n";*/
+                    childNode->distribution = DiscreteDistribution(100,
+                            childNode->getFValue(),
+                            childNode->getFHatValue(),
+                            childNode->getDValue(),
+                            childNode->getFHatValue() - childNode->getFValue());
 				}
             }
 
@@ -532,6 +546,7 @@ protected:
 	vector<TopLevelAction> tlas;
 
 	double lookahead;
+	string beliefType;
 	string expansionPolicy;
 	string learningPolicy;
 	string decisionPolicy;

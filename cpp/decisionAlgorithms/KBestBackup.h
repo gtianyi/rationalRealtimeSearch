@@ -1,6 +1,7 @@
 #pragma once
 #include <functional>
 #include <limits>
+#include <iostream>
 #include <memory>
 #include "../utility/PriorityQueue.h"
 #include "DecisionAlgorithm.h"
@@ -90,9 +91,17 @@ private:
                             best->getDValue(),
                             best->getFHatValue() - best->getFValue());
                 } else if (beliefType == "data") {
+                    bool retSucc;
                     best->distribution = DiscreteDistribution(
                             best->getGValue(),
-                            best->getFValue()-best->getGValue());
+                            best->getFValue()-best->getGValue(), retSucc);
+                    if (!retSucc) {
+                        best->distribution = DiscreteDistribution(100,
+                                best->getFValue(),
+                                best->getFHatValue(),
+                                best->getDValue(),
+                                best->getFHatValue() - best->getFValue());
+                    }
                 } else {
                     best->distribution = DiscreteDistribution(100,
                             best->getGValue(),
