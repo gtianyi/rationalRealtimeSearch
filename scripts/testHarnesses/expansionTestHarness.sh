@@ -5,7 +5,7 @@ then
   echo "./expansionTestHarness.sh <starting instance #> <# of instances to test> <# of processes> <Domain Type> <Domain Variables> <Lookahead value 1> <optional: additional lookahead values>"
   echo "Available domain types are TreeWorld and SlidingPuzzle"
   echo "Domain variables for TreeWorld: <branching factor> <tree depth>"
-  echo "Domain variables for SlidingPuzzle: <puzzle dimensions>"
+  echo "Domain variables for SlidingPuzzle: <puzzle dimensions> <puzzle type>"
   exit 1
 fi
 
@@ -14,7 +14,7 @@ then
   echo "./expansionTestHarness.sh <starting instance #> <# of instances to test> <# of processes> <Domain Type> <Domain Variables> <Lookahead value 1> <optional: additional lookahead values>"
   echo "Available domain types are TreeWorld and SlidingPuzzle"
   echo "Domain variables for TreeWorld: <branching factor> <tree depth>"
-  echo "Domain variables for SlidingPuzzle: <puzzle dimensions>"
+  echo "Domain variables for SlidingPuzzle: <puzzle dimensions> <puzzle type>"
   exit 1
 fi
 
@@ -68,9 +68,10 @@ then
 elif [ "$domainType" = "SlidingPuzzle" ]
 then
   dimensions=$5
-  for lookahead in "${@:6}"
+  tileType=$6
+  for lookahead in "${@:7}"
   do
-    mkdir ../../results/SlidingTilePuzzle/expansionTests/Nancy/${dimensions}x${dimensions}
+    mkdir -p ../../results/SlidingTilePuzzle/expansionTests/Nancy/${tileType}/${dimensions}x${dimensions}
     instance=$firstInstance
     while ((instance < lastInstance))
     do
@@ -80,11 +81,11 @@ then
         wait
         numProcs=0
       fi		  
-      if [ -f ../../results/SlidingTilePuzzle/expansionTests/Nancy/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json ]
+      if [ -f ../../results/SlidingTilePuzzle/expansionTests/Nancy/${tileType}/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json ]
 	  then 
 	    let instance++
 	  else
-	    ./../../expansionTests ${domainType} ${lookahead} ../../results/SlidingTilePuzzle/expansionTests/Nancy/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json < ${file} &
+	    ./../../expansionTests ${domainType} ${lookahead} ${tileType} ../../results/SlidingTilePuzzle/expansionTests/Nancy/${tileType}/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json < ${file} &
 	    let instance++
         let numProcs++
 	  fi

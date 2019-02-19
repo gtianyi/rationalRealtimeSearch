@@ -27,6 +27,11 @@ public:
 			generateKey();
 		}
 		
+
+        State(std::vector<std::vector<int>> b, char l, int f) : board(b), label(l), movedFace(f) {
+            generateKey();
+        }
+
 		friend std::ostream& operator<<(std::ostream& stream, const SlidingTilePuzzle::State& state) {
 			for (int r = 0; r < state.getBoard().size(); r++)
 			{
@@ -89,6 +94,8 @@ public:
 			return label;
 		}
 
+        int getFace() const { return movedFace; }
+
         void markStart() 
         {
             label = -1;
@@ -97,6 +104,7 @@ public:
 	private:
 		std::vector<std::vector<int> > board;
 		int label;
+		int movedFace;
 		unsigned long long theKey = -1;
 	};
 
@@ -364,7 +372,7 @@ public:
 		if (r - 1 > -1)
 		{
 			std::swap(board[r][c], board[r - 1][c]);
-			succs.push_back(State(board, 'U'));
+			succs.push_back(State(board, 'U', board[r][c]));
 		}
 	}
 
@@ -393,7 +401,7 @@ public:
 		if (r + 1 < size)
 		{
 			std::swap(board[r][c], board[r + 1][c]);
-			succs.push_back(State(board, 'D'));
+			succs.push_back(State(board, 'D' ,board[r][c]));
 		}
 	}
 
@@ -422,7 +430,7 @@ public:
 		if (c - 1 > -1)
 		{
 			std::swap(board[r][c], board[r][c - 1]);
-			succs.push_back(State(board, 'L'));
+			succs.push_back(State(board, 'L', board[r][c]));
 		}
 	}
 
@@ -451,7 +459,7 @@ public:
 		if (c + 1 < size)
 		{
 			std::swap(board[r][c], board[r][c + 1]);
-			succs.push_back(State(board, 'R'));
+			succs.push_back(State(board, 'R', board[r][c]));
 		}
 	}
 
