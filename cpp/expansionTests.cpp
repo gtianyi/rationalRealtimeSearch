@@ -12,6 +12,7 @@
 #include "learningAlgorithms/Dijkstra.h"
 #include "domain/TreeWorld.h"
 #include "domain/HeavyTilePuzzle.h"
+#include "domain/InverseTilePuzzle.h"
 #include <memory>
 
 using namespace std;
@@ -44,7 +45,7 @@ int main(int argc, char** argv)
     ResultContainer confidenceRes;
     ResultContainer lsslrtaRes;
 
-    DiscreteDistribution::readData(subDomain);
+    //DiscreteDistribution::readData(subDomain);
 
     if (domain == "TreeWorld") {
         // Make a tree world
@@ -106,14 +107,15 @@ int main(int argc, char** argv)
 				world = std::make_shared<SlidingTilePuzzle>(cin);
 			} else if (subDomain == "heavy"){
 				world = std::make_shared<HeavyTilePuzzle>(cin);
+			} else if (subDomain == "inverse"){
+				world = std::make_shared<InverseTilePuzzle>(cin);
 			}
-			
 
 		RealTimeSearch<SlidingTilePuzzle> bfs(*world, "bfs", "learn", "k-best", lookaheadDepth, 1, "normal");
 		RealTimeSearch<SlidingTilePuzzle> astar(*world, "a-star", "learn", "k-best", lookaheadDepth, 1, "normal");
 		RealTimeSearch<SlidingTilePuzzle> fhat(*world, "f-hat", "learn", "k-best", lookaheadDepth, 1, "normal");
 		RealTimeSearch<SlidingTilePuzzle> risk(*world, "risk", "learn", "k-best", lookaheadDepth, 1, "normal");
-		RealTimeSearch<SlidingTilePuzzle> riskdd(*world, "risk", "learn", "k-best", lookaheadDepth, 1, "data");
+		//RealTimeSearch<SlidingTilePuzzle> riskdd(*world, "risk", "learn", "k-best", lookaheadDepth, 1, "data");
         //RealTimeSearch<SlidingTilePuzzle> confidence(world, "confidence", "learn", "k-best", lookaheadDepth, 1, "normal");
 		RealTimeSearch<SlidingTilePuzzle> lsslrta(*world, "a-star", "learn", "minimin", lookaheadDepth);
 
@@ -130,12 +132,12 @@ int main(int argc, char** argv)
             cout << "Invalid path detected from risk search!" << endl;
             exit(1);
         }
-		riskddRes = riskdd.search();
-		if (!world->validatePath(riskddRes.path))
-		{
-			cout << "Invalid path detected from riskdd search!" << endl;
-			exit(1);
-		}
+		/*riskddRes = riskdd.search();*/
+		//if (!world->validatePath(riskddRes.path))
+		//{
+			//cout << "Invalid path detected from riskdd search!" << endl;
+			//exit(1);
+		/*}*/
 		
         //confidenceRes = confidence.search();
 		fhatRes = fhat.search();
@@ -169,8 +171,8 @@ int main(int argc, char** argv)
         ", \"A*\": " + to_string(astarRes.solutionCost) + 
         ", \"F-Hat\": " + to_string(fhatRes.solutionCost) +
 		", \"Risk\": " + to_string(riskRes.solutionCost) + 
-		", \"Riskdd\": " + to_string(riskddRes.solutionCost) + 
-        ", \"Confidence\": " + to_string(confidenceRes.solutionCost) +
+		//", \"Riskdd\": " + to_string(riskddRes.solutionCost) + 
+        //", \"Confidence\": " + to_string(confidenceRes.solutionCost) +
         ", \"LSS-LRTA*\": " + to_string(lsslrtaRes.solutionCost) +
 		", \"Lookahead\": " + to_string(lookaheadDepth) + " }";
 
