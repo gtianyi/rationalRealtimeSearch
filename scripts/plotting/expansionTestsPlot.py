@@ -39,9 +39,10 @@ markers=["o", "v", "s", "<", "p", "h", "^", "D", "X", ">", "o", "v", "s", "<", "
 
 # Hard coded result directories
 resultDirs = {"4x4"}
-tileType = "uniform"
+tileType = "inverse"
 limits = [3, 10, 30, 100, 300, 1000]
-algorithms = ["A*", "F-Hat", "BFS", "Risk", "Riskdd", "LSS-LRTA*", "Confidence"]
+# algorithms = ["A*", "F-Hat", "BFS", "Risk", "Riskdd", "LSS-LRTA*", "Confidence"]
+algorithms = ["A*", "F-Hat", "BFS", "Risk", "LSS-LRTA*"]
 
 instance = []
 lookAheadVals = []
@@ -76,7 +77,8 @@ dfDiff = pd.DataFrame({
     "Algorithm":algorithm
 })
 
-algorithmsExpC = ["A*", "F-Hat", "BFS", "Risk", "Riskdd", "LSS-LRTA*"]
+# algorithmsExpC = ["A*", "F-Hat", "BFS", "Risk", "Riskdd", "LSS-LRTA*"]
+algorithmsExpC = ["A*", "F-Hat", "BFS", "Risk", "LSS-LRTA*"]
 
 print("building plots...")
 
