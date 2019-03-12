@@ -2,7 +2,6 @@
 .clang-format
 plots/
 results/
-worlds/
 distributions/
 backupTestsAS
 backupTestsDFS
