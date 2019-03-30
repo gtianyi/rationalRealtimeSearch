@@ -252,7 +252,7 @@ public:
 		return correctedDerr[state];
 	}
 
-	Cost heuristic(const State& state) {
+	virtual Cost heuristic(const State& state) {
 		// Check if the heuristic of this state has been updated
 		if (correctedH.find(state) != correctedH.end())
 		{
@@ -497,7 +497,7 @@ public:
 		return startState;
 	}
 
-	Cost getEdgeCost(State state) {
+	virtual Cost getEdgeCost(State state) {
 		return 1;
 	}
 
