@@ -20,6 +20,8 @@
 #include "learningAlgorithms/Dijkstra.h"
 #include "learningAlgorithms/Ignorance.h"
 
+#include <time.h>
+
 using namespace std;
 
 template <class Domain>
@@ -244,7 +246,7 @@ public:
 		clean();
 	}
 
-	ResultContainer search()
+    ResultContainer search(int timeLimitinSec) 
 	{
 
 		domain.initialize(expansionPolicy, lookahead);
@@ -257,9 +259,12 @@ public:
 			domain.getStartState(), nullptr, -1);
 		
 		//int count=0;
+		//
+		clock_t startTime = clock();
 
-		while (1)
-		{
+        while (double(clock() - startTime) / CLOCKS_PER_SEC <
+                (double)timeLimitinSec) {
+
             // mark this node as the start of the current search (to prevent state pruning based on label)
             start->markStart();
 
@@ -306,6 +311,10 @@ public:
             // Add this step to the path taken so far
             res.path.push(start->getState().getLabel());
 		}
+
+		if (double(clock() - startTime) / CLOCKS_PER_SEC >=
+                (double)timeLimitinSec)
+            noSolutionFound(res);
 
 		return res;
 	}
@@ -534,6 +543,11 @@ private:
 	{
 		res.solutionFound = true;
 		res.solutionCost = solution->getFValue();
+	}
+
+    void noSolutionFound(ResultContainer& res) {
+            res.solutionFound = false;
+            res.solutionCost = -1;
 	}
 
 protected:
