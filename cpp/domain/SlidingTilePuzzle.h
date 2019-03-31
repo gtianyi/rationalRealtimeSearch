@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <bitset>
 #include "../utility/SlidingWindow.h"
+#include "../utility/DiscreteDistribution.h"
 
 using namespace std;
 
@@ -588,25 +589,67 @@ public:
         return false;
     }
 
-	std::vector<std::vector<int> > startBoard;
-	std::vector<std::vector<int> > endBoard;
-	int size;
-	State startState;
-	SlidingWindow<int> expansionDelayWindow;
-	unordered_map<State, Cost, HashState> correctedH;
-	unordered_map<State, Cost, HashState> correctedD;
-	unordered_map<State, Cost, HashState> correctedDerr;
+    virtual void readDistributionData(
+            ifstream& f,
+            unordered_map<double,
+                    vector<DiscreteDistribution::ProbabilityNode>>& hValueTable)
+            const {
+        cout << "reading unit tile data\n";
+        string line;
 
-	double epsilonHSum;
-	double epsilonDSum;
-	double curEpsilonH;
-	double curEpsilonD;
-	double expansionCounter;
+        double h, valueCount, hs, hsCount;
 
-	string expansionPolicy;
-	int lookahead;
+        while (getline(f, line)) {
+            stringstream ss(line);
 
-	static vector<int> table;
+            ss >> h;
+            ss >> valueCount;
+
+   /*         if (valueCount < 10) {*/
+				//continue;
+			//}
+
+            if (hValueTable.find(h) != hValueTable.end()) {
+                cout << "error: duplicate h from data " << h << "\n";
+            }
+
+            while (!ss.eof()) {
+                ss >> hs;
+                ss >> hsCount;
+
+				DiscreteDistribution::ProbabilityNode pn(hs, hsCount/valueCount);
+				hValueTable[h].push_back(pn);
+            }
+        }
+
+		f.close();
+
+		//cout << "total h " << hValueTable.size() << "\n";
+    }
+
+    virtual string getSubDomainName() const { return "uniform"; }
+
+    virtual double getHAdjustCoefficientForDataDriven() const { return 1.0; }
+
+    std::vector<std::vector<int>> startBoard;
+    std::vector<std::vector<int>> endBoard;
+    int size;
+    State startState;
+    SlidingWindow<int> expansionDelayWindow;
+    unordered_map<State, Cost, HashState> correctedH;
+    unordered_map<State, Cost, HashState> correctedD;
+    unordered_map<State, Cost, HashState> correctedDerr;
+
+    double epsilonHSum;
+    double epsilonDSum;
+    double curEpsilonH;
+    double curEpsilonD;
+    double expansionCounter;
+
+    string expansionPolicy;
+    int lookahead;
+
+    static vector<int> table;
 };
 
 vector<int> SlidingTilePuzzle::table;

@@ -9,12 +9,14 @@
 #include <sstream>
 #include <unordered_map>
 #include <vector>
+#include <cmath>
 
 using namespace std;
 
 #define M_PI 3.14159265358979323846 /* pi */
 
 class DiscreteDistribution {
+public:
     struct ProbabilityNode {
         double cost;
         double probability;
@@ -41,6 +43,11 @@ class DiscreteDistribution {
         }
     };
 
+	~DiscreteDistribution(){
+			distribution.clear();
+	}
+
+private:
     struct ProbabilityPair {
         ProbabilityNode first;
         ProbabilityNode second;
@@ -63,6 +70,7 @@ class DiscreteDistribution {
     double var;
 
     static unordered_map<double, vector<ProbabilityNode>> hValueTable;
+    static double hAdjustCoefficient;
 
     double probabilityDensityFunction(double x, double mu, double var) {
         return ((1 / sqrt(2 * M_PI * var)) *
@@ -474,7 +482,7 @@ public:
         // If the squish factor is 1, all values in distribution will be moved
         // to the mean.
         if (factor == 1) {
-            newDistribution.insert(ProbabilityNode(mean, 1.0));
+			newDistribution.insert(ProbabilityNode(mean, 1.0));
             distribution.clear();
             distribution = newDistribution;
 
@@ -524,45 +532,24 @@ public:
     set<ProbabilityNode>::iterator end() { return distribution.end(); }
 
     // below are code added by tianyi
-    static void readData(string puzzleType) {
+	template<class Domain>
+    static void readData(Domain& domain) {
         string fileName = "../results/SlidingTilePuzzle/sampleData/" +
-                puzzleType + "-statSummary.txt";
+                domain.getSubDomainName() + "-statSummary.txt";
+
         ifstream f(fileName);
 
-        //cout << "reading h data\n";
-        string line;
+		domain.readDistributionData(f, hValueTable);
 
-        double h, valueCount, hs, hsCount;
-
-        while (getline(f, line)) {
-            stringstream ss(line);
-
-            ss >> h;
-            ss >> valueCount;
-
-   /*         if (valueCount < 10) {*/
-				//continue;
-			//}
-
-            if (hValueTable.find(h) != hValueTable.end()) {
-                cout << "error: duplicate h from data " << h << "\n";
-            }
-
-            while (!ss.eof()) {
-                ss >> hs;
-                ss >> hsCount;
-
-				ProbabilityNode pn(hs, hsCount/valueCount);
-				hValueTable[h].push_back(pn);
-            }
-        }
-
-		f.close();
-
-		//cout << "total h " << hValueTable.size() << "\n";
+		hAdjustCoefficient = domain.getHAdjustCoefficientForDataDriven();
     }
 
     DiscreteDistribution(double g, double h, bool& retSuccess) {
+        h = h * hAdjustCoefficient;
+
+        if (hAdjustCoefficient == 15)
+            h = round(h * 10) / 10;
+
         if (hValueTable.find(h) == hValueTable.end()) {
             retSuccess = false;
             return;
@@ -570,7 +557,7 @@ public:
 
         auto& probNodeList = hValueTable[h];
 
-        for (auto& probNode : probNodeList) {
+        for (auto probNode : probNodeList) {
             probNode.cost += g;
             distribution.insert(probNode);
         }
@@ -580,3 +567,4 @@ public:
 };
 
 unordered_map<double, vector<DiscreteDistribution::ProbabilityNode>> DiscreteDistribution::hValueTable;
+double DiscreteDistribution::hAdjustCoefficient;

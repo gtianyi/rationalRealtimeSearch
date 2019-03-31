@@ -54,7 +54,6 @@ int main(int argc, char** argv)
     // Get sub-domain type
     string subDomain = argv[3];
 
-	DiscreteDistribution::readData(subDomain);
 
     string result = "{ ";
 
@@ -66,7 +65,6 @@ int main(int argc, char** argv)
         startAlg(world, "a-star", "none", "k-best", lookaheadDepth, "A*", result, 1, "normal");
         startAlg(world, "f-hat", "none", "k-best", lookaheadDepth, "F-Hat", result, 1, "normal");
         startAlg(world, "risk", "none", "k-best", lookaheadDepth, "Risk", result, 1, "normal");
-        startAlg(world, "confidence", "learn", "k-best", lookaheadDepth, "RiskDD", result, 1, "normal");
         startAlg(world, "a-star", "none", "minimin", lookaheadDepth, "LSS-LRTA*", result);
     } else if (domain == "SlidingPuzzle") {
         // Make a tile puzzle
@@ -74,18 +72,21 @@ int main(int argc, char** argv)
 
         if (subDomain == "uniform") {
             world = std::make_shared<SlidingTilePuzzle>(cin);
+            DiscreteDistribution::readData<SlidingTilePuzzle>(*world);
         } else if (subDomain == "heavy") {
             world = std::make_shared<HeavyTilePuzzle>(cin);
+			DiscreteDistribution::readData<SlidingTilePuzzle>(*world);
         } else if (subDomain == "inverse") {
             world = std::make_shared<InverseTilePuzzle>(cin);
+            DiscreteDistribution::readData<SlidingTilePuzzle>(*world);
         }
 
-        startAlg(*world, "bfs", "learn", "k-best", lookaheadDepth, "BFS", result, 1, "normal");
-        startAlg(*world, "a-star", "learn", "k-best", lookaheadDepth, "A*", result, 1, "normal");
-        startAlg(*world, "f-hat", "learn", "k-best", lookaheadDepth, "F-Hat", result, 1, "normal");
-        startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "Risk", result, 1, "normal");
-		 startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "RiskDD",result, 1, "data");
-        startAlg(*world, "a-star", "learn", "minimin", lookaheadDepth, "LSS-LRTA*", result);
+        //startAlg(*world, "bfs", "learn", "k-best", lookaheadDepth, "BFS", result, 1, "normal");
+        //startAlg(*world, "a-star", "learn", "k-best", lookaheadDepth, "A*", result, 1, "normal");
+        //startAlg(*world, "f-hat", "learn", "k-best", lookaheadDepth, "F-Hat", result, 1, "normal");
+        //startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "Risk", result, 1, "normal");
+		startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "RiskDD",result, 1, "data");
+        //startAlg(*world, "a-star", "learn", "minimin", lookaheadDepth, "LSS-LRTA*", result);
 
     } else {
         cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
