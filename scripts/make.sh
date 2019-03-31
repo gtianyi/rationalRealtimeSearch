@@ -8,7 +8,7 @@ rm ../expansionTests
 #g++ -std=c++11 ../cpp/lastIncrementalTests.cpp -o ../lastIncremental
 #g++ -std=c++11 ../cpp/backupTestsDFS.cpp -o ../backupTestsDFS
 #g++ -std=c++11 ../cpp/backupTestsAS.cpp -o ../backupTestsAS
-g++ -g -std=c++11 ../cpp/expansionTests.cpp -o ../expansionTests
+g++ -o3 -std=c++11 ../cpp/expansionTests.cpp -o ../expansionTests
 
 #chmod a+x ../generateTrees
 #chmod a+x ../lastIncremental

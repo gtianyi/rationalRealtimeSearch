@@ -18,12 +18,18 @@
 using namespace std;
 
 template <class Domain>
-void startAlg(Domain& domain, string expansionModule, string learningModule, string decisionModule,
+shared_ptr<RealTimeSearch<Domain>> startAlg(Domain& domain, string expansionModule, string learningModule, string decisionModule,
         double lookahead, string algName, string& result, double k = 1, string beliefType = "normal") {
-    RealTimeSearch<Domain> searchAlg(domain, expansionModule, learningModule, decisionModule,
-            lookahead, k, beliefType);
+    shared_ptr<RealTimeSearch<Domain>> searchAlg =
+            make_shared<RealTimeSearch<Domain>>(domain,
+                    expansionModule,
+                    learningModule,
+                    decisionModule,
+                    lookahead,
+                    k,
+                    beliefType);
 
-    ResultContainer res = searchAlg.search(300);
+    ResultContainer res = searchAlg->search(300);
 
     if (res.solutionFound && !domain.validatePath(res.path)) {
         cout << "Invalid path detected from search: " << expansionModule
@@ -32,6 +38,8 @@ void startAlg(Domain& domain, string expansionModule, string learningModule, str
     }
 
     result += "\""+algName+"\": " + to_string(res.solutionCost) + ", ";
+
+	return searchAlg;
 }
 
 int main(int argc, char** argv)
@@ -53,6 +61,14 @@ int main(int argc, char** argv)
 
     // Get sub-domain type
     string subDomain = argv[3];
+
+	//this is used to get around the seg fault
+	shared_ptr<RealTimeSearch<SlidingTilePuzzle>> alg1;
+	shared_ptr<RealTimeSearch<SlidingTilePuzzle>> alg2;
+	shared_ptr<RealTimeSearch<SlidingTilePuzzle>> alg3;
+	shared_ptr<RealTimeSearch<SlidingTilePuzzle>> alg4;
+	shared_ptr<RealTimeSearch<SlidingTilePuzzle>> alg5;
+	shared_ptr<RealTimeSearch<SlidingTilePuzzle>> alg6;
 
 
     string result = "{ ";
@@ -81,12 +97,12 @@ int main(int argc, char** argv)
             DiscreteDistribution::readData<SlidingTilePuzzle>(*world);
         }
 
-        //startAlg(*world, "bfs", "learn", "k-best", lookaheadDepth, "BFS", result, 1, "normal");
-        //startAlg(*world, "a-star", "learn", "k-best", lookaheadDepth, "A*", result, 1, "normal");
-        //startAlg(*world, "f-hat", "learn", "k-best", lookaheadDepth, "F-Hat", result, 1, "normal");
-        //startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "Risk", result, 1, "normal");
-		startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "RiskDD",result, 1, "data");
-        //startAlg(*world, "a-star", "learn", "minimin", lookaheadDepth, "LSS-LRTA*", result);
+		alg1 = startAlg(*world, "bfs", "learn", "k-best", lookaheadDepth, "BFS", result, 1, "normal");
+		alg2 =startAlg(*world, "a-star", "learn", "k-best", lookaheadDepth, "A*", result, 1, "normal");
+		alg3 =startAlg(*world, "f-hat", "learn", "k-best", lookaheadDepth, "F-Hat", result, 1, "normal");
+		alg4 =startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "Risk", result, 1, "normal");
+		alg5 = startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "RiskDD",result, 1, "data");
+		alg6 =startAlg(*world, "a-star", "learn", "minimin", lookaheadDepth, "LSS-LRTA*", result);
 
     } else {
         cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
