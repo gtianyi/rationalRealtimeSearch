@@ -6,7 +6,7 @@
 
 class InverseTilePuzzle : public SlidingTilePuzzle {
     using pNode = DiscreteDistribution::ProbabilityNode;
-    using HDistribuitonMap = unordered_map<double, vector<pNode>>;
+    using HDistribuitonMap = unordered_map<int, vector<pNode>>;
     using HData = unordered_map<double, vector<double>>;
 
 private:
@@ -88,7 +88,7 @@ private:
         double oneBucket = 1.0;
         double step = oneBucket / resolution;
 
-        for (double h = 0; h < maxH; h += step) {
+        for (double h = 0; h <= maxH; h += step) {
             if (h < 3.0) {
                 pNode pn(0, 1);
                 hValueTable[h].push_back(pn);
@@ -106,7 +106,7 @@ private:
 
             vector<pNode> distribution =
                     getDistributionBySortedhsList(sampledSortedHsList);
-            hValueTable.insert({h, distribution});
+            hValueTable.insert({(int)(h * 10), distribution});
         }
    }
 

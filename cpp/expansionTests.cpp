@@ -97,12 +97,12 @@ int main(int argc, char** argv)
             DiscreteDistribution::readData<SlidingTilePuzzle>(*world);
         }
 
-		alg1 = startAlg(*world, "bfs", "learn", "k-best", lookaheadDepth, "BFS", result, 1, "normal");
-		alg2 =startAlg(*world, "a-star", "learn", "k-best", lookaheadDepth, "A*", result, 1, "normal");
-		alg3 =startAlg(*world, "f-hat", "learn", "k-best", lookaheadDepth, "F-Hat", result, 1, "normal");
-		alg4 =startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "Risk", result, 1, "normal");
+	   /* alg1 = startAlg(*world, "bfs", "learn", "k-best", lookaheadDepth, "BFS", result, 1, "normal");*/
+		//alg2 =startAlg(*world, "a-star", "learn", "k-best", lookaheadDepth, "A*", result, 1, "normal");
+		//alg3 =startAlg(*world, "f-hat", "learn", "k-best", lookaheadDepth, "F-Hat", result, 1, "normal");
+		/*alg4 =startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "Risk", result, 1, "normal");*/
 		alg5 = startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "RiskDD",result, 1, "data");
-		alg6 =startAlg(*world, "a-star", "learn", "minimin", lookaheadDepth, "LSS-LRTA*", result);
+		//alg6 =startAlg(*world, "a-star", "learn", "minimin", lookaheadDepth, "LSS-LRTA*", result);
 
     } else {
         cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;

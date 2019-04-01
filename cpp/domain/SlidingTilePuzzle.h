@@ -591,7 +591,7 @@ public:
 
     virtual void readDistributionData(
             ifstream& f,
-            unordered_map<double,
+            unordered_map<int,
                     vector<DiscreteDistribution::ProbabilityNode>>& hValueTable)
             const {
         cout << "reading unit tile data\n";

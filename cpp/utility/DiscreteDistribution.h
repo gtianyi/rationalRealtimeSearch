@@ -69,7 +69,7 @@ private:
     int maxSamples;
     double var;
 
-    static unordered_map<double, vector<ProbabilityNode>> hValueTable;
+    static unordered_map<int, vector<ProbabilityNode>> hValueTable;
     static double hAdjustCoefficient;
 
     double probabilityDensityFunction(double x, double mu, double var) {
@@ -549,13 +549,18 @@ public:
 
         if (hAdjustCoefficient == 15)
             h = round(h * 10) / 10;
+        cout << "h " << h << endl;
 
-        if (hValueTable.find(h) == hValueTable.end()) {
+        int hIndex = int(h * 10);
+
+		if(hIndex > 799) hIndex = 799;
+
+        if (hValueTable.find(hIndex) == hValueTable.end()) {
             retSuccess = false;
             return;
         }
 
-        auto& probNodeList = hValueTable[h];
+        auto& probNodeList = hValueTable[hIndex];
 
         for (auto probNode : probNodeList) {
             probNode.cost += g;
@@ -566,5 +571,5 @@ public:
     }
 };
 
-unordered_map<double, vector<DiscreteDistribution::ProbabilityNode>> DiscreteDistribution::hValueTable;
+unordered_map<int, vector<DiscreteDistribution::ProbabilityNode>> DiscreteDistribution::hValueTable;
 double DiscreteDistribution::hAdjustCoefficient;
