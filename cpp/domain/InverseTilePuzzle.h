@@ -45,11 +45,12 @@ private:
         if (floorh == ceilh)
             return floorHs;
 
+		//get more sample if you are closer to that bin
         vector<double> sampleFromFloor =
-                getSampleByPercent<double>((h - floorh) / 10.0, floorHs);
+                getSampleByPercent<double>((ceilh - h) / 10.0, floorHs);
 
         vector<double> sampleFromCeil =
-                getSampleByPercent<double>((ceilh - h) / 10.0, ceilHs);
+                getSampleByPercent<double>( (h - floorh)/ 10.0, ceilHs);
 
         vector<double> ret = sampleFromFloor;
         ret.insert(ret.end(), sampleFromCeil.begin(), sampleFromCeil.end());
