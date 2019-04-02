@@ -7,7 +7,7 @@
 class InverseTilePuzzle : public SlidingTilePuzzle {
     using pNode = DiscreteDistribution::ProbabilityNode;
     using HDistribuitonMap = unordered_map<int, vector<pNode>>;
-    using HData = unordered_map<double, vector<double>>;
+    using HData = unordered_map<int, vector<double>>;
 
 private:
     template <class T>
@@ -34,10 +34,11 @@ private:
         return out;
     }
 
-    vector<double> getApproximateSortedHsList(double& h,
-            HData& hvshsData) const {
-        double floorh = floor(h);
-        double ceilh = ceil(h);
+    vector<double> getApproximateSortedHsList(int h, HData& hvshsData) const {
+        int floorh = floor(h / 10.0) * 10; // 113 -> 110 (1.13 -> 1.1)
+        double ceilh = ceil(h / 10.0) * 10;// 113 -> 120 (1.13 -> 1.2)
+        cout << "test floorh" << floorh << "ceilh" << ceilh << endl;
+
         vector<double>& floorHs = hvshsData[floorh];
         vector<double>& ceilHs = hvshsData[ceilh];
 
@@ -45,16 +46,16 @@ private:
             return floorHs;
 
         vector<double> sampleFromFloor =
-				getSampleByPercent<double>(h - floorh, floorHs);
- 
+                getSampleByPercent<double>((h - floorh) / 10.0, floorHs);
+
         vector<double> sampleFromCeil =
-                getSampleByPercent<double>(ceilh-h, ceilHs);
+                getSampleByPercent<double>((ceilh - h) / 10.0, ceilHs);
 
         vector<double> ret = sampleFromFloor;
         ret.insert(ret.end(), sampleFromCeil.begin(), sampleFromCeil.end());
         sort(ret.begin(), ret.end());
 
-		return ret;
+        return ret;
    }
 
     vector<pNode> getDistributionBySortedhsList(
@@ -83,30 +84,19 @@ private:
 
     void approximateHtableByData(HData& hvshsData,
             HDistribuitonMap& hValueTable,
-            double& maxH) const {
+            int maxH) const {
         int resolution = 10;
-        double oneBucket = 1.0;
-        double step = oneBucket / resolution;
+        int  oneBucket = 10; // 0.1 *100 -> 10
+        int step = oneBucket / resolution; // 1 so that hash table key could be int
 
-        for (double h = 0; h <= maxH; h += step) {
-            if (h < 3.0) {
-                pNode pn(0, 1);
-                hValueTable[h].push_back(pn);
-                continue;
-            }
-
-            vector<double> sampledSortedHsList;
-
-            if (h < 4.0) {
-				sampledSortedHsList	 = hvshsData[4.0];
-            }
-			else{
-                sampledSortedHsList = getApproximateSortedHsList(h, hvshsData);
-            }
+        for (int h = 0; h <= maxH; h += step) {
+            // might have to resolve unseen data here.
+            vector<double> sampledSortedHsList =
+                    getApproximateSortedHsList(h, hvshsData);
 
             vector<pNode> distribution =
                     getDistributionBySortedhsList(sampledSortedHsList);
-            hValueTable.insert({(int)(h * 10), distribution});
+            hValueTable.insert({h, distribution});
         }
    }
 
@@ -152,7 +142,8 @@ public:
         //cout << "reading inverse tile data\n";
         string line;
 
-        double h, valueCount, hs, hsCount, maxH;
+        double h, valueCount, hs, hsCount;
+		int maxH;
 
         HData hData;
 
@@ -160,7 +151,8 @@ public:
             stringstream ss(line);
 
             ss >> h;
-			maxH = h;
+            maxH = int(h * 100);
+
             ss >> valueCount;
 
             if (hData.find(h)!=hData.end()) {
@@ -177,7 +169,7 @@ public:
 					hsList.push_back(hs);
                 }
             }
-            hData[h] = hsList;
+            hData[h * 100] = hsList;
         }
 
 		f.close();
@@ -188,6 +180,4 @@ public:
     }
 
     virtual string getSubDomainName() const { return "inverse"; }
-
-    virtual double getHAdjustCoefficientForDataDriven() const { return 15.0; }
 };

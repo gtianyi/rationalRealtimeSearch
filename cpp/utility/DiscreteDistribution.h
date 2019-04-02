@@ -70,7 +70,6 @@ private:
     double var;
 
     static unordered_map<int, vector<ProbabilityNode>> hValueTable;
-    static double hAdjustCoefficient;
 
     double probabilityDensityFunction(double x, double mu, double var) {
         return ((1 / sqrt(2 * M_PI * var)) *
@@ -540,20 +539,14 @@ public:
         ifstream f(fileName);
 
 		domain.readDistributionData(f, hValueTable);
-
-		hAdjustCoefficient = domain.getHAdjustCoefficientForDataDriven();
     }
 
     DiscreteDistribution(double g, double h, bool& retSuccess) {
-        h = h * hAdjustCoefficient;
 
-        if (hAdjustCoefficient == 15)
-            h = round(h * 10) / 10;
-        cout << "h " << h << endl;
+		// hash table key is int
+        int hIndex = int(round(h * 100));
 
-        int hIndex = int(h * 10);
-
-		if(hIndex > 799) hIndex = 799;
+        cout << hIndex << endl;
 
         if (hValueTable.find(hIndex) == hValueTable.end()) {
             retSuccess = false;
@@ -572,4 +565,3 @@ public:
 };
 
 unordered_map<int, vector<DiscreteDistribution::ProbabilityNode>> DiscreteDistribution::hValueTable;
-double DiscreteDistribution::hAdjustCoefficient;

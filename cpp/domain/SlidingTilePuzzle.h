@@ -597,7 +597,7 @@ public:
         cout << "reading unit tile data\n";
         string line;
 
-        double h, valueCount, hs, hsCount;
+        int h, valueCount, hs, hsCount;
 
         while (getline(f, line)) {
             stringstream ss(line);
@@ -617,8 +617,9 @@ public:
                 ss >> hs;
                 ss >> hsCount;
 
-				DiscreteDistribution::ProbabilityNode pn(hs, hsCount/valueCount);
-				hValueTable[h].push_back(pn);
+                DiscreteDistribution::ProbabilityNode pn(
+                        hs, (float)hsCount / (float)valueCount);
+                hValueTable[h].push_back(pn);
             }
         }
 
@@ -628,8 +629,6 @@ public:
     }
 
     virtual string getSubDomainName() const { return "uniform"; }
-
-    virtual double getHAdjustCoefficientForDataDriven() const { return 1.0; }
 
     std::vector<std::vector<int>> startBoard;
     std::vector<std::vector<int>> endBoard;
