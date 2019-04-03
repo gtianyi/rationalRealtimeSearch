@@ -549,7 +549,7 @@ public:
     DiscreteDistribution(double g, double h, bool& retSuccess) {
 
 		// hash table key is int
-        int hIndex = int(round(h * 10)*10);
+        int hIndex = int(round(h * 100));
 
         //cout << hIndex << endl;
 

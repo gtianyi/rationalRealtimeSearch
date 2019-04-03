@@ -34,7 +34,7 @@ private:
         return out;
     }
 
-    vector<double> getApproximateSortedHsList(const int h, const HData& hvshsData) const {
+    vector<double> getApproximateSortedHsList_forPoint1(const int h, const HData& hvshsData) const {
         int floorh = floor(h / 10.0) * 10; // 113 -> 110 (1.13 -> 1.1)
         int ceilh = ceil(h / 10.0) * 10;// 113 -> 120 (1.13 -> 1.2)
         //cout << "test floorh" << floorh << "ceilh" << ceilh << endl;
@@ -67,7 +67,47 @@ private:
         sort(ret.begin(), ret.end());
 
         return ret;
+    }
+
+    vector<double> getApproximateSortedHsList(const int h,
+            const HData& hvshsData) const {
+
+		if(hvshsData.find(h)!=hvshsData.end())
+		{
+				return hvshsData.at(h);
+		}
+
+		int lefth = h;
+		int righth = h;
+
+        while (hvshsData.find(lefth) == hvshsData.end() && lefth > 0)
+            lefth -= 1;
+
+        while (hvshsData.find(righth) == hvshsData.end() && righth < 1185)
+            righth += 1;
+
+        // cout << "nearest available floorh" << floorh << "nearest available
+        // ceilh" << ceilh << endl;
+
+        const vector<double>& leftHs = hvshsData.at(lefth);
+        const vector<double>& rightHs = hvshsData.at(righth);
+
+        // get more sample if you are closer to that bin
+        double percent = (double)(righth - h) / (double)(righth - lefth);
+        vector<double> sampleFromFloor =
+                getSampleByPercent<double>(percent, leftHs);
+
+        percent = (double)(h - lefth) / (double)(righth - lefth);
+        vector<double> sampleFromCeil =
+                getSampleByPercent<double>(percent, rightHs);
+
+        vector<double> ret = sampleFromFloor;
+        ret.insert(ret.end(), sampleFromCeil.begin(), sampleFromCeil.end());
+        sort(ret.begin(), ret.end());
+
+        return ret;
    }
+
 
     vector<pNode> getDistributionBySortedhsList(
           const vector<double>& sortedhsList) const {
@@ -94,8 +134,8 @@ private:
     void approximateHtableByData(const HData& hvshsData,
             HDistribuitonMap& hValueTable,
             const int maxH) const {
-        int resolution = 10;
-        int  oneBucket = 10;  
+        int resolution = 1;
+        int  oneBucket = 1;  
         int step = oneBucket / resolution; // 1 so that hash table key could be int
 
         for (int h = 0; h <= maxH; h += step) {
@@ -153,6 +193,7 @@ public:
 
         double h, valueCount, hs, hsCount;
         int maxH = 0;
+        int intH = 0;
 
         HData hData;
 
@@ -160,11 +201,12 @@ public:
             stringstream ss(line);
 
             ss >> h;
-            maxH = max(maxH, int(h * 100));
+            intH = int(round(h * 100));
+            maxH = max(maxH, intH);
 
             ss >> valueCount;
 
-            if (hData.find(h * 100) != hData.end()) {
+            if (hData.find(intH) != hData.end()) {
                 cout << "error: duplicate h from data " << h << "\n";
             }
 
@@ -178,7 +220,7 @@ public:
 					hsList.push_back(hs);
                 }
             }
-            hData[h * 100] = hsList;
+            hData[intH] = hsList;
         }
 
 		f.close();
