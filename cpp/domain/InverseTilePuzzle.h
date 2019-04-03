@@ -11,7 +11,7 @@ class InverseTilePuzzle : public SlidingTilePuzzle {
 
 private:
     template <class T>
-    vector<T> getSampleByPercent(double percent, vector<T> in) const {
+    vector<T> getSampleByPercent(const double percent, vector<T> in) const {
         vector<T> out;
 
         int n = (int)((double)in.size() * percent);
@@ -34,23 +34,33 @@ private:
         return out;
     }
 
-    vector<double> getApproximateSortedHsList(int h, HData& hvshsData) const {
+    vector<double> getApproximateSortedHsList(const int h, const HData& hvshsData) const {
         int floorh = floor(h / 10.0) * 10; // 113 -> 110 (1.13 -> 1.1)
-        double ceilh = ceil(h / 10.0) * 10;// 113 -> 120 (1.13 -> 1.2)
-        cout << "test floorh" << floorh << "ceilh" << ceilh << endl;
+        int ceilh = ceil(h / 10.0) * 10;// 113 -> 120 (1.13 -> 1.2)
+        //cout << "test floorh" << floorh << "ceilh" << ceilh << endl;
 
-        vector<double>& floorHs = hvshsData[floorh];
-        vector<double>& ceilHs = hvshsData[ceilh];
+        while (hvshsData.find(floorh) == hvshsData.end() && floorh > 0)
+            floorh -= 10;
+
+        while (hvshsData.find(ceilh) == hvshsData.end() && ceilh < 1180)
+            ceilh += 10;
+
+        //cout << "nearest available floorh" << floorh << "nearest available ceilh" << ceilh << endl;
+
+        const vector<double>& floorHs = hvshsData.at(floorh);
+        const vector<double>& ceilHs = hvshsData.at(ceilh);
 
         if (floorh == ceilh)
             return floorHs;
 
 		//get more sample if you are closer to that bin
+        double percent = (double)(ceilh - h) / (double)(ceilh - floorh);
         vector<double> sampleFromFloor =
-                getSampleByPercent<double>((ceilh - h) / 10.0, floorHs);
+                getSampleByPercent<double>(percent, floorHs);
 
+        percent = (double)(h - floorh) / (double)(ceilh - floorh);
         vector<double> sampleFromCeil =
-                getSampleByPercent<double>( (h - floorh)/ 10.0, ceilHs);
+                getSampleByPercent<double>(percent, ceilHs);
 
         vector<double> ret = sampleFromFloor;
         ret.insert(ret.end(), sampleFromCeil.begin(), sampleFromCeil.end());
@@ -60,34 +70,32 @@ private:
    }
 
     vector<pNode> getDistributionBySortedhsList(
-            vector<double>& sortedhsList) const {
+          const vector<double>& sortedhsList) const {
         vector<pNode> ret;
-
-        double prevhs = -1.0;
-        int hsCounter = 1;
+        unordered_map<double, double> frequency;
 
         for (const auto& hs : sortedhsList) {
-            if (hs == prevhs) {
-                hsCounter++;
-				continue;
+            if (frequency.find(hs) != frequency.end()) {
+                continue;
             }
-
-            DiscreteDistribution::ProbabilityNode pn(
-                    hs, (double) hsCounter / (double) sortedhsList.size());
-            ret.push_back(pn);
-
-            prevhs = hs;
-            hsCounter = 1;
+            frequency[hs] =
+                    std::count(sortedhsList.begin(), sortedhsList.end(), hs) /
+                    (double)sortedhsList.size();
         }
+
+        for (const auto& i : frequency) {
+            DiscreteDistribution::ProbabilityNode pn(i.first, i.second);
+            ret.push_back(pn);
+		}
 
 		return ret;
     }
 
-    void approximateHtableByData(HData& hvshsData,
+    void approximateHtableByData(const HData& hvshsData,
             HDistribuitonMap& hValueTable,
-            int maxH) const {
-        int resolution = 10;
-        int  oneBucket = 10; // 0.1 *100 -> 10
+            const int maxH) const {
+        int resolution = 1;
+        int  oneBucket = 1;  
         int step = oneBucket / resolution; // 1 so that hash table key could be int
 
         for (int h = 0; h <= maxH; h += step) {
@@ -144,7 +152,7 @@ public:
         string line;
 
         double h, valueCount, hs, hsCount;
-		int maxH;
+        int maxH = 0;
 
         HData hData;
 
@@ -152,12 +160,12 @@ public:
             stringstream ss(line);
 
             ss >> h;
-            maxH = int(h * 100);
+            maxH = max(maxH, int(h * 100));
 
             ss >> valueCount;
 
-            if (hData.find(h)!=hData.end()) {
-				cout << "error: duplicate h from data " << h << "\n";
+            if (hData.find(h * 100) != hData.end()) {
+                cout << "error: duplicate h from data " << h << "\n";
             }
 
             vector<double> hsList;

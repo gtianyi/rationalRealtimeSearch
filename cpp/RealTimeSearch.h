@@ -246,7 +246,7 @@ public:
 		clean();
 	}
 
-    ResultContainer search(int timeLimitinSec) 
+    ResultContainer search(int iterationlimit) 
 	{
 
 		domain.initialize(expansionPolicy, lookahead);
@@ -258,17 +258,16 @@ public:
 			domain.distanceErr(domain.getStartState()), domain.epsilonHGlobal(), domain.epsilonDGlobal(), 
 			domain.getStartState(), nullptr, -1);
 		
-		//int count=0;
+		int count=0;
 		//
-		clock_t startTime = clock();
+		//clock_t startTime = clock();
 
-        while (double(clock() - startTime) / CLOCKS_PER_SEC <
-                (double)timeLimitinSec) {
+        while (count<=iterationlimit) {
 
             // mark this node as the start of the current search (to prevent state pruning based on label)
             start->markStart();
 
-			//count++;
+			count++;
 
             //if (beliefType == "data") {
                 //cout << "rl loop " << count << "h "
@@ -308,12 +307,15 @@ public:
 			// Decision-making Phase
 			start = decisionAlgo->backup(open, tlas, start);
 
+			cout <<"g "<< start->getGValue() << " h "<<start->getHValue()<<endl;
+
             // Add this step to the path taken so far
             res.path.push(start->getState().getLabel());
 		}
 
-		if (double(clock() - startTime) / CLOCKS_PER_SEC >=
-                (double)timeLimitinSec)
+		//cout<<"iteration: " << count<<endl;
+
+		if (count >= iterationlimit)
             noSolutionFound(res);
 
 		return res;
@@ -357,29 +359,28 @@ public:
         // mark this node as the start of the current search (to prevent state pruning based on label)
         start->markStart();
 
-		// Empty OPEN and CLOSED
-		open.clear();
+        // Empty OPEN and CLOSED
+        open.clear();
 
-		// delete all of the nodes from the last expansion phase
-		closed.clear();
+        // delete all of the nodes from the last expansion phase
+        closed.clear();
 
-		open.push(start);
-		closed[start->getState()] = start;
+        open.push(start);
+        closed[start->getState()] = start;
 
-		expansionAlgo->incrementLookahead();
+        expansionAlgo->incrementLookahead();
 
-		// Solve the search optimally
-		expansionAlgo->expand(open, closed, tlas, duplicateDetection, res);
+        // Solve the search optimally
+        expansionAlgo->expand(open, closed, tlas, duplicateDetection, res);
 
-		open.swapComparator(Node::compareNodesF);
-		start = open.top();
+        open.swapComparator(Node::compareNodesF);
+        start = open.top();
 
-		if (domain.isGoal(start->getState()))
-		{
-			// Calculate path cost and return solution
-			calculateCost(start, res);
+        if (domain.isGoal(start->getState())) {
+            // Calculate path cost and return solution
+            calculateCost(start, res);
 
-			return res;
+            return res;
 		}
 	}
 

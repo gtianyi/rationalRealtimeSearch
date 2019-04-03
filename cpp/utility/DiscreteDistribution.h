@@ -531,12 +531,17 @@ public:
     set<ProbabilityNode>::iterator end() { return distribution.end(); }
 
     // below are code added by tianyi
-	template<class Domain>
+    template <class Domain>
     static void readData(Domain& domain) {
-        string fileName = "../results/SlidingTilePuzzle/sampleData/" +
+        string fileName = "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/SlidingTilePuzzle/sampleData/" +
                 domain.getSubDomainName() + "-statSummary.txt";
 
         ifstream f(fileName);
+
+        if (!f.good()) {
+            cout << "No distribution data file!\n";
+            exit(1);
+		}
 
 		domain.readDistributionData(f, hValueTable);
     }
@@ -544,16 +549,17 @@ public:
     DiscreteDistribution(double g, double h, bool& retSuccess) {
 
 		// hash table key is int
-        int hIndex = int(round(h * 100));
+        int hIndex = int(round(h * 10)*10);
 
-        cout << hIndex << endl;
+        //cout << hIndex << endl;
 
         if (hValueTable.find(hIndex) == hValueTable.end()) {
+			cout << "not found h" << endl;
             retSuccess = false;
             return;
         }
 
-        auto& probNodeList = hValueTable[hIndex];
+        const auto& probNodeList = hValueTable[hIndex];
 
         for (auto probNode : probNodeList) {
             probNode.cost += g;

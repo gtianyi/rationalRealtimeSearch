@@ -29,7 +29,7 @@ shared_ptr<RealTimeSearch<Domain>> startAlg(Domain& domain, string expansionModu
                     k,
                     beliefType);
 
-    ResultContainer res = searchAlg->search(300);
+    ResultContainer res = searchAlg->search(1000*200/lookahead);
 
     if (res.solutionFound && !domain.validatePath(res.path)) {
         cout << "Invalid path detected from search: " << expansionModule
@@ -97,11 +97,11 @@ int main(int argc, char** argv)
             DiscreteDistribution::readData<SlidingTilePuzzle>(*world);
         }
 
-	   /* alg1 = startAlg(*world, "bfs", "learn", "k-best", lookaheadDepth, "BFS", result, 1, "normal");*/
+		//alg1 = startAlg(*world, "bfs", "learn", "k-best", lookaheadDepth, "BFS", result, 1, "normal");
 		//alg2 =startAlg(*world, "a-star", "learn", "k-best", lookaheadDepth, "A*", result, 1, "normal");
 		//alg3 =startAlg(*world, "f-hat", "learn", "k-best", lookaheadDepth, "F-Hat", result, 1, "normal");
-		/*alg4 =startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "Risk", result, 1, "normal");*/
-		alg5 = startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "RiskDD",result, 1, "data");
+		alg4 =startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "Risk", result, 1, "normal");
+		//alg5 = startAlg(*world, "a-star", "learn", "k-best", lookaheadDepth, "RiskDD",result, 1, "data");
 		//alg6 =startAlg(*world, "a-star", "learn", "minimin", lookaheadDepth, "LSS-LRTA*", result);
 
     } else {
