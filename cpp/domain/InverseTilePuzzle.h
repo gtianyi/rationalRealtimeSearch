@@ -94,8 +94,8 @@ private:
     void approximateHtableByData(const HData& hvshsData,
             HDistribuitonMap& hValueTable,
             const int maxH) const {
-        int resolution = 1;
-        int  oneBucket = 1;  
+        int resolution = 10;
+        int  oneBucket = 10;  
         int step = oneBucket / resolution; // 1 so that hash table key could be int
 
         for (int h = 0; h <= maxH; h += step) {
