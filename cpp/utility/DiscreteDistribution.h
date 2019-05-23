@@ -70,6 +70,7 @@ private:
     double var;
 
     static unordered_map<int, vector<ProbabilityNode>> hValueTable;
+    static unordered_map<int, vector<ProbabilityNode>> hPostSearchTable;
 
     double probabilityDensityFunction(double x, double mu, double var) {
         return ((1 / sqrt(2 * M_PI * var)) *
@@ -536,14 +537,21 @@ public:
         string fileName = "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/SlidingTilePuzzle/sampleData/" +
                 domain.getSubDomainName() + "-statSummary.txt";
 
-        ifstream f(fileName);
+        string fileName_ps = "/home/aifs1/gu/phd/research/workingPaper/"
+                             "realtime-nancy/results/SlidingTilePuzzle/"
+                             "sampleData/" +
+                domain.getSubDomainName() + "-statSummary-postSearch.txt";
 
-        if (!f.good()) {
+        ifstream f(fileName);
+        ifstream f_ps(fileName_ps);
+
+        if (!f.good() || !f_ps.good()) {
             cout << "No distribution data file!\n";
             exit(1);
 		}
 
 		domain.readDistributionData(f, hValueTable);
+		domain.readDistributionData(f_ps, hPostSearchTable);
     }
 
     DiscreteDistribution(double g, double h, bool& retSuccess) {
@@ -571,3 +579,4 @@ public:
 };
 
 unordered_map<int, vector<DiscreteDistribution::ProbabilityNode>> DiscreteDistribution::hValueTable;
+unordered_map<int, vector<DiscreteDistribution::ProbabilityNode>> DiscreteDistribution::hPostSearchTable;
