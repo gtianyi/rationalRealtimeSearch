@@ -10,4 +10,4 @@ expansionTests
 expansionTests-debug
 generateTrees
 lastIncremental
-
+*.txt
