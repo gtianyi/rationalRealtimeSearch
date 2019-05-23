@@ -46,6 +46,7 @@ public:
 		bool open;
 		int delayCntr;
 		DiscreteDistribution distribution;
+		DiscreteDistribution distribution_ps;
 
 	public:
 		Cost getGValue() const { return g; }

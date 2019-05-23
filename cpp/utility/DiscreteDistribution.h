@@ -554,20 +554,22 @@ public:
 		domain.readDistributionData(f_ps, hPostSearchTable);
     }
 
-    DiscreteDistribution(double g, double h, bool& retSuccess) {
+    DiscreteDistribution(double g, double h, bool& retSuccess, bool isPostSearch ) {
 
 		// hash table key is int
-        int hIndex = int(round(h * 100));
+        //int hIndex = int(round(h * 100)); //have to fix this for inverse
+        int hIndex = int(h);
 
-        //cout << hIndex << endl;
+        unordered_map<int, vector<DiscreteDistribution::ProbabilityNode>>&
+                table = isPostSearch ? hPostSearchTable : hValueTable;
 
-        if (hValueTable.find(hIndex) == hValueTable.end()) {
+        if (table.find(hIndex) == table.end()) {
 			cout << "not found h" << endl;
             retSuccess = false;
             return;
         }
 
-        const auto& probNodeList = hValueTable[hIndex];
+        const auto& probNodeList = table[hIndex];
 
         for (auto probNode : probNodeList) {
             probNode.cost += g;
