@@ -554,9 +554,11 @@ public:
 		domain.readDistributionData(f_ps, hPostSearchTable);
     }
 
-    DiscreteDistribution(double g, double h, bool& retSuccess, bool isPostSearch ) {
-
-		// hash table key is int
+    DiscreteDistribution(double g,
+            double h,
+            bool& retSuccess,
+            bool isPostSearch = false) {
+        // hash table key is int
         //int hIndex = int(round(h * 100)); //have to fix this for inverse
         int hIndex = int(h);
 

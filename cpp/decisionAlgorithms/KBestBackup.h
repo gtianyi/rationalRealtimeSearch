@@ -91,16 +91,20 @@ private:
                             best->getDValue(),
                             best->getFHatValue() - best->getFValue());
                 } else if (beliefType == "data") {
-                    bool retSucc;
+                    bool retSucc, retSucc_ps;
                     best->distribution = DiscreteDistribution(
                             best->getGValue(),
                             best->getFValue()-best->getGValue(), retSucc);
+                    best->distribution_ps = DiscreteDistribution(best->getGValue(),
+                            best->getFValue() - best->getGValue(),
+                            retSucc_ps, true);
                     if (!retSucc) {
                         best->distribution = DiscreteDistribution(100,
                                 best->getFValue(),
                                 best->getFHatValue(),
                                 best->getDValue(),
                                 best->getFHatValue() - best->getFValue());
+						best->lackOfHValueData = true;
                     }
                 } else {
                     best->distribution = DiscreteDistribution(100,

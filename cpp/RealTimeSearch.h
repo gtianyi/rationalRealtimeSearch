@@ -47,6 +47,7 @@ public:
 		int delayCntr;
 		DiscreteDistribution distribution;
 		DiscreteDistribution distribution_ps;
+		bool lackOfHValueData;
 
 	public:
 		Cost getGValue() const { return g; }
@@ -87,6 +88,7 @@ public:
 		{
 			open = true;
 			delayCntr = 0;
+			lackOfHValueData = false;
 		}
 
 		friend std::ostream& operator<<(std::ostream& stream, const Node& node) {
@@ -478,11 +480,17 @@ private:
                         childNode->getDValue(),
                         childNode->getFHatValue() - childNode->getFValue());
             } else if (beliefType == "data") {
-                bool hInData;
+                bool hInData, hInData_ps;
                 childNode->distribution =
                         DiscreteDistribution(childNode->getGValue(),
                                 childNode->getFValue() - childNode->getGValue(),
                                 hInData);
+                childNode->distribution_ps =
+                        DiscreteDistribution(childNode->getGValue(),
+                                childNode->getFValue() - childNode->getGValue(),
+                                hInData_ps,
+                                true);
+
                 if (!hInData) {
                 /*    cout << "Never see h "*/
                          //<< childNode->getFValue() - childNode->getGValue()
@@ -492,7 +500,9 @@ private:
                             childNode->getFHatValue(),
                             childNode->getDValue(),
                             childNode->getFHatValue() - childNode->getFValue());
-				}
+
+					childNode->lackOfHValueData = true;
+                }
             }
 
 			tla.expectedMinimumPathCost = childNode->distribution.expectedCost();
