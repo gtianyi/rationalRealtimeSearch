@@ -491,7 +491,7 @@ private:
                                 hInData_ps,
                                 true);
 
-                if (!hInData) {
+                if (!hInData){
                 /*    cout << "Never see h "*/
                          //<< childNode->getFValue() - childNode->getGValue()
                          /*<< "\n";*/
