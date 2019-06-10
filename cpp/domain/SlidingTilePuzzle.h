@@ -639,6 +639,8 @@ public:
     unordered_map<State, Cost, HashState> correctedD;
     unordered_map<State, Cost, HashState> correctedDerr;
 
+    unordered_map<State, vector<DiscreteDistribution::ProbabilityNode>, HashState> correctedDistribution;
+
     double epsilonHSum;
     double epsilonDSum;
     double curEpsilonH;
