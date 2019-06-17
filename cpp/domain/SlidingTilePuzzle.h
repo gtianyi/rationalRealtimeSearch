@@ -640,6 +640,7 @@ public:
     unordered_map<State, Cost, HashState> correctedDerr;
 
     unordered_map<State, vector<DiscreteDistribution::ProbabilityNode>, HashState> correctedDistribution;
+    unordered_map<State, vector<DiscreteDistribution::ProbabilityNode>, HashState> correctedPostSearchDistribution;
 
     double epsilonHSum;
     double epsilonDSum;

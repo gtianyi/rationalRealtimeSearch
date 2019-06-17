@@ -58,8 +58,10 @@ public:
 		Cost getEpsilonH() const { return epsH; }
 		Cost getEpsilonD() const { return epsD; }
 		Cost getFHatValue() const { return g + getHHatValue(); }
+		Cost getFHatValueFromDist() const { return g + getHHatValueFromDist(); }
 		Cost getDHatValue() const { return (derr / (1.0 - epsD)); }
 		Cost getHHatValue() const { return h + getDHatValue() * epsH; }
+		Cost getHHatValueFromDist() const { return distribution.expectedCost(); }
 		State getState() const { return stateRep; }
 		shared_ptr<Node> getParent() const { return parent; }
 		int getOwningTLA() const { return owningTLA; }
@@ -73,6 +75,8 @@ public:
 		void setState(State s) { stateRep = s; }
 		void setOwningTLA(int tla) { owningTLA = tla; }
 		void setParent(shared_ptr<Node> p) { parent = p; }
+
+		void setDistribution( DiscreteDistribution& dist) { distribution = dist; }
 
 		bool onOpen() { return open; }
 		void close() { open = false; }
@@ -123,6 +127,20 @@ public:
 		{
 			// Tie break on g-value
 			if (n1->getFHatValue() == n2->getFHatValue())
+			{
+                if (n1->getFValue() == n2->getFValue())
+                {
+				    return n1->getGValue() > n2->getGValue();
+                }
+                return n1->getFValue() < n2->getFValue();
+			}
+			return n1->getFHatValue() < n2->getFHatValue();
+		}
+
+		static bool compareNodesFHatFromDist(const shared_ptr<Node> n1, const shared_ptr<Node> n2)
+		{
+			// Tie break on g-value
+			if (n1->getFHatValueFromDist() == n2->getFHatValueFromDist())
 			{
                 if (n1->getFValue() == n2->getFValue())
                 {

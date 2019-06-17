@@ -8,14 +8,14 @@
 using namespace std;
 
 template <class Domain, class Node, class TopLevelAction>
-class Dijkstra : public LearningAlgorithm<Domain, Node, TopLevelAction>
+class DijkstraDistribution : public LearningAlgorithm<Domain, Node, TopLevelAction>
 {
 	typedef typename Domain::State State;
 	typedef typename Domain::Cost Cost;
 	typedef typename Domain::HashState Hash;
 
 public:
-	Dijkstra(Domain& domain)
+	DijkstraDistribution(Domain& domain)
 		: domain(domain)
 	{}
 
@@ -25,11 +25,11 @@ public:
 		for (typename unordered_map<State, shared_ptr<Node>, Hash>::iterator it = closed.begin(); it != closed.end(); it++)
 		{
 			if (!it->second->onOpen())
-				domain.updateHeuristic(it->first, numeric_limits<double>::infinity());
+				domain.updateDistribtuion(it->first, Null);
 		}
 
-		// Order open by h
-		open.swapComparator(Node::compareNodesH);
+		// Order open by f-hat
+		open.swapComparator(Node::compareNodesFHatFromDist);
 
 		// Perform reverse dijkstra while closed is not empy
 		while (!closed.empty() && !open.empty())
@@ -45,18 +45,12 @@ public:
 				typename unordered_map<State, shared_ptr<Node>, Hash>::iterator it = closed.find(s);
 
 				if (it != closed.end() &&
-					domain.heuristic(s) > domain.getEdgeCost(cur->getState()) + domain.heuristic(cur->getState()))
+					domain.hhat(s) > domain.getEdgeCost(cur->getState()) + domain.hhat(cur->getState()))
 				{
 					// Update the heuristic of this pedecessor
-					domain.updateHeuristic(s, domain.getEdgeCost(cur->getState()) + domain.heuristic(cur->getState()));
-					// Update the distance of this predecessor
-					domain.updateDistance(s, domain.distance(cur->getState()) + 1);
-					// Update the distance for the heuristic error of this predecessor
-					domain.updateDistanceErr(s, domain.distanceErr(cur->getState()));
+					domain.updateDistribtuion(s, domain.getEdgeCost(cur->getState()) + domain.getDistribution(cur->getState()));
 
-					it->second->setDValue(domain.distance(s));
-					it->second->setDErrValue(domain.distanceErr(s));
-					it->second->setHValue(domain.heuristic(s));
+					it->second->setDistribtuion(newdistribution);
 
 					if (open.find(it->second) == open.end())
 					{
