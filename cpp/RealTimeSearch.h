@@ -460,6 +460,7 @@ private:
 		return false;
 	}
 
+	//we need a new generate funciton for nancydd and simplified node constructor
 	void generateTopLevelActions(shared_ptr<Node> start, ResultContainer& res)
 	{
 		// The first node to be expanded in any problem is the start node
@@ -520,6 +521,8 @@ private:
                             childNode->getFHatValue() - childNode->getFValue());
 
 					childNode->lackOfHValueData = true;
+
+					// we should do extrapolate here, do not use the original nancy method
                 }
             }
 

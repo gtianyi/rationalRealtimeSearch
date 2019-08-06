@@ -267,6 +267,18 @@ public:
 		return correctedH[state];
 	}
 
+    virtual Cost HHatFromDistribution(const State& state) {
+		// Check if the heuristic h-hat of this state has been updated
+		if (correctedDistribution.find(state) != correctedDistribution.end())
+		{
+			return correctedDistribution[state].expectedCost();
+		}
+
+		updateDistribution(state);
+
+		return correctedDistribution[state].expectedCost();
+	}
+
 	Cost epsilonHGlobal()
 	{
 		return curEpsilonH;
@@ -639,8 +651,8 @@ public:
     unordered_map<State, Cost, HashState> correctedD;
     unordered_map<State, Cost, HashState> correctedDerr;
 
-    unordered_map<State, vector<DiscreteDistribution::ProbabilityNode>, HashState> correctedDistribution;
-    unordered_map<State, vector<DiscreteDistribution::ProbabilityNode>, HashState> correctedPostSearchDistribution;
+    unordered_map<State, DiscreteDistribution, HashState> correctedDistribution;
+    unordered_map<State, DiscreteDistribution, HashState> correctedPostSearchDistribution;
 
     double epsilonHSum;
     double epsilonDSum;
