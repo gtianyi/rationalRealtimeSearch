@@ -312,6 +312,7 @@ public:
         ResultContainer res;
 
         // Get the start node
+		this should be different for dd
         shared_ptr<Node> start = make_shared<Node>(0,
                 domain.heuristic(domain.getStartState()),
                 domain.distance(domain.getStartState()),

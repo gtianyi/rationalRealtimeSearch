@@ -1,132 +1,116 @@
 #pragma once
-#include <unordered_map>
 #include <functional>
 #include <limits>
 #include <memory>
-#include "ExpansionAlgorithm.h"
+#include <unordered_map>
 #include "../utility/PriorityQueue.h"
-#include"../utility/ResultContainer.h"
+#include "../utility/ResultContainer.h"
+#include "ExpansionAlgorithm.h"
 
 using namespace std;
 
 template <class Domain, class Node, class TopLevelAction>
-class RiskDD : public ExpansionAlgorithm<Domain, Node, TopLevelAction>
-{
-	typedef typename Domain::State State;
-	typedef typename Domain::Cost Cost;
-	typedef typename Domain::HashState Hash;
+class RiskDD : public ExpansionAlgorithm<Domain, Node, TopLevelAction> {
+    typedef typename Domain::State State;
+    typedef typename Domain::Cost Cost;
+    typedef typename Domain::HashState Hash;
 
 public:
-	RiskDD(Domain& domain, double lookahead, int expansionAllocation)
-		: domain(domain), lookahead(lookahead), expansionsPerIteration(expansionAllocation)
-	{}
+    RiskDD(Domain& domain, double lookahead, int expansionAllocation)
+            : domain(domain),
+              lookahead(lookahead),
+              expansionsPerIteration(expansionAllocation) {}
 
-	void incrementLookahead()
-	{
-		lookahead++;
-	}
+    void incrementLookahead() { lookahead++; }
 
-	void expand(PriorityQueue<shared_ptr<Node> >& open, unordered_map<State, shared_ptr<Node>, Hash>& closed, vector<TopLevelAction>& tlas,
-		std::function<bool(shared_ptr<Node>, unordered_map<State, shared_ptr<Node>, Hash>&, PriorityQueue<shared_ptr<Node> >&, vector<TopLevelAction>&)> duplicateDetection,
-		ResultContainer& res)
-	{
-		// This starts at 1, because we had to expand start to get the top level actions
-		int expansions = 1;
+    void expand(PriorityQueue<shared_ptr<Node>>& open,
+            unordered_map<State, shared_ptr<Node>, Hash>& closed,
+            vector<TopLevelAction>& tlas,
+            std::function<bool(shared_ptr<Node>,
+                    unordered_map<State, shared_ptr<Node>, Hash>&,
+                    PriorityQueue<shared_ptr<Node>>&,
+                    vector<TopLevelAction>&)> duplicateDetection,
+            ResultContainer& res) {
+        // This starts at 1, because we had to expand start to get the top level
+        // actions
+        int expansions = 1;
 
-		while (expansions < lookahead && !open.empty())
-		{
-			// At the beginning of each expansion we are going to update our beliefs at every TLA.
-			// Why? Because this could be the first expansion in the phase.
-			// If it isn't? Wouldn't we only need to update the TLA of the node we expanded last iteration?
-			// In a tree, yes. But in a graph, this could have placed nodes onto the open lists of other TLAs.
-			// Therefore, the beliefs of all TLAs should be updated before every expansion.
-			kBestDecision(tlas);
+        while (expansions < lookahead && !open.empty()) {
+            // At the beginning of each expansion we are going to update our
+            // beliefs at every TLA.
+            // Why? Because this could be the first expansion in the phase.
+            // If it isn't? Wouldn't we only need to update the TLA of the node
+            // we expanded last iteration?
+            // In a tree, yes. But in a graph, this could have placed nodes onto
+            // the open lists of other TLAs.
+            // Therefore, the beliefs of all TLAs should be updated before every
+            // expansion.
+            kBestDecision(tlas);
 
-			// Simulate expansion of best node under each TLA
-			int chosenTLAIndex = simulateExpansion(tlas);
+            // risk computation
+            int chosenTLAIndex = computeRiskAndGetBestTLA(tlas);
 
-			// Expand under the TLA which holds the lowest risk
-			shared_ptr<Node> chosenNode = tlas[chosenTLAIndex].open.top();
+            // Expand under the TLA which holds the lowest risk
+            shared_ptr<Node> chosenNode = tlas[chosenTLAIndex].open.top();
 
-			// Add this node to the expansion delay window
-			we don't need this for dd
-			domain.pushDelayWindow(chosenNode->getDelayCntr());
+            // Check if current node is goal. If it is, then the expansion phase
+            // is over, time to move.
+            if (domain.isGoal(chosenNode->getState())) {
+                return;
+            }
 
-			// Check if current node is goal. If it is, then the expansion phase is over, time to move.
-			if (domain.isGoal(chosenNode->getState()))
-			{
-				return;
-			}
+            // Remove the chosen node from open
+            tlas[chosenTLAIndex].open.pop();
+            open.remove(chosenNode);
+            chosenNode->close();
 
-			// Remove the chosen node from open
-			tlas[chosenTLAIndex].open.pop();
-			open.remove(chosenNode);
-			chosenNode->close();
+            // Book keeping for expansion count
+            res.nodesExpanded++;
+            expansions++;
 
-			// Book keeping for expansion count
-			res.nodesExpanded++;
-			expansions++;
+            // Generate the successors of the chosen node
+            vector<State> children = domain.successors(chosenNode->getState());
 
-			// Increment the delay counts of every other node on open...
-			we don't need this for dd
-			for (shared_ptr<Node> n : open)
-			{
-				n->incDelayCntr();
-			}
+            // Book keeping for number of nodes generated
+            res.nodesGenerated += children.size();
 
-			// Generate the successors of the chosen node
-			vector<State> children = domain.successors(chosenNode->getState());
+            State bestChild;
+            Cost bestF = numeric_limits<double>::infinity();
 
-			// Book keeping for number of nodes generated
-			res.nodesGenerated += children.size();
+            // Iterate over the successor states
+            for (State child : children) {
+                // Create a node for this state
+                shared_ptr<Node> childNode = make_shared<Node>(
+                        chosenNode->getGValue() + domain.getEdgeCost(child),
+                        domain.heuristic(child),
+                        child,
+                        chosenNode,
+                        tlas.size());
 
-			State bestChild;
-			Cost bestF = numeric_limits<double>::infinity();
+                bool dup = duplicateDetection(childNode, closed, open, tlas);
 
-			// Iterate over the successor states
-			for (State child : children)
-			{
-				// Create a node for this state
-				this should be different for dd
-				shared_ptr<Node> childNode = make_shared<Node>(chosenNode->getGValue() + domain.getEdgeCost(child),
-					domain.heuristic(child), domain.distance(child), domain.distanceErr(child), 
-					domain.epsilonHGlobal(), domain.epsilonDGlobal(), child, chosenNode, chosenNode->getOwningTLA());
+                if (!dup && childNode->getFValue() < bestF) {
+                    bestF = childNode->getFValue();
+                    bestChild = child;
+                }
 
-				bool dup = duplicateDetection(childNode, closed, open, tlas);
+                // Duplicate detection performed
+                if (!dup) {
+                    // If this state hasn't yet been reached, add
+                    // this node open
+                    open.push(childNode);
+                    closed[child] = childNode;
 
-				if (!dup && childNode->getFValue() < bestF)
-				{
-					bestF = childNode->getFValue();
-					bestChild = child;
-				}
-
-				// Duplicate detection performed
-				if (!dup)
-				{
-					// If this state hasn't yet been reached, add this node open 
-					open.push(childNode);
-					closed[child] = childNode;
-
-					// Add to open of generating TLA
-					tlas[chosenTLAIndex].open.push(childNode);
-				}
-			}
-
-			// Learn the one-step error
-			if (bestF != numeric_limits<double>::infinity())
-			{
-				Cost epsD = (1 + domain.distance(bestChild)) - chosenNode->getDValue();
-				Cost epsH = (domain.getEdgeCost(bestChild) + domain.heuristic(bestChild)) - chosenNode->getHValue();
-
-				domain.pushEpsilonHGlobal(epsH);
-				domain.pushEpsilonDGlobal(epsD);
-			}
-		}
+                    // Add to open of generating TLA
+                    tlas[chosenTLAIndex].open.push(childNode);
+                }
+            }
+        }
 	}
 
 private:
 	// In DD this is different, we just use the post search belief
-	int simulateExpansion(vector<TopLevelAction>& tlas)
+	int computeRiskAndGetBestTLA(vector<TopLevelAction>& tlas)
 	{
 		int minimalRiskTLA = 0;
 		double minimalRisk = numeric_limits<double>::infinity();
