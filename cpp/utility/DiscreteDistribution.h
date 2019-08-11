@@ -554,10 +554,7 @@ public:
 		domain.readDistributionData(f_ps, hPostSearchTable);
     }
 
-    DiscreteDistribution(double g,
-            double h,
-            bool& retSuccess,
-            bool isPostSearch = false) {
+    DiscreteDistribution(double h, bool isPostSearch = false) {
         // hash table key is int
         //int hIndex = int(round(h * 100)); //have to fix this for inverse
         int hIndex = int(h);
@@ -567,18 +564,25 @@ public:
 
         if (table.find(hIndex) == table.end()) {
 			cout << "not found h" << endl;
-            retSuccess = false;
             return;
         }
 
         const auto& probNodeList = table[hIndex];
 
         for (auto probNode : probNodeList) {
-            probNode.cost += g;
             distribution.insert(probNode);
         }
+    }
 
-        retSuccess = true;
+    DiscreteDistribution(const DiscreteDistribution& rhs) {
+        if (&rhs == this) {
+            return ;
+        }
+
+        distribution.clear();
+
+        distribution = rhs.distribution;
+        maxSamples = rhs.maxSamples;
     }
 };
 

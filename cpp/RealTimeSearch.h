@@ -63,12 +63,18 @@ public:
         Cost getFHatValueFromDist() const { return g + getHHatValueFromDist(); }
         Cost getDHatValue() const { return (derr / (1.0 - epsD)); }
         Cost getHHatValue() const { return h + getDHatValue() * epsH; }
-        Cost getHHatValueFromDist() const {
-            return hStartDistribution.expectedCost();
-        }
+        Cost getHHatValueFromDist() const { return hStartDistribution.expectedCost(); }
         State getState() const { return stateRep; }
         shared_ptr<Node> getParent() const { return parent; }
         int getOwningTLA() const { return owningTLA; }
+
+        DiscreteDistribution getHstartDistribution() const {
+            return hStartDistribution;
+        }
+
+        DiscreteDistribution getHstartDistribution_ps() const {
+            return hStartDistribution_ps;
+        }
 
         void setHValue(Cost val) { h = val; }
         void setGValue(Cost val) { g = val; }
@@ -83,6 +89,7 @@ public:
         void setHStartDistribution(DiscreteDistribution& dist) {
             hStartDistribution = dist;
         }
+
         void setHStartDistribution_ps(DiscreteDistribution& dist) {
             hStartDistribution_ps = dist;
         }
@@ -118,8 +125,18 @@ public:
             delayCntr = 0;
         }
 
-        Node(Cost g, Cost h, State state, shared_ptr<Node> parent, int tla)
-                : g(g), h(h), stateRep(state), parent(parent), owningTLA(tla) {
+        Node(Cost g,
+                DiscreteDistribution& hstartdist,
+                DiscreteDistribution& hstartdist_ps,
+                State state,
+                shared_ptr<Node> parent,
+                int tla)
+                : g(g),
+                  hStartDistribution(hstartdist),
+                  hStartDistribution_ps(hstartdist_ps),
+                  stateRep(state),
+                  parent(parent),
+                  owningTLA(tla) {
             open = true;
             delayCntr = 0;
             lackOfHValueData = false;
@@ -353,19 +370,19 @@ public:
             // Exploration Phase
             domain.updateEpsilons();
 
-            // First, generate the top-level actions
-            if (beliefType == "normal")
+            if (beliefType == "normal") {
                 generateTopLevelActions(start, res);
-            else if (beliefType == "data")
+                expansionAlgo->expand(
+                        open, closed, tlas, duplicateDetection, res);
+            } else if (beliefType == "data") {
                 generateTopLevelActionsDD(start, res);
-            else {
+                expansionAlgo->expand(
+                        open, closed, tlas, duplicateDetectionDD, res);
+            } else {
                 cout << "Realtime search main loop line 370: wrong belief "
                         "type!!!"
                      << endl;
             }
-
-            // Expand some nodes until expnasion limit
-            expansionAlgo->expand(open, closed, tlas, duplicateDetection, res);
 
             // Check if this is a dead end
             if (open.empty()) {
@@ -443,6 +460,57 @@ private:
         }
 
         return false;
+    }
+
+    static bool duplicateDetectionDD(shared_ptr<Node> node,
+            unordered_map<State, shared_ptr<Node>, Hash>& closed,
+            PriorityQueue<shared_ptr<Node>>& open,
+            vector<TopLevelAction>& tlaList) {
+        // Check if this state exists
+        typename unordered_map<State, shared_ptr<Node>, Hash>::iterator it =
+                closed.find(node->getState());
+
+        if (it != closed.end()) {
+            // This state has been generated before, check if its node is on
+            // OPEN
+            if (it->second->onOpen()) {
+                // This node is on OPEN, keep the better g-value
+                if (node->getGValue() < it->second->getGValue()) {
+                    tlaList[it->second->getOwningTLA()].open.remove(it->second);
+                    it->second->setGValue(node->getGValue());
+                    it->second->setParent(node->getParent());
+                    it->second->setHStartDistribution(node->getHstartDistribution());
+                    it->second->setHStartDistribution_ps(node->getHstartDistribution_ps());
+                    it->second->setState(node->getState());
+                    it->second->setOwningTLA(node->getOwningTLA());
+                    tlaList[node->getOwningTLA()].open.push(it->second);
+                }
+            } else {
+                // This node is on CLOSED, compare the f-values. If this new
+                // f-value is better, reset g, h, and d.
+                // Then reopen the node.
+				//
+				// here for dd we compare f-hat, because in the learning, 
+				// if its distribution is updated, then the hvalue should not
+				// be ues anywhere
+                if (node->getFHatValueFromDist() < it->second->getFHatValueFromDist()) {
+                    it->second->setGValue(node->getGValue());
+                    it->second->setParent(node->getParent());
+                    it->second->setHStartDistribution(
+                            node->getHstartDistribution());
+                    it->second->setHStartDistribution_ps(node->getHstartDistribution_ps());
+                    it->second->setState(node->getState());
+                    it->second->setOwningTLA(node->getOwningTLA());
+                    tlaList[node->getOwningTLA()].open.push(it->second);
+                    it->second->reOpen();
+                    open.push(it->second);
+                }
+            }
+
+            return true;
+        }
+
+        return false;
 	}
 
 	//we need a new generate funciton for nancydd and simplified node constructor
@@ -477,39 +545,11 @@ private:
 			TopLevelAction tla;
 			tla.topLevelNode = childNode;
 
-            if (beliefType == "normal") {
                 childNode->distribution = DiscreteDistribution(100,
                         childNode->getFValue(),
                         childNode->getFHatValue(),
                         childNode->getDValue(),
-                        childNode->getFHatValue() - childNode->getFValue());
-            } else if (beliefType == "data") {
-                bool hInData, hInData_ps;
-                childNode->distribution =
-                        DiscreteDistribution(childNode->getGValue(),
-                                childNode->getFValue() - childNode->getGValue(),
-                                hInData);
-                childNode->distribution_ps =
-                        DiscreteDistribution(childNode->getGValue(),
-                                childNode->getFValue() - childNode->getGValue(),
-                                hInData_ps,
-                                true);
-
-                if (!hInData){
-                /*    cout << "Never see h "*/
-                         //<< childNode->getFValue() - childNode->getGValue()
-                         /*<< "\n";*/
-                    childNode->distribution = DiscreteDistribution(100,
-                            childNode->getFValue(),
-                            childNode->getFHatValue(),
-                            childNode->getDValue(),
-                            childNode->getFHatValue() - childNode->getFValue());
-
-					childNode->lackOfHValueData = true;
-
-					// we should do extrapolate here, do not use the original nancy method
-                }
-            }
+                       }
 
 			tla.expectedMinimumPathCost = childNode->distribution.expectedCost();
 
@@ -550,7 +590,8 @@ private:
             for (State child : children) {
                 shared_ptr<Node> childNode = make_shared<Node>(
                         start->getGValue() + domain.getEdgeCost(child),
-                        domain.heuristic(child),
+                        domain.hstart_distribution(child),
+                        domain.hstart_distribution_ps(child),
                         child,
                         start,
                         tlas.size());
@@ -566,39 +607,31 @@ private:
                 TopLevelAction tla;
                 tla.topLevelNode = childNode;
 
-                if (beliefType == "normal") {
+                bool hInData, hInData_ps;
+                childNode->distribution =
+                        DiscreteDistribution(childNode->getGValue(),
+                                childNode->getFValue() - childNode->getGValue(),
+                                hInData);
+                childNode->distribution_ps =
+                        DiscreteDistribution(childNode->getGValue(),
+                                childNode->getFValue() - childNode->getGValue(),
+                                hInData_ps,
+                                true);
+
+                if (!hInData) {
+                    /*    cout << "Never see h "*/
+                    //<< childNode->getFValue() - childNode->getGValue()
+                    /*<< "\n";*/
                     childNode->distribution = DiscreteDistribution(100,
                             childNode->getFValue(),
                             childNode->getFHatValue(),
                             childNode->getDValue(),
                             childNode->getFHatValue() - childNode->getFValue());
-                } else if (beliefType == "data") {
-                    bool hInData, hInData_ps;
-                    childNode->distribution = DiscreteDistribution(
-                            childNode->getGValue(),
-                            childNode->getFValue() - childNode->getGValue(),
-                            hInData);
-                    childNode->distribution_ps = DiscreteDistribution(
-                            childNode->getGValue(),
-                            childNode->getFValue() - childNode->getGValue(),
-                            hInData_ps,
-                            true);
 
-                    if (!hInData) {
-                        /*    cout << "Never see h "*/
-                        //<< childNode->getFValue() - childNode->getGValue()
-                        /*<< "\n";*/
-                        childNode->distribution = DiscreteDistribution(100,
-                                childNode->getFValue(),
-                                childNode->getFHatValue(),
-                                childNode->getDValue(),
-                                childNode->getFHatValue() -
-                                        childNode->getFValue());
+                    childNode->lackOfHValueData = true;
 
-                        childNode->lackOfHValueData = true;
-
-                        // we should do extrapolate here, do not use the
-                        // original nancy method
+                    // we should do extrapolate here, do not use the
+                    // original nancy method
                     }
                 }
 

@@ -74,25 +74,18 @@ public:
             // Book keeping for number of nodes generated
             res.nodesGenerated += children.size();
 
-            State bestChild;
-            Cost bestF = numeric_limits<double>::infinity();
-
             // Iterate over the successor states
             for (State child : children) {
                 // Create a node for this state
                 shared_ptr<Node> childNode = make_shared<Node>(
                         chosenNode->getGValue() + domain.getEdgeCost(child),
-                        domain.heuristic(child),
+                        domain.hstart_distribution(child),
+                        domain.hstart_distribution_ps(child),
                         child,
                         chosenNode,
                         tlas.size());
 
                 bool dup = duplicateDetection(childNode, closed, open, tlas);
-
-                if (!dup && childNode->getFValue() < bestF) {
-                    bestF = childNode->getFValue();
-                    bestChild = child;
-                }
 
                 // Duplicate detection performed
                 if (!dup) {
@@ -238,7 +231,7 @@ private:
 		}
 	}
 
-	let's make it purely nancy, not a variation of k-best, which is a variation of csernaBackup
+	//let's make it purely nancy, not a variation of k-best, which is a variation of csernaBackup
 	void kBestDecision(vector<TopLevelAction>& tlas)
 	{
 		// The K-Best decision assumes that the only nodes within the subtrees of the TLAs are the k-best frontier nodes
