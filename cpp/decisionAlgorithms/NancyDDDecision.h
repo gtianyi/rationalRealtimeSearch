@@ -15,10 +15,8 @@ class NancyDDDecision : public DecisionAlgorithm<Domain, Node, TopLevelAction> {
     typedef typename Domain::Cost Cost;
 
 public:
-    NancyDDDecision(Domain& domain, double k, string beliefType, double lookahead)
+    NancyDDDecision(Domain& domain, double lookahead)
             : domain(domain),
-              k(k),
-              beliefType(beliefType),
               lookahead(lookahead) {}
 
     shared_ptr<Node> backup(PriorityQueue<shared_ptr<Node>>& open,
@@ -42,6 +40,5 @@ public:
 
 protected:
     Domain& domain;
-    string beliefType;
     double lookahead;
 };

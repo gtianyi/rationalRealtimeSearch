@@ -9,7 +9,7 @@
 #include "utility/ResultContainer.h"
 #include "decisionAlgorithms/DecisionAlgorithm.h"
 #include "decisionAlgorithms/KBestBackup.h"
-#include "decisionAlgorithms/NancyDDBackup.h"
+#include "decisionAlgorithms/NancyDDDecision.h"
 #include "decisionAlgorithms/ScalarBackup.h"
 #include "expansionAlgorithms/ExpansionAlgorithm.h"
 #include "expansionAlgorithms/AStar.h"
@@ -310,11 +310,11 @@ public:
         } else if (decisionModule == "k-best") {
             decisionAlgo =
                     make_shared<KBestBackup<Domain, Node, TopLevelAction>>(
-                            domain, k, beliefType, lookahead);
+                            domain, k, lookahead);
         } else if (decisionModule == "nancyDD") {
             decisionAlgo =
-                    make_shared<NancyDDBackup<Domain, Node, TopLevelActionDD>>(
-                            domain, k, beliefType, lookahead);
+                    make_shared<NancyDDDecision<Domain, Node, TopLevelActionDD>>(
+                            domain, lookahead);
         }  else {
             decisionAlgo =
                     make_shared<ScalarBackup<Domain, Node, TopLevelAction>>(

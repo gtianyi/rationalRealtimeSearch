@@ -14,10 +14,9 @@ class KBestBackup : public DecisionAlgorithm<Domain, Node, TopLevelAction> {
     typedef typename Domain::Cost Cost;
 
 public:
-    KBestBackup(Domain& domain, double k, string beliefType, double lookahead)
+    KBestBackup(Domain& domain, double k, double lookahead)
             : domain(domain),
               k(k),
-              beliefType(beliefType),
               lookahead(lookahead) {}
 
     shared_ptr<Node> backup(PriorityQueue<shared_ptr<Node>>& open,
@@ -84,34 +83,11 @@ private:
                 tla.open.pop();
 
                 // Make this node's PDF a discrete distribution...
-                if (beliefType == "normal") {
-                    best->distribution = DiscreteDistribution(100,
-                            best->getFValue(),
-                            best->getFHatValue(),
-                            best->getDValue(),
-                            best->getFHatValue() - best->getFValue());
-                } else if (beliefType == "data") {
-                    bool retSucc, retSucc_ps;
-                    best->distribution = DiscreteDistribution(
-                            best->getGValue(),
-                            best->getFValue()-best->getGValue(), retSucc);
-                    best->distribution_ps = DiscreteDistribution(best->getGValue(),
-                            best->getFValue() - best->getGValue(),
-                            retSucc_ps, true);
-                    if (!retSucc) {
-                        best->distribution = DiscreteDistribution(100,
-                                best->getFValue(),
-                                best->getFHatValue(),
-                                best->getDValue(),
-                                best->getFHatValue() - best->getFValue());
-						best->lackOfHValueData = true;
-                    }
-                } else {
-                    best->distribution = DiscreteDistribution(100,
-                            best->getGValue(),
-                            best->getDValue(),
-                            domain.getBranchingFactor());
-                }
+                best->distribution = DiscreteDistribution(100,
+                        best->getFValue(),
+                        best->getFHatValue(),
+                        best->getDValue(),
+                        best->getFHatValue() - best->getFValue());
 
                 tla.kBestNodes.push_back(best);
                 i++;
@@ -125,6 +101,5 @@ private:
 protected:
     Domain& domain;
     double k;
-    string beliefType;
     double lookahead;
 };
