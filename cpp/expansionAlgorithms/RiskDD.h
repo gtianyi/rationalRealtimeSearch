@@ -6,6 +6,7 @@
 #include "../utility/PriorityQueue.h"
 #include "../utility/ResultContainer.h"
 #include "ExpansionAlgorithm.h"
+#include "../decisionAlgorithms/NancyDDBackup.h"
 
 using namespace std;
 
@@ -45,10 +46,10 @@ public:
             // the open lists of other TLAs.
             // Therefore, the beliefs of all TLAs should be updated before every
             // expansion.
-            kBestDecision(tlas);
+            NancyDDBackup<Domain, Node, TopLevelAction>::backup2TLA(tlas);
 
             // risk computation
-            int chosenTLAIndex = computeRiskAndGetBestTLA(tlas);
+            int chosenTLAIndex = computeRiskByPSAndGetBestTLA(tlas);
 
             // Expand under the TLA which holds the lowest risk
             shared_ptr<Node> chosenNode = tlas[chosenTLAIndex].open.top();
@@ -103,175 +104,103 @@ public:
 
 private:
 	// In DD this is different, we just use the post search belief
-	int computeRiskAndGetBestTLA(vector<TopLevelAction>& tlas)
-	{
-		int minimalRiskTLA = 0;
-		double minimalRisk = numeric_limits<double>::infinity();
+    int computeRiskByPSAndGetBestTLA(vector<TopLevelAction>& tlas) {
+        int minimalRiskTLA = 0;
+        double minimalRisk = numeric_limits<double>::infinity();
 
-		// Start by identifying alpha: the TLA with lowest expected cost
-		int alphaTLA = 0;
-		double alphaExpectedCost = tlas[0].belief.expectedCost();
-		for (int i = 1; i < tlas.size(); i++)
-		{
-			if (tlas[i].belief.expectedCost() < alphaExpectedCost)
-			{
-				alphaExpectedCost = tlas[i].belief.expectedCost();
-				alphaTLA = i;
-			}
-		}
+        // Start by identifying alpha: the TLA with lowest expected cost
+        int alphaTLA = 0;
+        double alphaExpectedCost = tlas[0].belief.expectedCost();
+        for (int i = 1; i < tlas.size(); i++) {
+            if (tlas[i].belief.expectedCost() < alphaExpectedCost) {
+                alphaExpectedCost = tlas[i].belief.expectedCost();
+                alphaTLA = i;
+            }
+        }
 
-		// Iterate over the top level actions
-		for (int i = 0; i < tlas.size(); i++)
-		{
-			// If this TLA has no unique subtree, skip its risk calc, it is pruned
-			if (tlas[i].open.empty())
-				continue;
+        // Iterate over the top level actions
+        for (int i = 0; i < tlas.size(); i++) {
+            // If this TLA has no unique subtree, skip its risk calc, it is
+            // pruned
+            if (tlas[i].open.empty())
+                continue;
 
-			// Simulate how expanding this TLA's best node would affect its belief
-			// Belief of TLA is squished as a result of search. Mean stays the same, but variance is decreased by a factor based on expansion delay.
-			double ds = expansionsPerIteration / domain.averageDelayWindow();
-			double dy = tlas[i].open.top()->getDValue();
-			double squishFactor = min(1.0, (ds / dy));
+            // Calculate the risk associated with expanding that node (by using
+            // the simulated belief as alpha in risk analysis)
+            double riskCalculation = riskAnalysis(alphaTLA, i, tlas);
 
-			// Now squish the simulated belief by factor
-			vector<TopLevelAction> squishedTopLevelActions = tlas;
-			squishedTopLevelActions[i].belief.squish(squishFactor);
-
-			// Calculate the risk associated with expanding that node (by using the simulated belief as alpha in risk analysis)
-			double riskCalculation = riskAnalysis(alphaTLA, squishedTopLevelActions);
-
-			// If this is the first TLA risk has been calculated for, it by default minimizes risk...
-            // If two actions minimize risk by same value, tie break on f-hat -> f -> g in this order.
-            if (riskCalculation == minimalRisk)
-            {
-                if (tlas[i].topLevelNode->getFHatValue() == tlas[minimalRiskTLA].topLevelNode->getFHatValue())
-                {
-                    if (tlas[i].topLevelNode->getFValue() == tlas[minimalRiskTLA].topLevelNode->getFValue())
-                    {
-                        if (tlas[i].topLevelNode->getGValue() > tlas[minimalRiskTLA].topLevelNode->getGValue())
-                        {
-                            minimalRiskTLA = i;
-                        }
-                    }
-                    else if (tlas[i].topLevelNode->getFValue() < tlas[minimalRiskTLA].topLevelNode->getFValue())
-                    {
+            // If this is the first TLA risk has been calculated for, it by
+            // default minimizes risk...
+            // If two actions minimize risk by same value, tie break on f-hat -> g in this order.
+            // Andrew do  f-hat -> f -> g, we get rid of f here since we will never use h after learning.
+            if (riskCalculation == minimalRisk) {
+                if (tlas[i].topLevelNode->getFHatValueFromDist() ==
+                        tlas[minimalRiskTLA]
+                                .topLevelNode->getFHatValueFromDist()) {
+                    if (tlas[i].topLevelNode->getGValue() >
+                            tlas[minimalRiskTLA].topLevelNode->getGValue()) {
                         minimalRiskTLA = i;
                     }
-                }
-                else if (tlas[i].topLevelNode->getFHatValue() < tlas[minimalRiskTLA].topLevelNode->getFHatValue())
-                {
+                } else if (tlas[i].topLevelNode->getFHatValue() <
+                        tlas[minimalRiskTLA].topLevelNode->getFHatValue()) {
                     minimalRiskTLA = i;
                 }
-            }
-			else if (riskCalculation < minimalRisk)
-			{
-				// Otherwise the TLA with the lower risk replaces the current lowest
-				minimalRisk = riskCalculation;
-				minimalRiskTLA = i;
+            } else if (riskCalculation < minimalRisk) {
+                // Otherwise the TLA with the lower risk replaces the current
+                // lowest
+                minimalRisk = riskCalculation;
+                minimalRiskTLA = i;
 			}
 		}
 
 		return minimalRiskTLA;
-	}
+    }
 
-	double riskAnalysis(int alphaIndex, vector<TopLevelAction>& squishedTopLevelActions)
-	{
-		double risk = 0;
+    double riskAnalysis(int alphaIndex,
+            int simulateTLAIndex,
+            const vector<TopLevelAction>& tlas) const {
+        double risk = 0;
 
-		// Perform numerical integration to calculate risk associated with taking alpha as the expansion
-		for (auto alpha : squishedTopLevelActions[alphaIndex].belief)
-		{
-			for (int tla = 0; tla < squishedTopLevelActions.size(); tla++)
-			{
-				// Don't integrate over alpha as a beta action
-				if (tla == alphaIndex)
-					continue;
+        const auto& alphaBelief = tlas[alphaIndex].belief;
+        if (alphaIndex == simulateTLAIndex)
+            alphaBelief = tlas[alphaIndex].belief_ps;
 
-				// Integrate over values in beta belief
-				for (auto beta : squishedTopLevelActions[tla].belief)
-				{
-					// Only use beta costs less than alpha cost in risk analysis
-					if (beta.cost < alpha.cost)
-					{
-						// Calculate the risk
-						double value = alpha.probability * beta.probability * (alpha.cost - beta.cost);
-						risk += value;
-					}
-					else
-						break;
-				}
-			}
-		}
+        // Perform numerical integration to calculate risk associated with
+        // taking alpha as the expansion
+        for (const auto& alpha : alphaBelief) {
+            for (int tla = 0; tla < tlas.size(); tla++) {
+                // Don't integrate over alpha as a beta action
+                if (tla == alphaIndex)
+                    continue;
 
-		return risk;
-	}
+                const auto& betaBelief = tlas[tla].belief;
+                if (tla == simulateTLAIndex)
+                    betaBelief = tlas[tla].belief_ps;
 
-	void csernaBackup(TopLevelAction& tla)
-	{
-		// We assume in k-best that only the k-best nodes matter.
-		if (!tla.kBestNodes.empty())
-		{
-			// Perform Cserna Backups on k-best nodes
-			while (tla.kBestNodes.size() > 1)
-			{
-				// Take the first two and do a Cserna backup...
-				tla.kBestNodes[0]->distribution = tla.kBestNodes[0]->distribution * tla.kBestNodes[1]->distribution;
-				// Remove the other used in the backup
-				tla.kBestNodes.erase(remove(tla.kBestNodes.begin(), tla.kBestNodes.end(), tla.kBestNodes[1]), tla.kBestNodes.end());
-			}
+                // Integrate over values in beta belief
+                for (const auto& beta : betaBelief.belief) {
+                    // Only use beta costs less than alpha cost
+                    // in risk
+                    // analysis
+                    if (beta.cost < alpha.cost) {
+                        // Calculate the risk
+                        double value = alpha.probability * beta.probability *
+                                (alpha.cost - beta.cost);
+                        risk += value;
+                    } else
+						//here Andrew assume, the belief nodes are arranged in ascending order
+                        break;
+                }
+            }
+        }
 
-			// Get the expected value of the resulting Cserna Distribution
-			tla.expectedMinimumPathCost = tla.kBestNodes[0]->distribution.expectedCost();
-			tla.belief = tla.kBestNodes[0]->distribution;
-		}
-		else
-		{
-			// If nothing was expanded under this TLA, use the expected value of the TLA
-			tla.expectedMinimumPathCost = numeric_limits<double>::infinity();
-		}
-	}
-
-	//let's make it purely nancy, not a variation of k-best, which is a variation of csernaBackup
-	void kBestDecision(vector<TopLevelAction>& tlas)
-	{
-		// The K-Best decision assumes that the only nodes within the subtrees of the TLAs are the k-best frontier nodes
-		// on their opened lists. Find them.
-		for (TopLevelAction& tla : tlas)
-		{
-			tla.kBestNodes.clear();
-
-			// If this TLA has unique, probably optimal subtrees beneath it, it is valid
-
-			int i = 0;
-			// Add to the best k nodes while i < k and non-selected nodes exist on the frontier
-			while (i < k && !tla.open.empty())
-			{
-				shared_ptr<Node> best = tla.open.top();
-				tla.open.pop();
-
-				// Make this node's PDF a discrete distribution...
-				best->distribution = DiscreteDistribution(100, best->getFValue(), best->getFHatValue(),
-					best->getDValue(), best->getFHatValue() - best->getFValue());
-
-				tla.kBestNodes.push_back(best);
-				i++;
-			}
-
-			// Now put the nodes back in the top level open list
-			for (shared_ptr<Node> n : tla.kBestNodes)
-			{
-				tla.open.push(n);
-			}
-
-			// Now that k-best are selected, perform Cserna backup
-			csernaBackup(tla);
-		}
-	}
+        return risk;
+    }
 
 protected:
-	Domain & domain;
-	double lookahead;
-	string sortingFunction;
-	int k = 1;
-	int expansionsPerIteration;
+    Domain& domain;
+    double lookahead;
+    string sortingFunction;
+    int k = 1;
+    int expansionsPerIteration;
 };

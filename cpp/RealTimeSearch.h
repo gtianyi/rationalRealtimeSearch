@@ -213,6 +213,7 @@ public:
         shared_ptr<Node> topLevelNode;
         vector<shared_ptr<Node>> kBestNodes;
         DiscreteDistribution belief;
+        DiscreteDistribution belief_ps;
 
         TopLevelAction() { open_TLA.swapComparator(Node::compareNodesFHat); }
 

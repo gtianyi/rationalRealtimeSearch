@@ -4,41 +4,15 @@
 #include <iostream>
 #include <memory>
 #include "../utility/PriorityQueue.h"
-#include "DecisionAlgorithm.h"
 
 using namespace std;
 
 template <class Domain, class Node, class TopLevelAction>
-class NancyDDBackup : public DecisionAlgorithm<Domain, Node, TopLevelAction> {
+class NancyDDBackup{
     typedef typename Domain::State State;
     typedef typename Domain::Cost Cost;
 
 public:
-    NancyDDBackup(Domain& domain, double k, string beliefType, double lookahead)
-            : domain(domain),
-              k(k),
-              beliefType(beliefType),
-              lookahead(lookahead) {}
-
-    shared_ptr<Node> backup(PriorityQueue<shared_ptr<Node>>& open,
-            vector<TopLevelAction>& tlas,
-            shared_ptr<Node> start) {
-        kBestDecision(tlas);
-
-        // Take the TLA with the lowest expected minimum path cost
-        TopLevelAction lowestExpectedPathTLA = tlas[0];
-        for (TopLevelAction tla : tlas) {
-            if (tla.expectedMinimumPathCost <
-                    lowestExpectedPathTLA.expectedMinimumPathCost)
-                lowestExpectedPathTLA = tla;
-        }
-
-        shared_ptr<Node> goalPrime = lowestExpectedPathTLA.topLevelNode;
-
-        return goalPrime;
-    }
-
-private:
     void csernaBackup(TopLevelAction& tla) {
         // We assume in k-best that only the k-best nodes matter.
         if (!tla.kBestNodes.empty()) {
@@ -67,7 +41,7 @@ private:
     }
 
 	//let's make it purely nancy, not a variation of k-best, which is a variation of csernaBackup
-    void kBestDecision(vector<TopLevelAction>& tlas) {
+    static void backup2TLA(vector<TopLevelAction>& tlas) {
         // The K-Best decision assumes that the only nodes within the subtrees
         // of the TLAs are the k-best frontier nodes
         // on their opened lists. Find them.
@@ -123,10 +97,4 @@ private:
             csernaBackup(tla);
         }
     }
-
-protected:
-    Domain& domain;
-    double k;
-    string beliefType;
-    double lookahead;
 };
