@@ -237,11 +237,11 @@ public:
         }
     };
 
-    struct TopLevelActionDD : public TopLevelAction {
-        TopLevelActionDD() {
-            this->open_TLA.swapComparator(Node::compareNodesFHatFromDist);
-        }
-    };
+	struct TopLevelActionDD : public TopLevelAction {
+		TopLevelActionDD() {
+			this->open_TLA.swapComparator(Node::compareNodesFHatFromDist);
+		}
+	};
 
     RealTimeSearch(Domain& domain,
             string expansionModule,
@@ -329,31 +329,43 @@ public:
 
         ResultContainer res;
 
-        // Get the start node
-		this should be different for dd
-        shared_ptr<Node> start = make_shared<Node>(0,
-                domain.heuristic(domain.getStartState()),
-                domain.distance(domain.getStartState()),
-                domain.distanceErr(domain.getStartState()),
-                domain.epsilonHGlobal(),
-                domain.epsilonDGlobal(),
-                domain.getStartState(),
-                nullptr,
-                -1);
+        shared_ptr<Node> start;
 
+        if (beliefType == "normal") {
+            start = make_shared<Node>(0,
+                    domain.heuristic(domain.getStartState()),
+                    domain.distance(domain.getStartState()),
+                    domain.distanceErr(domain.getStartState()),
+                    domain.epsilonHGlobal(),
+                    domain.epsilonDGlobal(),
+                    domain.getStartState(),
+                    nullptr,
+                    -1);
+
+        } else if (beliefType == "data") {
+            start = make_shared<Node>(0,
+                    domain.hstart_distribution(domain.getStartState()),
+                    domain.hstart_distribution_ps(domain.getStartState()),
+                    domain.getStartState(),
+                    nullptr,
+                    -1);
+        }
+
+        // Get the start node
         int count = 0;
         //
         // clock_t startTime = clock();
 
         while (count <= iterationlimit) {
-            // mark this node as the start of the current search (to prevent state pruning based on label)
+            // mark this node as the start of the current search (to
+            // prevent state pruning based on label)
             start->markStart();
 
             count++;
 
-            //if (beliefType == "data") {
-                //cout << "rl loop " << count << "h "
-                     //<< start->getFValue() - start->getGValue() << endl;
+            // if (beliefType == "data") {
+            // cout << "rl loop " << count << "h "
+            //<< start->getFValue() - start->getGValue() << endl;
             //}
 
             // Check if a goal has been reached
@@ -361,7 +373,7 @@ public:
                 // Calculate path cost and return solution
                 calculateCost(start, res);
 
-				//cout<<"count "<<count<<"\n";
+                // cout<<"count "<<count<<"\n";
 
                 return res;
             }
@@ -380,7 +392,8 @@ public:
                 expansionAlgo->expand(
                         open, closed, tlas, duplicateDetectionDD, res);
             } else {
-                cout << "Realtime search main loop line 370: wrong belief "
+                cout << "Realtime search main loop line 370: wrong "
+                        "belief "
                         "type!!!"
                      << endl;
             }
@@ -388,15 +401,16 @@ public:
             // Check if this is a dead end
             if (open.empty()) {
                 break;
-			}
+            }
 
-			// Learning Phase
-			learningAlgo->learn(open, closed);
+            // Learning Phase
+            learningAlgo->learn(open, closed);
 
-			// Decision-making Phase
-			start = decisionAlgo->backup(open, tlas, start);
+            // Decision-making Phase
+            start = decisionAlgo->backup(open, tlas, start);
 
-			cout <<"g "<< start->getGValue() << " h "<<start->getHValue()<<endl;
+            cout << "g " << start->getGValue() << " h " << start->getHValue()
+                 << endl;
 
             // Add this step to the path taken so far
             res.path.push(start->getState().getLabel());
@@ -512,55 +526,62 @@ private:
         }
 
         return false;
-	}
+    }
 
-	//we need a new generate funciton for nancydd and simplified node constructor
-	void generateTopLevelActions(shared_ptr<Node> start, ResultContainer& res)
-	{
-		// The first node to be expanded in any problem is the start node
-		// Doing so yields the top level actions
-		start->close();
-		closed[start->getState()] = start;
-		res.nodesExpanded++;
+    // we need a new generate funciton for nancydd and simplified node
+    // constructor
+    void generateTopLevelActions(shared_ptr<Node> start, ResultContainer& res) {
+        // The first node to be expanded in any problem is the start node
+        // Doing so yields the top level actions
+        start->close();
+        closed[start->getState()] = start;
+        res.nodesExpanded++;
 
-		vector<State> children = domain.successors(start->getState());
-		res.nodesGenerated += children.size();
+        vector<State> children = domain.successors(start->getState());
+        res.nodesGenerated += children.size();
 
-		State bestChild;
-		Cost bestF = numeric_limits<double>::infinity();
+        State bestChild;
+        Cost bestF = numeric_limits<double>::infinity();
 
-		for (State child : children)
-		{
-			shared_ptr<Node> childNode = make_shared<Node>(start->getGValue() + domain.getEdgeCost(child),
-				domain.heuristic(child), domain.distance(child), domain.distanceErr(child), domain.epsilonHGlobal(),
-				domain.epsilonDGlobal(), child, start, tlas.size());
+        for (State child : children) {
+            shared_ptr<Node> childNode = make_shared<Node>(
+                    start->getGValue() + domain.getEdgeCost(child),
+                    domain.heuristic(child),
+                    domain.distance(child),
+                    domain.distanceErr(child),
+                    domain.epsilonHGlobal(),
+                    domain.epsilonDGlobal(),
+                    child,
+                    start,
+                    tlas.size());
 
-			if (childNode->getFValue() < bestF)
-			{
-				bestF = childNode->getFValue();
-				bestChild = child;
-			}
+            if (childNode->getFValue() < bestF) {
+                bestF = childNode->getFValue();
+                bestChild = child;
+            }
 
-			// No top level action will ever be a duplicate, so no need to check.
-			// Make a new top level action and push this node onto its open
-			TopLevelAction tla;
-			tla.topLevelNode = childNode;
+            // No top level action will ever be a duplicate, so no need to
+            // check.
+            // Make a new top level action and push this node onto its open
+            TopLevelAction tla;
+            tla.topLevelNode = childNode;
 
-                childNode->distribution = DiscreteDistribution(100,
-                        childNode->getFValue(),
-                        childNode->getFHatValue(),
-                        childNode->getDValue(),
-                       }
+            childNode->distribution = DiscreteDistribution(100,
+                    childNode->getFValue(),
+                    childNode->getFHatValue(),
+                    childNode->getDValue(),
+                    childNode->getFHatValue() - childNode->getFValue());
 
-			tla.expectedMinimumPathCost = childNode->distribution.expectedCost();
+            tla.expectedMinimumPathCost =
+                    childNode->distribution.expectedCost();
 
-			// Push this node onto open and closed
-			closed[child] = childNode;
-			open.push(childNode);
-			tla.open.push(childNode);
+            // Push this node onto open and closed
+            closed[child] = childNode;
+            open.push(childNode);
+            tla.open.push(childNode);
 
-			// Add this top level action to the list
-			tlas.push_back(tla);
+            // Add this top level action to the list
+            tlas.push_back(tla);
 		}
 
 		// Learn one-step error
@@ -572,96 +593,61 @@ private:
 			domain.pushEpsilonHGlobal(epsH);
 			domain.pushEpsilonDGlobal(epsD);
 		}
-	}
+    }
 
-        void generateTopLevelActionsDD(shared_ptr<Node> start,
-                ResultContainer& res) {
-            // The first node to be expanded in any problem is the start node
-            // Doing so yields the top level actions
-            start->close();
-            closed[start->getState()] = start;
-            res.nodesExpanded++;
+    void generateTopLevelActionsDD(shared_ptr<Node> start,
+            ResultContainer& res) {
+        // The first node to be expanded in any problem is the start node
+        // Doing so yields the top level actions
+        start->close();
+        closed[start->getState()] = start;
+        res.nodesExpanded++;
 
-            vector<State> children = domain.successors(start->getState());
-            res.nodesGenerated += children.size();
+        vector<State> children = domain.successors(start->getState());
+        res.nodesGenerated += children.size();
 
-            State bestChild;
-            Cost bestF = numeric_limits<double>::infinity();
+        State bestChild;
+        Cost bestF = numeric_limits<double>::infinity();
 
-            for (State child : children) {
-                shared_ptr<Node> childNode = make_shared<Node>(
-                        start->getGValue() + domain.getEdgeCost(child),
-                        domain.hstart_distribution(child),
-                        domain.hstart_distribution_ps(child),
-                        child,
-                        start,
-                        tlas.size());
+        for (State child : children) {
+            shared_ptr<Node> childNode = make_shared<Node>(
+                    start->getGValue() + domain.getEdgeCost(child),
+                    domain.hstart_distribution(child),
+                    domain.hstart_distribution_ps(child),
+                    child,
+                    start,
+                    tlas.size());
 
-                if (childNode->getFValue() < bestF) {
-                    bestF = childNode->getFValue();
-                    bestChild = child;
-                }
-
-                // No top level action will ever be a duplicate, so no need to
-                // check.
-                // Make a new top level action and push this node onto its open
-                TopLevelAction tla;
-                tla.topLevelNode = childNode;
-
-                bool hInData, hInData_ps;
-                childNode->distribution =
-                        DiscreteDistribution(childNode->getGValue(),
-                                childNode->getFValue() - childNode->getGValue(),
-                                hInData);
-                childNode->distribution_ps =
-                        DiscreteDistribution(childNode->getGValue(),
-                                childNode->getFValue() - childNode->getGValue(),
-                                hInData_ps,
-                                true);
-
-                if (!hInData) {
-                    /*    cout << "Never see h "*/
-                    //<< childNode->getFValue() - childNode->getGValue()
-                    /*<< "\n";*/
-                    childNode->distribution = DiscreteDistribution(100,
-                            childNode->getFValue(),
-                            childNode->getFHatValue(),
-                            childNode->getDValue(),
-                            childNode->getFHatValue() - childNode->getFValue());
-
-                    childNode->lackOfHValueData = true;
-
-                    // we should do extrapolate here, do not use the
-                    // original nancy method
-                    }
-                }
-
-                tla.expectedMinimumPathCost =
-                        childNode->distribution.expectedCost();
-
-                // Push this node onto open and closed
-                closed[child] = childNode;
-                open.push(childNode);
-                tla.open.push(childNode);
-
-                // Add this top level action to the list
-                tlas.push_back(tla);
+            if (childNode->getFValue() < bestF) {
+                bestF = childNode->getFValue();
+                bestChild = child;
             }
 
-            // Learn one-step error
-            if (!children.empty()) {
-                Cost epsD =
-                        (1 + domain.distance(bestChild)) - start->getDValue();
-                Cost epsH = (domain.getEdgeCost(bestChild) +
-                                    domain.heuristic(bestChild)) -
-                        start->getHValue();
+            // No top level action will ever be a duplicate, so no need to
+            // check.
+            // Make a new top level action and push this node onto its open
+            TopLevelAction tla;
+            tla.topLevelNode = childNode;
 
-                domain.pushEpsilonHGlobal(epsH);
-                domain.pushEpsilonDGlobal(epsD);
-            }
-	}
+            childNode->distribution = domain.hstart_distribution(child);
 
-	void restartLists(shared_ptr<Node> start)
+            childNode->distribution_ps = domain.hstart_distribution_ps(child);
+
+            tla.expectedMinimumPathCost =
+                    childNode->distribution.expectedCost() +
+                    childNode->getGValue();
+
+            // Push this node onto open and closed
+            closed[child] = childNode;
+            open.push(childNode);
+            tla.open.push(childNode);
+
+            // Add this top level action to the list
+            tlas.push_back(tla);
+        }
+        }
+
+        void restartLists(shared_ptr<Node> start)
 	{
 		// clear the TLA list
 		tlas.clear();
