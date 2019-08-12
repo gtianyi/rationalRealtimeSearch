@@ -238,7 +238,7 @@ public:
         return correctedH[state];
     }
 
-    virtual DiscreteDistribution hstartDistribution(const State& state) {
+    virtual DiscreteDistribution hstart_distribution(const State& state) {
         // Check if the heuristic h-hat of this state has been updated
         if (correctedDistribution.find(state) != correctedDistribution.end()) {
             return correctedDistribution[state];
@@ -312,6 +312,10 @@ public:
     }
 
     void updateHeuristic(const State& state, Cost value) {
+        correctedH[state] = value;
+    }
+
+    void update_hstart_distribution(const State& state, Cost value) {
         correctedH[state] = value;
     }
 
