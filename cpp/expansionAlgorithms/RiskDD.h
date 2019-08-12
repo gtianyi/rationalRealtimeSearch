@@ -46,7 +46,7 @@ public:
             // the open lists of other TLAs.
             // Therefore, the beliefs of all TLAs should be updated before every
             // expansion.
-            NancyDDBackup<Domain, Node, TopLevelAction>::backup2TLA(tlas);
+            NancyDDBackup<Node, TopLevelAction>::backup2TLA(tlas);
 
             // risk computation
             int chosenTLAIndex = computeRiskByPSAndGetBestTLA(tlas);
@@ -165,6 +165,8 @@ private:
         if (alphaIndex == simulateTLAIndex)
             alphaBelief = tlas[alphaIndex].belief_ps;
 
+		const auto alphaGValue = tlas[alphaIndex].topLevelNode.getGValue();
+
         // Perform numerical integration to calculate risk associated with
         // taking alpha as the expansion
         for (const auto& alpha : alphaBelief) {
@@ -177,6 +179,9 @@ private:
                 if (tla == simulateTLAIndex)
                     betaBelief = tlas[tla].belief_ps;
 
+                const auto betaGValue =
+                        tlas[tla].topLevelNode.getGValue();
+
                 // Integrate over values in beta belief
                 for (const auto& beta : betaBelief.belief) {
                     // Only use beta costs less than alpha cost
@@ -185,7 +190,8 @@ private:
                     if (beta.cost < alpha.cost) {
                         // Calculate the risk
                         double value = alpha.probability * beta.probability *
-                                (alpha.cost - beta.cost);
+                                (alpha.cost + alphaGValue - beta.cost -
+                                               betaGValue);
                         risk += value;
                     } else
 						//here Andrew assume, the belief nodes are arranged in ascending order

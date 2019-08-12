@@ -41,6 +41,8 @@ public:
         bool operator!=(const ProbabilityNode& node) {
             return !(*this == node);
         }
+
+        void shift(double shiftCost) { cost += shiftCost; }
     };
 
 	~DiscreteDistribution(){
@@ -582,6 +584,22 @@ public:
         distribution.clear();
 
         distribution = rhs.distribution;
+        maxSamples = rhs.maxSamples;
+    }
+
+    DiscreteDistribution(const DiscreteDistribution& rhs, double shiftCost) {
+        if (&rhs == this) {
+            return ;
+        }
+
+        distribution.clear();
+
+        distribution = rhs.distribution;
+
+		for(auto n:distribution){
+				n.shift(shiftCost);
+		}
+
         maxSamples = rhs.maxSamples;
     }
 };

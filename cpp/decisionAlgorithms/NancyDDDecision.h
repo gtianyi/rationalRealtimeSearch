@@ -23,7 +23,7 @@ public:
             vector<TopLevelAction>& tlas,
             shared_ptr<Node> start) {
 		// we might can avoid do this because we acturally do this in every expansion
-        NancyDDBackup<Domain, Node, TopLevelAction>::backup2TLA(tlas);
+        NancyDDBackup<Node, TopLevelAction>::backup2TLA(tlas);
 
         // Take the TLA with the lowest expected minimum path cost
         TopLevelAction lowestExpectedPathTLA = tlas[0];
