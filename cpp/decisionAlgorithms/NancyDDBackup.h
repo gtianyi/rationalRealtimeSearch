@@ -15,22 +15,22 @@ public:
         // The nancydd backup is backing up the two belief from the frontier
 		// to the TLA and update its minimum path cost.
         for (TopLevelAction& tla : tlas) {
-            if (tla.open.empty()) {
+            if (tla.open_TLA.empty()) {
                 tla.expectedMinimumPathCost =
                         numeric_limits<double>::infinity();
                 continue;
             }
 
-            shared_ptr<Node> best = tla.open.top();
+            shared_ptr<Node> best = tla.open_TLA.top();
 
-            tla.belief = DiscreteDistribution(best->distribution,
-                    best->getGvalue() - tla.topLevelNode->getGValue());
+            tla.belief = DiscreteDistribution(best->getHstartDistribution(),
+                    best->getGValue() - tla.topLevelNode->getGValue());
 
-            tla.belief_ps = DiscreteDistribution(best->distribution_ps,
-                    best->getGvalue() - tla.topLevelNode->getGValue());
+            tla.belief_ps = DiscreteDistribution(best->getHstartDistribution_ps(),
+                    best->getGValue() - tla.topLevelNode->getGValue());
 
             tla.expectedMinimumPathCost =
-                    tla.belief.expectedCost() + tla.topLevelNode->getGvalue();
+                    tla.belief.expectedCost() + tla.topLevelNode->getGValue();
 
         }
     }

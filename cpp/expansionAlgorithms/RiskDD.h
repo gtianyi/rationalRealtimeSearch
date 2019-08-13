@@ -52,7 +52,7 @@ public:
             int chosenTLAIndex = computeRiskByPSAndGetBestTLA(tlas);
 
             // Expand under the TLA which holds the lowest risk
-            shared_ptr<Node> chosenNode = tlas[chosenTLAIndex].open.top();
+            shared_ptr<Node> chosenNode = tlas[chosenTLAIndex].open_TLA.top();
 
             // Check if current node is goal. If it is, then the expansion phase
             // is over, time to move.
@@ -61,7 +61,7 @@ public:
             }
 
             // Remove the chosen node from open
-            tlas[chosenTLAIndex].open.pop();
+            tlas[chosenTLAIndex].open_TLA.pop();
             open.remove(chosenNode);
             chosenNode->close();
 
@@ -96,7 +96,7 @@ public:
                     closed[child] = childNode;
 
                     // Add to open of generating TLA
-                    tlas[chosenTLAIndex].open.push(childNode);
+                    tlas[chosenTLAIndex].open_TLA.push(childNode);
                 }
             }
         }
@@ -122,7 +122,7 @@ private:
         for (int i = 0; i < tlas.size(); i++) {
             // If this TLA has no unique subtree, skip its risk calc, it is
             // pruned
-            if (tlas[i].open.empty())
+            if (tlas[i].open_TLA.empty())
                 continue;
 
             // Calculate the risk associated with expanding that node (by using

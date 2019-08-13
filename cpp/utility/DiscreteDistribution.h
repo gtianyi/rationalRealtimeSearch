@@ -396,7 +396,7 @@ public:
     }
 
     // could optimize code here, comment by tianyi
-    double expectedCost() {
+    double expectedCost() const {
         double E = 0.0;
 
         for (ProbabilityNode n : distribution) {

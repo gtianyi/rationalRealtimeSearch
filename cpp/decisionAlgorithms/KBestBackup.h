@@ -78,9 +78,9 @@ private:
             int i = 0;
             // Add to the best k nodes while i < k and non-selected nodes exist
             // on the frontier
-            while (i < k && !tla.open.empty()) {
-                shared_ptr<Node> best = tla.open.top();
-                tla.open.pop();
+            while (i < k && !tla.open_TLA.empty()) {
+                shared_ptr<Node> best = tla.open_TLA.top();
+                tla.open_TLA.pop();
 
                 // Make this node's PDF a discrete distribution...
                 best->distribution = DiscreteDistribution(100,

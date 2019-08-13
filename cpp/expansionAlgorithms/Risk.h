@@ -46,7 +46,7 @@ public:
 			int chosenTLAIndex = simulateExpansion(tlas);
 
 			// Expand under the TLA which holds the lowest risk
-			shared_ptr<Node> chosenNode = tlas[chosenTLAIndex].open.top();
+			shared_ptr<Node> chosenNode = tlas[chosenTLAIndex].open_TLA.top();
 
 			// Add this node to the expansion delay window
 			domain.pushDelayWindow(chosenNode->getDelayCntr());
@@ -58,7 +58,7 @@ public:
 			}
 
 			// Remove the chosen node from open
-			tlas[chosenTLAIndex].open.pop();
+			tlas[chosenTLAIndex].open_TLA.pop();
 			open.remove(chosenNode);
 			chosenNode->close();
 
@@ -105,7 +105,7 @@ public:
 					closed[child] = childNode;
 
 					// Add to open of generating TLA
-					tlas[chosenTLAIndex].open.push(childNode);
+					tlas[chosenTLAIndex].open_TLA.push(childNode);
 				}
 			}
 
@@ -143,13 +143,13 @@ private:
 		for (int i = 0; i < tlas.size(); i++)
 		{
 			// If this TLA has no unique subtree, skip its risk calc, it is pruned
-			if (tlas[i].open.empty())
+			if (tlas[i].open_TLA.empty())
 				continue;
 
 			// Simulate how expanding this TLA's best node would affect its belief
 			// Belief of TLA is squished as a result of search. Mean stays the same, but variance is decreased by a factor based on expansion delay.
 			double ds = expansionsPerIteration / domain.averageDelayWindow();
-			double dy = tlas[i].open.top()->getDValue();
+			double dy = tlas[i].open_TLA.top()->getDValue();
 			double squishFactor = min(1.0, (ds / dy));
 
 			// Now squish the simulated belief by factor
@@ -262,10 +262,10 @@ private:
 
 			int i = 0;
 			// Add to the best k nodes while i < k and non-selected nodes exist on the frontier
-			while (i < k && !tla.open.empty())
+			while (i < k && !tla.open_TLA.empty())
 			{
-				shared_ptr<Node> best = tla.open.top();
-				tla.open.pop();
+				shared_ptr<Node> best = tla.open_TLA.top();
+				tla.open_TLA.pop();
 
 				// Make this node's PDF a discrete distribution...
 				best->distribution = DiscreteDistribution(100, best->getFValue(), best->getFHatValue(),
@@ -278,7 +278,7 @@ private:
 			// Now put the nodes back in the top level open list
 			for (shared_ptr<Node> n : tla.kBestNodes)
 			{
-				tla.open.push(n);
+				tla.open_TLA.push(n);
 			}
 
 			// Now that k-best are selected, perform Cserna backup

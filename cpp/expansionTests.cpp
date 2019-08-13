@@ -74,16 +74,7 @@ int main(int argc, char** argv)
 
     string result = "{ ";
 
-    if (domain == "TreeWorld") {
-        // Make a tree world
-        TreeWorld world = TreeWorld(cin);
-
-        startAlg(world, "bfs", "none", "k-best", lookaheadDepth, "BFS", result, 1, "normal");
-        startAlg(world, "a-star", "none", "k-best", lookaheadDepth, "A*", result, 1, "normal");
-        startAlg(world, "f-hat", "none", "k-best", lookaheadDepth, "F-Hat", result, 1, "normal");
-        startAlg(world, "risk", "none", "k-best", lookaheadDepth, "Risk", result, 1, "normal");
-        startAlg(world, "a-star", "none", "minimin", lookaheadDepth, "LSS-LRTA*", result);
-    } else if (domain == "SlidingPuzzle") {
+    if (domain == "SlidingPuzzle") {
         // Make a tile puzzle
         std::shared_ptr<SlidingTilePuzzle> world;
 

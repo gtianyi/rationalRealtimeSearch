@@ -33,7 +33,7 @@ public:
 		// Start by shoving everything on open onto the stack...
 		while (!open.empty())
 		{
-			tlas[open.top()->getOwningTLA()].open.remove(open.top());
+			tlas[open.top()->getOwningTLA()].open_TLA.remove(open.top());
 
 			// Pairs on stack represent <State's node, the depth it was generated in DFS>
 			theStack.push(make_pair(open.top(), 2));
@@ -52,7 +52,7 @@ public:
 			{
 				// Add this node to open and TLA open
 				open.push(cur.first);
-				tlas[cur.first->getOwningTLA()].open.push(cur.first);
+				tlas[cur.first->getOwningTLA()].open_TLA.push(cur.first);
 			}
 			else
 			{

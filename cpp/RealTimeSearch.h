@@ -17,7 +17,6 @@
 #include "expansionAlgorithms/DepthFirst.h"
 #include "expansionAlgorithms/Risk.h"
 #include "expansionAlgorithms/RiskDD.h"
-#include "expansionAlgorithms/Confidence.h"
 #include "learningAlgorithms/LearningAlgorithm.h"
 #include "learningAlgorithms/Dijkstra.h"
 #include "learningAlgorithms/Dijkstra_distribution.h"
@@ -66,7 +65,8 @@ public:
         Cost getHHatValueFromDist() const {
             if (twoDistribtuionCleared)
                 return numeric_limits<double>::infinity();
-            return hStartDistribution.expectedCost(); }
+            return hStartDistribution.expectedCost();
+        }
         State getState() const { return stateRep; }
         shared_ptr<Node> getParent() const { return parent; }
         int getOwningTLA() const { return owningTLA; }
@@ -89,11 +89,11 @@ public:
         void setOwningTLA(int tla) { owningTLA = tla; }
         void setParent(shared_ptr<Node> p) { parent = p; }
 
-        void setHStartDistribution(DiscreteDistribution& dist) {
+        void setHStartDistribution(const DiscreteDistribution& dist) {
             hStartDistribution = dist;
         }
 
-        void setHStartDistribution_ps(DiscreteDistribution& dist) {
+        void setHStartDistribution_ps(const DiscreteDistribution& dist) {
             hStartDistribution_ps = dist;
         }
 
@@ -132,8 +132,8 @@ public:
         }
 
         Node(Cost g,
-                DiscreteDistribution& hstartdist,
-                DiscreteDistribution& hstartdist_ps,
+                const DiscreteDistribution& hstartdist,
+                const DiscreteDistribution& hstartdist_ps,
                 State state,
                 shared_ptr<Node> parent,
                 int tla)
@@ -278,10 +278,6 @@ public:
         }  else if (expansionModule == "riskDD") {
             expansionAlgo = make_shared<RiskDD<Domain, Node, TopLevelActionDD>>(
                     domain, lookahead, 1);
-        } else if (expansionModule == "confidence") {
-            expansionAlgo =
-                    make_shared<Confidence<Domain, Node, TopLevelAction>>(
-                            domain, lookahead, 1);
         } else {
             expansionAlgo = make_shared<AStar<Domain, Node, TopLevelAction> >(domain, lookahead, "f");
             cout << "not specified expansion Mudule type, use Astart" << endl;
@@ -441,7 +437,7 @@ private:
             if (it->second->onOpen()) {
                 // This node is on OPEN, keep the better g-value
                 if (node->getGValue() < it->second->getGValue()) {
-                    tlaList[it->second->getOwningTLA()].open.remove(it->second);
+                    tlaList[it->second->getOwningTLA()].open_TLA.remove(it->second);
                     it->second->setGValue(node->getGValue());
                     it->second->setParent(node->getParent());
                     it->second->setHValue(node->getHValue());
@@ -451,7 +447,7 @@ private:
                     it->second->setEpsilonD(node->getEpsilonD());
                     it->second->setState(node->getState());
                     it->second->setOwningTLA(node->getOwningTLA());
-                    tlaList[node->getOwningTLA()].open.push(it->second);
+                    tlaList[node->getOwningTLA()].open_TLA.push(it->second);
                 }
             } else {
                 // This node is on CLOSED, compare the f-values. If this new
@@ -467,7 +463,7 @@ private:
                     it->second->setEpsilonD(node->getEpsilonD());
                     it->second->setState(node->getState());
                     it->second->setOwningTLA(node->getOwningTLA());
-                    tlaList[node->getOwningTLA()].open.push(it->second);
+                    tlaList[node->getOwningTLA()].open_TLA.push(it->second);
                     it->second->reOpen();
                     open.push(it->second);
                 }
@@ -493,14 +489,14 @@ private:
             if (it->second->onOpen()) {
                 // This node is on OPEN, keep the better g-value
                 if (node->getGValue() < it->second->getGValue()) {
-                    tlaList[it->second->getOwningTLA()].open.remove(it->second);
+                    tlaList[it->second->getOwningTLA()].open_TLA.remove(it->second);
                     it->second->setGValue(node->getGValue());
                     it->second->setParent(node->getParent());
                     it->second->setHStartDistribution(node->getHstartDistribution());
                     it->second->setHStartDistribution_ps(node->getHstartDistribution_ps());
                     it->second->setState(node->getState());
                     it->second->setOwningTLA(node->getOwningTLA());
-                    tlaList[node->getOwningTLA()].open.push(it->second);
+                    tlaList[node->getOwningTLA()].open_TLA.push(it->second);
                 }
             } else {
                 // This node is on CLOSED, compare the f-values. If this new
@@ -518,7 +514,7 @@ private:
                     it->second->setHStartDistribution_ps(node->getHstartDistribution_ps());
                     it->second->setState(node->getState());
                     it->second->setOwningTLA(node->getOwningTLA());
-                    tlaList[node->getOwningTLA()].open.push(it->second);
+                    tlaList[node->getOwningTLA()].open_TLA.push(it->second);
                     it->second->reOpen();
                     open.push(it->second);
                 }
@@ -580,7 +576,7 @@ private:
             // Push this node onto open and closed
             closed[child] = childNode;
             open.push(childNode);
-            tla.open.push(childNode);
+            tla.open_TLA.push(childNode);
 
             // Add this top level action to the list
             tlas.push_back(tla);
@@ -631,9 +627,9 @@ private:
             TopLevelAction tla;
             tla.topLevelNode = childNode;
 
-            childNode->distribution = domain.hstart_distribution(child);
+            childNode->hStartDistribution = domain.hstart_distribution(child);
 
-            childNode->distribution_ps = domain.hstart_distribution_ps(child);
+            childNode->hStartDistribution_ps = domain.hstart_distribution_ps(child);
 
             tla.expectedMinimumPathCost =
                     childNode->distribution.expectedCost() +
@@ -642,7 +638,7 @@ private:
             // Push this node onto open and closed
             closed[child] = childNode;
             open.push(childNode);
-            tla.open.push(childNode);
+            tla.open_TLA.push(childNode);
 
             // Add this top level action to the list
             tlas.push_back(tla);

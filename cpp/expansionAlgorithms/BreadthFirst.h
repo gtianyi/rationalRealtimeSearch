@@ -63,7 +63,7 @@ public:
 			open.remove(cur);
 
 			// Remove this node from the open list of any TLAs
-			tlas[cur->getOwningTLA()].open.remove(cur);
+			tlas[cur->getOwningTLA()].open_TLA.remove(cur);
 
 			vector<State> children = domain.successors(cur->getState());
 			res.nodesGenerated += children.size();
@@ -93,7 +93,7 @@ public:
 					closed[child] = childNode;
 
 					// Add to open of generating TLA
-					tlas[childNode->getOwningTLA()].open.push(childNode);
+					tlas[childNode->getOwningTLA()].open_TLA.push(childNode);
 				}
 			}
 
