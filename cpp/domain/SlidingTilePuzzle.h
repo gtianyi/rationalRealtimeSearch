@@ -317,7 +317,7 @@ public:
         correctedH[state] = value;
     }
 
-    pair<DiscreteDistribution, DiscreteDistribution> update_hstart_distribution(
+    pair<DiscreteDistribution, DiscreteDistribution> update_two_distribution(
             const State& state,
             const State& pred,
             Cost value) {

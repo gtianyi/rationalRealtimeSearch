@@ -3,7 +3,7 @@
 #rm ../backupTestsDFS
 #rm ../backupTestsAS
 #rm ../expansionTests
-rm ../expansionTests-debug
+rm -rf ../expansionTests-debug
 
 #g++ -std=c++11 ../cpp/generateTrees.cpp -o ../generateTrees
 #g++ -std=c++11 ../cpp/lastIncrementalTests.cpp -o ../lastIncremental

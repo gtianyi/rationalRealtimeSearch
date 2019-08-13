@@ -168,11 +168,11 @@ private:
             const vector<TopLevelAction>& tlas) const {
         double risk = 0;
 
-        const auto& alphaBelief = tlas[alphaIndex].belief;
-        if (alphaIndex == simulateTLAIndex)
-            alphaBelief = tlas[alphaIndex].belief_ps;
+        const auto& alphaBelief = alphaIndex == simulateTLAIndex ?
+                tlas[alphaIndex].belief_ps :
+                tlas[alphaIndex].belief;
 
-		const auto alphaGValue = tlas[alphaIndex].topLevelNode.getGValue();
+        const auto alphaGValue = tlas[alphaIndex].topLevelNode->getGValue();
 
         // Perform numerical integration to calculate risk associated with
         // taking alpha as the expansion
@@ -182,15 +182,14 @@ private:
                 if (tla == alphaIndex)
                     continue;
 
-                const auto& betaBelief = tlas[tla].belief;
-                if (tla == simulateTLAIndex)
-                    betaBelief = tlas[tla].belief_ps;
+                const auto& betaBelief = tla == simulateTLAIndex ?
+                        tlas[tla].belief_ps :
+                        tlas[tla].belief;
 
-                const auto betaGValue =
-                        tlas[tla].topLevelNode.getGValue();
+                const auto betaGValue = tlas[tla].topLevelNode->getGValue();
 
                 // Integrate over values in beta belief
-                for (const auto& beta : betaBelief.belief) {
+                for (const auto& beta : betaBelief) {
                     // Only use beta costs less than alpha cost
                     // in risk
                     // analysis

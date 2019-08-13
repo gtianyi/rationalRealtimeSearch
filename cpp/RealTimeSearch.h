@@ -220,6 +220,9 @@ public:
         shared_ptr<Node> topLevelNode;
         vector<shared_ptr<Node>> kBestNodes;
         DiscreteDistribution belief;
+        DiscreteDistribution belief_ps;
+        Cost h_TLA;
+
 
         TopLevelAction() { open_TLA.swapComparator(Node::compareNodesFHat); }
 
@@ -241,17 +244,14 @@ public:
             belief = rhs.belief;
             return *this;
         }
+
+        Cost getF_TLA() { return this->topLevelNode->getGValue() + h_TLA; }
     };
 
     struct TopLevelActionDD : public TopLevelAction {
-        DiscreteDistribution belief_ps;
-        Cost h_TLA;
-
         TopLevelActionDD() {
             this->open_TLA.swapComparator(Node::compareNodesFHatFromDist);
         }
-
-        Cost getF_TLA() { return this->topLevelNode->getGValue() + h_TLA; }
     };
 
     RealTimeSearch(Domain& domain,
@@ -285,7 +285,7 @@ public:
             expansionAlgo = make_shared<Risk<Domain, Node, TopLevelAction>>(
                     domain, lookahead, 1);
         } else if (expansionModule == "riskDD") {
-            expansionAlgo = make_shared<RiskDD<Domain, Node, TopLevelActionDD>>(
+            expansionAlgo = make_shared<RiskDD<Domain, Node, TopLevelAction>>(
                     domain, lookahead, 1);
         } else {
             expansionAlgo = make_shared<AStar<Domain, Node, TopLevelAction>>(
@@ -301,7 +301,7 @@ public:
                     make_shared<Dijkstra<Domain, Node, TopLevelAction>>(domain);
         } else if (learningModule == "learnDD") {
             learningAlgo = make_shared<
-                    DijkstraDistribution<Domain, Node, TopLevelActionDD>>(
+                    DijkstraDistribution<Domain, Node, TopLevelAction>>(
                     domain);
         } else {
             learningAlgo =
@@ -322,7 +322,7 @@ public:
                             domain, k, lookahead);
         } else if (decisionModule == "nancyDD") {
             decisionAlgo = make_shared<
-                    NancyDDDecision<Domain, Node, TopLevelActionDD>>(
+                    NancyDDDecision<Domain, Node, TopLevelAction>>(
                     domain, lookahead);
         } else {
             decisionAlgo =
@@ -355,6 +355,7 @@ public:
             start = make_shared<Node>(0,
                     domain.hstart_distribution(domain.getStartState()),
                     domain.hstart_distribution_ps(domain.getStartState()),
+                    domain.heuristic(domain.getStartState()),
                     domain.getStartState(),
                     nullptr,
                     -1);
@@ -632,7 +633,7 @@ private:
             // No top level action will ever be a duplicate, so no need to
             // check.
             // Make a new top level action and push this node onto its open
-            TopLevelAction tla;
+            TopLevelActionDD tla;
             tla.topLevelNode = childNode;
 
             childNode->hStartDistribution = domain.hstart_distribution(child);
@@ -643,6 +644,8 @@ private:
                     childNode->distribution.expectedCost() +
                     childNode->getGValue();
 
+			tla.h_TLA  = childNode->getHValue();
+
             // Push this node onto open and closed
             closed[child] = childNode;
             open.push(childNode);
@@ -651,18 +654,17 @@ private:
             // Add this top level action to the list
             tlas.push_back(tla);
         }
-        }
+    }
 
-        void restartLists(shared_ptr<Node> start)
-	{
-		// clear the TLA list
-		tlas.clear();
+    void restartLists(shared_ptr<Node> start) {
+        // clear the TLA list
+        tlas.clear();
 
-		// Empty OPEN and CLOSED
-		open.clear();
+        // Empty OPEN and CLOSED
+        open.clear();
 
-		// delete all of the nodes from the last expansion phase
-		closed.clear();
+        // delete all of the nodes from the last expansion phase
+        closed.clear();
 	}
 
 	void clean()

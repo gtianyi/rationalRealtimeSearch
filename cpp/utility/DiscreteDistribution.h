@@ -529,9 +529,11 @@ public:
         return *this;
     }
 
-    set<ProbabilityNode>::iterator begin() { return distribution.begin(); }
+    set<ProbabilityNode>::iterator begin() const {
+        return distribution.begin();
+    }
 
-    set<ProbabilityNode>::iterator end() { return distribution.end(); }
+    set<ProbabilityNode>::iterator end() const { return distribution.end(); }
 
     // below are code added by tianyi
     template <class Domain>
