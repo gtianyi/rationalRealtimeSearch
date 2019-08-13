@@ -25,7 +25,7 @@ public:
                 it != closed.end();
                 it++) {
             if (!it->second->onOpen())
-                domain.updateDistribtuion(it->first, Null);
+                it->second->markClearTwoDistribtuion();
         }
 
         // Order open by f-hat
@@ -46,13 +46,16 @@ public:
                 if (it != closed.end() &&
                         domain.HHatFromDistribution(s) >
                                 domain.getEdgeCost(cur->getState()) +
-                                        domain.hhat(cur->getState())) {
+                                        domain.HHatFromDistribution(
+                                                cur->getState())) {
                     // Update the heuristic of this pedecessor
-                    auto newdistribution = domain.updateDistribtuion(s,
-                            domain.getEdgeCost(cur->getState()),
-                            domain.getDistribution(cur->getState()));
+                    auto distribution_pair = domain.update_two_distribution(s,
+                            cur->getState(),
+                            domain.getEdgeCost(cur->getState()));
 
-                    it->second->setDistribtuion(newdistribution);
+                    it->second->setHStartDistribution(distribution_pair.first);
+                    it->second->setHStartDistribution_ps(distribution_pair.second);
+                    it->second->markUnClearTwoDistribtuion();
 
                     if (open.find(it->second) == open.end()) {
                         open.push(it->second);

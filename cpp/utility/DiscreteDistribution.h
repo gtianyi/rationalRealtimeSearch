@@ -587,6 +587,7 @@ public:
         maxSamples = rhs.maxSamples;
     }
 
+	//create a distribution by shifting from the predescssor distribution
     DiscreteDistribution(const DiscreteDistribution& rhs, double shiftCost) {
         if (&rhs == this) {
             return ;

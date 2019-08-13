@@ -49,7 +49,7 @@ public:
         DiscreteDistribution distribution;
         DiscreteDistribution hStartDistribution;
         DiscreteDistribution hStartDistribution_ps;
-        bool lackOfHValueData;
+		bool twoDistribtuionCleared;
 
     public:
         Cost getGValue() const { return g; }
@@ -63,7 +63,10 @@ public:
         Cost getFHatValueFromDist() const { return g + getHHatValueFromDist(); }
         Cost getDHatValue() const { return (derr / (1.0 - epsD)); }
         Cost getHHatValue() const { return h + getDHatValue() * epsH; }
-        Cost getHHatValueFromDist() const { return hStartDistribution.expectedCost(); }
+        Cost getHHatValueFromDist() const {
+            if (twoDistribtuionCleared)
+                return numeric_limits<double>::infinity();
+            return hStartDistribution.expectedCost(); }
         State getState() const { return stateRep; }
         shared_ptr<Node> getParent() const { return parent; }
         int getOwningTLA() const { return owningTLA; }
@@ -103,6 +106,9 @@ public:
         void incDelayCntr() { delayCntr++; }
         int getDelayCntr() { return delayCntr; }
 
+        void markClearTwoDistribution() { twoDistribtuionCleared = true; }
+        void markUnClearTwoDistribution() { twoDistribtuionCleared = false; }
+
         Node(Cost g,
                 Cost h,
                 Cost d,
@@ -139,7 +145,7 @@ public:
                   owningTLA(tla) {
             open = true;
             delayCntr = 0;
-            lackOfHValueData = false;
+            twoDistribtuionCleared = false;
         }
 
         friend std::ostream& operator<<(std::ostream& stream,
@@ -188,13 +194,9 @@ public:
                 const shared_ptr<Node> n2) {
             // Tie break on g-value
             if (n1->getFHatValueFromDist() == n2->getFHatValueFromDist()) {
-                if (n1->getFValue() == n2->getFValue())
-                {
 				    return n1->getGValue() > n2->getGValue();
-                }
-                return n1->getFValue() < n2->getFValue();
 			}
-			return n1->getFHatValue() < n2->getFHatValue();
+			return n1->getFHatValueFromDist() < n2->getFHatValueFromDist();
         }
 
         static bool compareNodesH(const shared_ptr<Node> n1,

@@ -315,8 +315,16 @@ public:
         correctedH[state] = value;
     }
 
-    void update_hstart_distribution(const State& state, Cost value) {
-        correctedH[state] = value;
+    pair<DiscreteDistribution, DiscreteDistribution> update_two_distribution(
+            const State& state,
+            const State& pred,
+            Cost value) {
+        correctedDistribution[state] = DiscreteDistribution(correctedDistribution[pred], value);
+        correctedPostSearchDistribution[state] = DiscreteDistribution(
+                correctedPostSearchDistribution[pred], value);
+
+        return make_pair(correctedDistribution[state],
+                correctedPostSearchDistribution[state]);
     }
 
     Cost manhattanDistance(const State& state) const {
