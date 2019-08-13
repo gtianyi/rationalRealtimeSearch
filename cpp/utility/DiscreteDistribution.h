@@ -597,9 +597,9 @@ public:
 
         distribution = rhs.distribution;
 
-		for(auto n:distribution){
-				n.shift(shiftCost);
-		}
+        for (auto n : distribution) {
+            n.shift(shiftCost);
+        }
 
         maxSamples = rhs.maxSamples;
     }

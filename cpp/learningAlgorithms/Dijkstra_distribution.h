@@ -54,8 +54,14 @@ public:
                             cur->getState(),
                             domain.getEdgeCost(cur->getState()));
 
+                    auto newh = cur->getHValue() +
+                            domain.getEdgeCost(cur->getState());
+                    domain.updateHeuristic(s, newh);
+
                     it->second->setHStartDistribution(distribution_pair.first);
-                    it->second->setHStartDistribution_ps(distribution_pair.second);
+                    it->second->setHStartDistribution_ps(
+                            distribution_pair.second);
+                    it->second->setHValue(newh);
                     it->second->markUnClearTwoDistribution();
 
                     if (open.find(it->second) == open.end()) {

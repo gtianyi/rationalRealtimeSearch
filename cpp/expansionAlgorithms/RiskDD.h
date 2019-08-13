@@ -82,6 +82,7 @@ public:
                         chosenNode->getGValue() + domain.getEdgeCost(child),
                         domain.hstart_distribution(child),
                         domain.hstart_distribution_ps(child),
+                        domain.heuristic(child),
                         child,
                         chosenNode,
                         tlas.size());
@@ -131,14 +132,20 @@ private:
 
             // If this is the first TLA risk has been calculated for, it by
             // default minimizes risk...
-            // If two actions minimize risk by same value, tie break on f-hat -> g in this order.
-            // Andrew do  f-hat -> f -> g, we get rid of f here since we will never use h after learning.
+            // If two actions minimize risk by same value
+			// tie break on fhat - > backed-up  f -> g in this order.
             if (riskCalculation == minimalRisk) {
                 if (tlas[i].topLevelNode->getFHatValueFromDist() ==
                         tlas[minimalRiskTLA]
                                 .topLevelNode->getFHatValueFromDist()) {
-                    if (tlas[i].topLevelNode->getGValue() >
-                            tlas[minimalRiskTLA].topLevelNode->getGValue()) {
+                    if (tlas[i].getF_TLA() == tlas[minimalRiskTLA].getF_TLA()) {
+                        if (tlas[i].topLevelNode->getGValue() >
+                                tlas[minimalRiskTLA]
+                                        .topLevelNode->getGValue()) {
+                            minimalRiskTLA = i;
+                        }
+                    } else if (tlas[i].getF_TLA() <
+                            tlas[minimalRiskTLA].getF_TLA()) {
                         minimalRiskTLA = i;
                     }
                 } else if (tlas[i].topLevelNode->getFHatValue() <
@@ -150,10 +157,10 @@ private:
                 // lowest
                 minimalRisk = riskCalculation;
                 minimalRiskTLA = i;
-			}
-		}
+            }
+        }
 
-		return minimalRiskTLA;
+        return minimalRiskTLA;
     }
 
     double riskAnalysis(int alphaIndex,

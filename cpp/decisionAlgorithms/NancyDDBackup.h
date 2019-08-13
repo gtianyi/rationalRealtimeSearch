@@ -29,6 +29,9 @@ public:
             tla.belief_ps = DiscreteDistribution(best->getHstartDistribution_ps(),
                     best->getGValue() - tla.topLevelNode->getGValue());
 
+            tla.h_TLA = best->getHValue() +
+                    (best->getGValue() - tla.topLevelNode->getGValue());
+
             tla.expectedMinimumPathCost =
                     tla.belief.expectedCost() + tla.topLevelNode->getGValue();
 

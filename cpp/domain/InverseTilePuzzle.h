@@ -167,6 +167,37 @@ public:
         return correctedH[state];
     }
 
+    DiscreteDistribution hstart_distribution(const State& state) {
+        // Check if the heuristic h-hat of this state has been updated
+        if (correctedDistribution.find(state) != correctedDistribution.end()) {
+            return correctedDistribution[state];
+        }
+
+        Cost h = manhattanDistanceWithInverseFaceCost(state);
+
+        correctedDistribution[state] = DiscreteDistribution(h);
+        correctedPostSearchDistribution[state] = DiscreteDistribution(h,true);
+
+        updateHeuristic(state, h);
+
+        return correctedDistribution[state];
+    }
+
+    DiscreteDistribution hstart_distribution_ps(const State& state) {
+        // Check if the heuristic h-hat of this state has been updated
+        if (correctedDistribution.find(state) != correctedDistribution.end()) {
+            return correctedDistribution[state];
+        }
+
+        Cost h = manhattanDistanceWithInverseFaceCost(state);
+
+        correctedDistribution[state] = DiscreteDistribution(h);
+        correctedPostSearchDistribution[state] = DiscreteDistribution(h,true);
+
+        return correctedPostSearchDistribution[state];
+    }
+
+
     Cost manhattanDistanceWithInverseFaceCost(const State& state) const {
         Cost manhattanSum = 0;
 

@@ -134,12 +134,14 @@ public:
         Node(Cost g,
                 const DiscreteDistribution& hstartdist,
                 const DiscreteDistribution& hstartdist_ps,
+                Cost h,
                 State state,
                 shared_ptr<Node> parent,
                 int tla)
                 : g(g),
                   hStartDistribution(hstartdist),
                   hStartDistribution_ps(hstartdist_ps),
+				  h(h),
                   stateRep(state),
                   parent(parent),
                   owningTLA(tla) {
@@ -192,9 +194,12 @@ public:
 
         static bool compareNodesFHatFromDist(const shared_ptr<Node> n1,
                 const shared_ptr<Node> n2) {
-            // Tie break on g-value
+            // Tie break on f-value then g-value
             if (n1->getFHatValueFromDist() == n2->getFHatValueFromDist()) {
-				    return n1->getGValue() > n2->getGValue();
+                if (n1->getFValue() == n2->getFValue()) {
+                    return n1->getGValue() > n2->getGValue();
+                }
+                return n1->getFValue() < n2->getFValue();
 			}
 			return n1->getFHatValueFromDist() < n2->getFHatValueFromDist();
         }
@@ -215,7 +220,6 @@ public:
         shared_ptr<Node> topLevelNode;
         vector<shared_ptr<Node>> kBestNodes;
         DiscreteDistribution belief;
-        DiscreteDistribution belief_ps;
 
         TopLevelAction() { open_TLA.swapComparator(Node::compareNodesFHat); }
 
@@ -239,11 +243,16 @@ public:
         }
     };
 
-	struct TopLevelActionDD : public TopLevelAction {
-		TopLevelActionDD() {
-			this->open_TLA.swapComparator(Node::compareNodesFHatFromDist);
-		}
-	};
+    struct TopLevelActionDD : public TopLevelAction {
+        DiscreteDistribution belief_ps;
+        Cost h_TLA;
+
+        TopLevelActionDD() {
+            this->open_TLA.swapComparator(Node::compareNodesFHatFromDist);
+        }
+
+        Cost getF_TLA() { return this->topLevelNode->getGValue() + h_TLA; }
+    };
 
     RealTimeSearch(Domain& domain,
             string expansionModule,
@@ -275,11 +284,12 @@ public:
         } else if (expansionModule == "risk") {
             expansionAlgo = make_shared<Risk<Domain, Node, TopLevelAction>>(
                     domain, lookahead, 1);
-        }  else if (expansionModule == "riskDD") {
+        } else if (expansionModule == "riskDD") {
             expansionAlgo = make_shared<RiskDD<Domain, Node, TopLevelActionDD>>(
                     domain, lookahead, 1);
         } else {
-            expansionAlgo = make_shared<AStar<Domain, Node, TopLevelAction> >(domain, lookahead, "f");
+            expansionAlgo = make_shared<AStar<Domain, Node, TopLevelAction>>(
+                    domain, lookahead, "f");
             cout << "not specified expansion Mudule type, use Astart" << endl;
         }
 
@@ -293,8 +303,9 @@ public:
             learningAlgo = make_shared<
                     DijkstraDistribution<Domain, Node, TopLevelActionDD>>(
                     domain);
-        }  else {
-            learningAlgo = make_shared<Dijkstra<Domain, Node, TopLevelAction> >(domain);
+        } else {
+            learningAlgo =
+                    make_shared<Dijkstra<Domain, Node, TopLevelAction>>(domain);
         }
 
         if (decisionModule == "minimin") {
@@ -310,10 +321,10 @@ public:
                     make_shared<KBestBackup<Domain, Node, TopLevelAction>>(
                             domain, k, lookahead);
         } else if (decisionModule == "nancyDD") {
-            decisionAlgo =
-                    make_shared<NancyDDDecision<Domain, Node, TopLevelActionDD>>(
-                            domain, lookahead);
-        }  else {
+            decisionAlgo = make_shared<
+                    NancyDDDecision<Domain, Node, TopLevelActionDD>>(
+                    domain, lookahead);
+        } else {
             decisionAlgo =
                     make_shared<ScalarBackup<Domain, Node, TopLevelAction>>(
                             "minimin");
@@ -488,13 +499,14 @@ private:
             // OPEN
             if (it->second->onOpen()) {
                 // This node is on OPEN, keep the better g-value
+				//
+				// we only update the g value, and the parent,
+				// since everything else should be identical with the same state
+				// then change the owing tla
                 if (node->getGValue() < it->second->getGValue()) {
                     tlaList[it->second->getOwningTLA()].open_TLA.remove(it->second);
                     it->second->setGValue(node->getGValue());
                     it->second->setParent(node->getParent());
-                    it->second->setHStartDistribution(node->getHstartDistribution());
-                    it->second->setHStartDistribution_ps(node->getHstartDistribution_ps());
-                    it->second->setState(node->getState());
                     it->second->setOwningTLA(node->getOwningTLA());
                     tlaList[node->getOwningTLA()].open_TLA.push(it->second);
                 }
@@ -503,16 +515,11 @@ private:
                 // f-value is better, reset g, h, and d.
                 // Then reopen the node.
 				//
-				// here for dd we compare f-hat, because in the learning, 
-				// if its distribution is updated, then the hvalue should not
-				// be ues anywhere
-                if (node->getFHatValueFromDist() < it->second->getFHatValueFromDist()) {
+				// here for dd we compare g, because for the same state, 
+				// their h value are the same.
+                if (node->getGValue() < it->second->getGValue()) {
                     it->second->setGValue(node->getGValue());
                     it->second->setParent(node->getParent());
-                    it->second->setHStartDistribution(
-                            node->getHstartDistribution());
-                    it->second->setHStartDistribution_ps(node->getHstartDistribution_ps());
-                    it->second->setState(node->getState());
                     it->second->setOwningTLA(node->getOwningTLA());
                     tlaList[node->getOwningTLA()].open_TLA.push(it->second);
                     it->second->reOpen();
@@ -612,6 +619,7 @@ private:
                     start->getGValue() + domain.getEdgeCost(child),
                     domain.hstart_distribution(child),
                     domain.hstart_distribution_ps(child),
+					domain.heuristic(child),
                     child,
                     start,
                     tlas.size());
