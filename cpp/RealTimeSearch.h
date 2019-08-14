@@ -419,7 +419,7 @@ public:
             start = decisionAlgo->backup(open, tlas, start);
 
             // Learning Phase
-            learningAlgo->learn(open, closed);
+			learningAlgo->learn(open, closed);
 
             cout << "g " << start->getGValue() << " h " << start->getHValue()
                  << endl;

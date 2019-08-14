@@ -33,12 +33,12 @@ public:
             return this->cost > node.cost;
         }
 
-        bool operator==(const ProbabilityNode& node) {
+        bool operator==(const ProbabilityNode& node) const {
             return (this->cost == node.cost) &&
                     (this->probability == node.probability);
         }
 
-        bool operator!=(const ProbabilityNode& node) {
+        bool operator!=(const ProbabilityNode& node) const{
             return !(*this == node);
         }
 
@@ -563,6 +563,8 @@ public:
         //int hIndex = int(round(h * 100)); //have to fix this for inverse
         int hIndex = int(h);
 
+        //cout << "see a new state, h: " << hIndex << endl;
+
         unordered_map<int, vector<DiscreteDistribution::ProbabilityNode>>&
                 table = isPostSearch ? hPostSearchTable : hValueTable;
 
@@ -589,7 +591,7 @@ public:
         maxSamples = rhs.maxSamples;
     }
 
-	//create a distribution by shifting from the predescssor distribution
+    // create a distribution by shifting from the predescssor distribution
     DiscreteDistribution(const DiscreteDistribution& rhs, double shiftCost) {
         if (&rhs == this) {
             return ;
@@ -597,10 +599,9 @@ public:
 
         distribution.clear();
 
-        distribution = rhs.distribution;
-
-        for (auto n : distribution) {
+        for (auto n : rhs.distribution) {
             n.shift(shiftCost);
+			distribution.insert(n);
         }
 
         maxSamples = rhs.maxSamples;

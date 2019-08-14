@@ -29,8 +29,8 @@ public:
         // Take the TLA with the lowest expected minimum path cost
         TopLevelAction lowestExpectedPathTLA = tlas[0];
         for (const TopLevelAction& tla : tlas) {
-            cout << "expectedMinimumPathCost of TLA "
-                 << tla.expectedMinimumPathCost << endl;
+            //cout << "expectedMinimumPathCost of TLA "
+                 //<< tla.expectedMinimumPathCost << endl;
 
             /*if (tla.expectedMinimumPathCost ==*/
                     //lowestExpectedPathTLA.expectedMinimumPathCost) {
@@ -44,15 +44,15 @@ public:
                     lowestExpectedPathTLA.expectedMinimumPathCost)
                 lowestExpectedPathTLA = tla;
 
-            /*cout << "tla size: " << tla.open_TLA.size() << endl;*/
-            //cout << "tla open top: " << tla.open_TLA.top() << endl;
-            //cout << "tla open top h: " << tla.open_TLA.top()->getHValue()
-                 //<< endl;
+			//cout << "tla size: " << tla.open_TLA.size() << endl;
+			//cout << "tla open top: \n" << tla.open_TLA.top()->getState() << endl;
+			cout << "tla open top h: " << tla.open_TLA.top()->getHValue()
+				 << endl;
             //cout << "tla open top original h: "
                  //<< domain.manhattanDistance(tla.open_TLA.top()->getState()) << endl;
-            //cout << "tla open top dist exp: "
-                 //<< tla.open_TLA.top()->getHstartDistribution().expectedCost()
-                 //<< endl;
+			cout << "tla open top dist exp: "
+				 << tla.open_TLA.top()->getHstartDistribution().expectedCost()
+				 << endl;
             /*cout << "tla exp cost: " << tla.expectedMinimumPathCost << endl;*/
         }
 
