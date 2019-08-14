@@ -11,3 +11,4 @@ expansionTests-debug
 generateTrees
 lastIncremental
 *.txt
+*.nfs*
