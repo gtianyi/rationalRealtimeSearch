@@ -422,6 +422,8 @@ public:
             cout << "g " << start->getGValue() << " h " << start->getHValue()
                  << endl;
 
+            cout << "learned state table "
+                 << domain.getCorrectDistributionSize() << endl;
             // Add this step to the path taken so far
             res.path.push(start->getState().getLabel());
 		}
@@ -496,6 +498,7 @@ private:
                 closed.find(node->getState());
 
         if (it != closed.end()) {
+            cout << "duplicate here\n";
             // This state has been generated before, check if its node is on
             // OPEN
             if (it->second->onOpen()) {
@@ -612,9 +615,6 @@ private:
         vector<State> children = domain.successors(start->getState());
         res.nodesGenerated += children.size();
 
-        State bestChild;
-        Cost bestF = numeric_limits<double>::infinity();
-
         for (State child : children) {
             shared_ptr<Node> childNode = make_shared<Node>(
                     start->getGValue() + domain.getEdgeCost(child),
@@ -624,11 +624,6 @@ private:
                     child,
                     start,
                     tlas.size());
-
-            if (childNode->getFValue() < bestF) {
-                bestF = childNode->getFValue();
-                bestChild = child;
-            }
 
             // No top level action will ever be a duplicate, so no need to
             // check.

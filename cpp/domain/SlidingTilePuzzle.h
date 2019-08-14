@@ -565,7 +565,8 @@ public:
         cout << "reading unit tile data\n";
         string line;
 
-        int h, valueCount, hs, hsCount;
+        int h, valueCount, hsCount;
+		double hs;
 
         while (getline(f, line)) {
             stringstream ss(line);
@@ -573,9 +574,9 @@ public:
             ss >> h;
             ss >> valueCount;
 
-   /*         if (valueCount < 10) {*/
-				//continue;
-			//}
+            /*         if (valueCount < 10) {*/
+            // continue;
+            //}
 
             if (hValueTable.find(h) != hValueTable.end()) {
                 cout << "error: duplicate h from data " << h << "\n";
@@ -593,10 +594,14 @@ public:
 
 		f.close();
 
-		//cout << "total h " << hValueTable.size() << "\n";
+		cout << "total h buckets " << hValueTable.size() << "\n";
     }
 
     virtual string getSubDomainName() const { return "uniform"; }
+
+    int getCorrectDistributionSize() const {
+        return correctedDistribution.size();
+    }
 
     std::vector<std::vector<int>> startBoard;
     std::vector<std::vector<int>> endBoard;

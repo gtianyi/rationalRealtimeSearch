@@ -85,7 +85,7 @@ public:
                         domain.heuristic(child),
                         child,
                         chosenNode,
-                        tlas.size());
+                        chosenNode->getOwningTLA());
 
                 bool dup = duplicateDetection(childNode, closed, open, tlas);
 

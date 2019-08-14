@@ -38,13 +38,16 @@ public:
 
             closed.erase(cur->getState());
 
+            //cout << "closed size: " << closed.size() << endl;
+            //cout << "open size: " << open.size() << endl;
+
             // Now get all of the predecessors of cur
             for (State s : domain.predecessors(cur->getState())) {
                 typename unordered_map<State, shared_ptr<Node>, Hash>::iterator
                         it = closed.find(s);
 
                 if (it != closed.end() &&
-                        domain.hstart_distribution(s).expectedCost() >
+                        it->second->getFHatValueFromDist() >
                                 domain.getEdgeCost(cur->getState()) +
                                         domain.hstart_distribution(
                                                       cur->getState())
