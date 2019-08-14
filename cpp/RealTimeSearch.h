@@ -232,6 +232,8 @@ public:
             topLevelNode = tla.topLevelNode;
             kBestNodes = tla.kBestNodes;
             belief = tla.belief;
+			belief_ps = tla.belief_ps;
+			h_TLA = tla.h_TLA;
         }
 
         TopLevelAction& operator=(const TopLevelAction& rhs) {
@@ -245,7 +247,7 @@ public:
             return *this;
         }
 
-        Cost getF_TLA() { return this->topLevelNode->getGValue() + h_TLA; }
+        Cost getF_TLA() const { return this->topLevelNode->getGValue() + h_TLA; }
     };
 
     struct TopLevelActionDD : public TopLevelAction {
@@ -413,17 +415,19 @@ public:
                 break;
             }
 
-            // Learning Phase
-            learningAlgo->learn(open, closed);
-
             // Decision-making Phase
             start = decisionAlgo->backup(open, tlas, start);
+
+            // Learning Phase
+            learningAlgo->learn(open, closed);
 
             cout << "g " << start->getGValue() << " h " << start->getHValue()
                  << endl;
 
             cout << "learned state table "
                  << domain.getCorrectDistributionSize() << endl;
+
+            cout << start->getState() << endl;
             // Add this step to the path taken so far
             res.path.push(start->getState().getLabel());
 		}
@@ -498,7 +502,6 @@ private:
                 closed.find(node->getState());
 
         if (it != closed.end()) {
-            cout << "duplicate here\n";
             // This state has been generated before, check if its node is on
             // OPEN
             if (it->second->onOpen()) {

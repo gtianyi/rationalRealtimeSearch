@@ -54,6 +54,11 @@ public:
             // Expand under the TLA which holds the lowest risk
             shared_ptr<Node> chosenNode = tlas[chosenTLAIndex].open_TLA.top();
 
+            //cout << "exp: choseNode \n" << chosenNode->getState() << endl;
+			//cout << "exp: choseNode \n";
+            //cout << "g " << chosenNode->getGValue() << " h "
+                 //<< chosenNode->getHValue() << endl;
+
             // Check if current node is goal. If it is, then the expansion phase
             // is over, time to move.
             if (domain.isGoal(chosenNode->getState())) {
@@ -159,6 +164,8 @@ private:
                 minimalRiskTLA = i;
             }
         }
+
+        //cout << "min risk value " << minimalRisk << endl;
 
         return minimalRiskTLA;
     }
