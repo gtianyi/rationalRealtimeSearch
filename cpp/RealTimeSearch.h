@@ -421,13 +421,9 @@ public:
             // Learning Phase
 			learningAlgo->learn(open, closed);
 
-            cout << "g " << start->getGValue() << " h " << start->getHValue()
-                 << endl;
+            //cout << "g " << start->getGValue() << " h " << start->getHValue()
+                 //<< endl;
 
-            cout << "learned state table "
-                 << domain.getCorrectDistributionSize() << endl;
-
-            cout << start->getState() << endl;
             // Add this step to the path taken so far
             res.path.push(start->getState().getLabel());
 		}

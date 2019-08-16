@@ -2,17 +2,19 @@
 
 if [ "$1" = "help" ] || [ "$1" = "-help" ] || [ "$1" = "?" ]
 then
-  echo "./expansionTestHarness.sh <starting instance #> <# of instances to test> <# of processes> <Domain Type> <Domain Variables> <Lookahead value> <optional: additional lookahead values>"
+  echo "./expansionTestHarness.sh <starting instance #> <# of instances to test> <# of processes> <Domain Type> <Domain Variables> <# of algorithm> <algorithm> <optional: additional algorithms> <Lookahead value> <optional: additional lookahead values>"
   echo "Available domain types are TreeWorld and SlidingPuzzle"
+  echo "Algorithms are: bfs, astar, fhat, lsslrtastar, risk, riskdd"
   echo "Domain variables for TreeWorld: <branching factor> <tree depth>"
   echo "Domain variables for SlidingPuzzle: <puzzle dimensions> <puzzle type>"
   exit 1
 fi
 
-if (($# < 6))
+if (($# < 8))
 then
-  echo "./expansionTestHarness.sh <starting instance #> <# of instances to test> <# of processes> <Domain Type> <Domain Variables> <Lookahead value> <optional: additional lookahead values>"
+  echo "./expansionTestHarness.sh <starting instance #> <# of instances to test> <# of processes> <Domain Type> <Domain Variables> <# of algorithm> <algorithm> <optional: additional algorithms> <Lookahead value> <optional: additional lookahead values>"
   echo "Available domain types are TreeWorld and SlidingPuzzle"
+  echo "Algorithms are: bfs, astar, fhat, lsslrtastar, risk, riskdd"
   echo "Domain variables for TreeWorld: <branching factor> <tree depth>"
   echo "Domain variables for SlidingPuzzle: <puzzle dimensions> <puzzle type>"
   exit 1
@@ -69,26 +71,35 @@ elif [ "$domainType" = "SlidingPuzzle" ]
 then
   dimensions=$5
   tileType=$6
-  for lookahead in "${@:7}"
-  do
-    mkdir -p ../../results/SlidingTilePuzzle/expansionTests/Nancy/${tileType}/${dimensions}x${dimensions}
-    instance=$firstInstance
-    while ((instance < lastInstance))
+  algNum=$7
+  for (( i=1;i<=$algNum;i++ ))
+  do 
+    algindex=$((7+$i))	  
+	algname=${!algindex}
+	algstop=$((7+$algNum+1))
+	echo $algname
+    for lookahead in "${@:$algstop}"
     do
-	  file="../../worlds/slidingTile/${instance}-${dimensions}x${dimensions}.st"
-      if ((numProcs >= ${maxProcs}))
-      then
-        wait
-        numProcs=0
-      fi		  
-      if [ -f ../../results/SlidingTilePuzzle/expansionTests/Nancy/${tileType}/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json ]
-	  then 
-	    let instance++
-	  else
-	    ./../../expansionTests ${domainType} ${lookahead} ${tileType} ../../results/SlidingTilePuzzle/expansionTests/Nancy/${tileType}/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json < ${file} &
-	    let instance++
-        let numProcs++
-	  fi
+      echo "lookahead $lookahead"
+	  mkdir -p ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}/${dimensions}x${dimensions}
+      instance=$firstInstance
+      while ((instance < lastInstance))
+      do
+	    file="../../worlds/slidingTile/${instance}-${dimensions}x${dimensions}.st"
+        if ((numProcs >= ${maxProcs}))
+        then
+          wait
+          numProcs=0
+        fi		  
+	    if [ -f ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json ]
+	    then 
+	      let instance++
+	    else
+	      ./../../expansionTests ${domainType} ${lookahead} ${tileType} ${algname} ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json < ${file} &
+	      let instance++
+          let numProcs++
+	    fi
+      done
     done
   done
 else

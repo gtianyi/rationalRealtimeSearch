@@ -42,12 +42,35 @@ void startAlg(SlidingTilePuzzle& domain, string expansionModule, string learning
 
 int main(int argc, char** argv)
 {
-    if (argc != 5) {
-        cout << "Wrong number of arguments: ./expansionTests.sh <Domain Type> <expansion limit> <sub domain type> <output file> < <domain file>"
+    if (argc != 6) {
+        cout << "Wrong number of arguments: ./expansionTests.sh <Domain Type> <expansion limit> <sub domain type> <algorithm> <output file> < <domain file>"
              << endl;
         cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
         cout << "tree domains are na" << endl;
         cout << "Puzzle sub-domains are uniform, heavy, inverse, sroot" << endl;
+        cout << "Available algorithm are bfs, astar, fhat, lsslrtastar, risk, riskdd" << endl;
+        exit(1);
+    }
+
+    vector<string> bfsConfig{"bfs", "learn", "k-best", "BFS", "normal"};
+    vector<string> astarConfig{"a-star", "learn", "k-best", "A*", "normal"};
+    vector<string> fhatConfig{"f-hat", "learn", "k-best", "F-Hat", "normal"};
+    vector<string> lsslrtastarConfig{
+            "a-star", "learn", "minimin", "LSS-LRTA*", "normal"};
+    vector<string> riskConfig{"risk", "learn", "k-best", "Risk", "normal"};
+    vector<string> riskddConfig{
+            "riskDD", "learnDD", "nancyDD", "RiskDD", "data"};
+    unordered_map<string, vector<string>> algorithmsConfig({{"bfs", bfsConfig},
+            {"astar", astarConfig},
+            {"fhat", fhatConfig},
+            {"lsslrtastar", lsslrtastarConfig},
+            {"risk", riskConfig},
+            {"riskdd", riskddConfig}});
+
+    if (algorithmsConfig.find(argv[4]) == algorithmsConfig.end()) {
+        cout << "Available algorithm are bfs, astar, fhat, lsslrtastar, "
+                "risk, riskdd"
+             << endl;
         exit(1);
     }
 
@@ -77,21 +100,16 @@ int main(int argc, char** argv)
 			DiscreteDistribution::readData<SlidingTilePuzzle>(*world);
         }
 
-		//alg1 = startAlg(*world, "bfs", "learn", "k-best", lookaheadDepth, "BFS", result, 1, "normal");
-		//alg2 =startAlg(*world, "a-star", "learn", "k-best", lookaheadDepth, "A*", result, 1, "normal");
-		//alg3 =startAlg(*world, "f-hat", "learn", "k-best", lookaheadDepth, "F-Hat", result, 1, "normal");
-		//alg4 =startAlg(*world, "risk", "learn", "k-best", lookaheadDepth, "Risk", result, 1, "normal");
         startAlg(*world,
-                "riskDD",
-                "learnDD",
-                "nancyDD",
+                algorithmsConfig[argv[4]][0],
+                algorithmsConfig[argv[4]][1],
+                algorithmsConfig[argv[4]][2],
                 lookaheadDepth,
-                "RiskDD",
+                algorithmsConfig[argv[4]][3],
                 result,
                 1,
-                "data");
-        // alg6 =startAlg(*world, "a-star", "learn", "minimin", lookaheadDepth,
-        // "LSS-LRTA*", result);
+                algorithmsConfig[argv[4]][4]);
+
     } else {
         cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
         exit(1);
@@ -99,7 +117,7 @@ int main(int argc, char** argv)
 
     result += "\"Lookahead\": " + to_string(lookaheadDepth) + " }";
 
-    ofstream out(argv[4]);
+    ofstream out(argv[5]);
 
     out << result;
     out.close();

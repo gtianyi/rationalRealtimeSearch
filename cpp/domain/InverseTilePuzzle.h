@@ -83,7 +83,7 @@ private:
         while (hvshsData.find(lefth) == hvshsData.end() && lefth > 0)
             lefth -= 1;
 
-        while (hvshsData.find(righth) == hvshsData.end() && righth < 1185)
+        while (hvshsData.find(righth) == hvshsData.end() && righth < 118)
             righth += 1;
 
         // cout << "nearest available floorh" << floorh << "nearest available
@@ -173,7 +173,7 @@ public:
             return correctedDistribution[state];
         }
 
-        Cost h = manhattanDistanceWithInverseFaceCost(state);
+        Cost h = manhattanDistanceWithInverseFaceCost(state) * 10;
 
         correctedDistribution[state] = DiscreteDistribution(h);
         correctedPostSearchDistribution[state] = DiscreteDistribution(h,true);
@@ -189,9 +189,9 @@ public:
             return correctedDistribution[state];
         }
 
-        Cost h = manhattanDistanceWithInverseFaceCost(state);
+        Cost h = manhattanDistanceWithInverseFaceCost(state) * 10;
 
-        correctedDistribution[state] = DiscreteDistribution(h);
+        correctedDistribution[state] = DiscreteDistribution(h*10);
         correctedPostSearchDistribution[state] = DiscreteDistribution(h,true);
 
         return correctedPostSearchDistribution[state];
@@ -232,7 +232,7 @@ public:
             stringstream ss(line);
 
             ss >> h;
-            intH = int(round(h * 100));
+            intH = int(round(h * 10));
             maxH = max(maxH, intH);
 
             ss >> valueCount;
