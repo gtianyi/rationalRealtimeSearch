@@ -47,6 +47,13 @@ def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
     return
 
 
+def makeCoverageTable(dataframe):
+    grp = dataframe.groupby(['Node Expansion Limit',
+                             'Algorithm'])['Solution Cost'].count()
+    print(grp)
+    # grp.to_csv("../../plots/inverse/coverage.csv")
+
+
 def main():
 
     markers = [
@@ -57,7 +64,9 @@ def main():
     # Hard coded result directories
     tileDimension = "4x4"
     tileType = "uniform"
+    # tileType = "inverse"
     limits = [3, 10, 30, 100, 300, 1000]
+    # limits = [100, 1000]
     algorithms = {
         "astar": "A*",
         "fhat": "F-Hat",
@@ -71,7 +80,7 @@ def main():
     lookAheadVals = []
     algorithm = []
     solutionCost = []
-    differenceCost = []
+    # differenceCost = []
 
     print("reading in data...")
 
@@ -85,11 +94,12 @@ def main():
                     jsonFile) as json_data:
                 resultData = json.load(json_data)
 
-                instance.append(str(jsonFile))
-                lookAheadVals.append(resultData["Lookahead"])
-                algorithm.append(algorithms[alg])
-                solutionCost.append(resultData[algorithms[alg]])
-                # differenceCost.append(resultData[algo.replace("A*", "A*")] - resultData["A*"])
+                if float(resultData[algorithms[alg]]) != -1.0:
+                    instance.append(str(jsonFile))
+                    lookAheadVals.append(resultData["Lookahead"])
+                    algorithm.append(algorithms[alg])
+                    solutionCost.append(resultData[algorithms[alg]])
+                    # differenceCost.append(resultData[algo.replace("A*", "A*")] - resultData["A*"])
 
     df = pd.DataFrame({
         "instance": instance,
@@ -98,23 +108,34 @@ def main():
         "Algorithm": algorithm
     })
 
-    for rowdata in df.iterrows():
-        row = rowdata[1]
-        relateastar = df[(df["instance"] == row['instance'])
-                         & (df["Algorithm"] == 'A*')]
-        diffCost = row['Solution Cost'] - relateastar['Solution Cost']
-        diffCost = diffCost.values[0]
-        differenceCost.append(diffCost)
+    # for rowdata in df.iterrows():
+    # row = rowdata[1]
+    # relateastar = df[(df["instance"] == row['instance'])
+    # & (df["Algorithm"] == 'A*')]
+    # diffCost = row['Solution Cost'] - relateastar['Solution Cost']
+    # diffCost = diffCost.values[0]
+    # differenceCost.append(diffCost)
 
-    df["Algorithm Cost - A* Cost"] = differenceCost
+    # df["Algorithm Cost - A* Cost"] = differenceCost
+
+    # print df
 
     print("building plots...")
+    # makeCoverageTable(df)
 
-    makeDifferencePlot(
-    13, 10, "Node Expansion Limit", "Algorithm Cost - A* Cost", df,
-    0.35, "Algorithm", limits, algorithms.values(), "Node Expansion Limit",
-    "Algorithm Cost - A* Cost", "../../plots/" + tileType + '/' +
-    "CostDD" + ".pdf", markers)
+    #  makeDifferencePlot(13, 10, "Node Expansion Limit",
+    # "Algorithm Cost - A* Cost", df, 0.35, "Algorithm",
+    # limits, algorithms.values(), "Node Expansion Limit",
+    # "Algorithm Cost - A* Cost",
+    # "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
+    # markers)
+
+    makeDifferencePlot(13, 10, "Node Expansion Limit",
+                       "Solution Cost", df, 0.35, "Algorithm", limits,
+                       algorithms.values(), "Node Expansion Limit",
+                       "Solution Cost",
+                       "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
+                       markers)
 
 
 if __name__ == '__main__':

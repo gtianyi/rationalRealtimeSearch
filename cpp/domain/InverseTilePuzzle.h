@@ -191,7 +191,7 @@ public:
 
         Cost h = manhattanDistanceWithInverseFaceCost(state) * 10;
 
-        correctedDistribution[state] = DiscreteDistribution(h*10);
+        correctedDistribution[state] = DiscreteDistribution(h);
         correctedPostSearchDistribution[state] = DiscreteDistribution(h,true);
 
         return correctedPostSearchDistribution[state];
