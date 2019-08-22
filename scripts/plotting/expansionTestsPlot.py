@@ -51,7 +51,7 @@ def makeCoverageTable(dataframe):
     grp = dataframe.groupby(['Node Expansion Limit',
                              'Algorithm'])['Solution Cost'].count()
     print(grp)
-    # grp.to_csv("../../plots/inverse/coverage.csv")
+    grp.to_csv("../../plots/inverse/coverage-inverse.csv")
 
 
 def main():
@@ -63,7 +63,7 @@ def main():
 
     # Hard coded result directories
     tileDimension = "4x4"
-    tileType = "uniform"
+    tileType = "inverse"
     # tileType = "inverse"
     limits = [3, 10, 30, 100, 300, 1000]
     # limits = [100, 1000]
@@ -121,7 +121,7 @@ def main():
     # print df
 
     print("building plots...")
-    # makeCoverageTable(df)
+    makeCoverageTable(df)
 
     #  makeDifferencePlot(13, 10, "Node Expansion Limit",
     # "Algorithm Cost - A* Cost", df, 0.35, "Algorithm",
@@ -130,12 +130,12 @@ def main():
     # "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
     # markers)
 
-    makeDifferencePlot(13, 10, "Node Expansion Limit",
-                       "Solution Cost", df, 0.35, "Algorithm", limits,
-                       algorithms.values(), "Node Expansion Limit",
-                       "Solution Cost",
-                       "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
-                       markers)
+    # makeDifferencePlot(13, 10, "Node Expansion Limit",
+                       # "Solution Cost", df, 0.35, "Algorithm", limits,
+                       # algorithms.values(), "Node Expansion Limit",
+                       # "Solution Cost",
+                       # "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
+                       # markers)
 
 
 if __name__ == '__main__':

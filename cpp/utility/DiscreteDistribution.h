@@ -570,6 +570,7 @@ public:
 
         if (table.find(hIndex) == table.end()) {
             cout << "not found h" << endl;
+            cout << "looking for h index" << hIndex << endl;
             return;
         }
 

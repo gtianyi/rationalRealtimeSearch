@@ -244,6 +244,8 @@ public:
             topLevelNode = rhs.topLevelNode;
             kBestNodes = rhs.kBestNodes;
             belief = rhs.belief;
+			belief_ps = rhs.belief_ps;
+			h_TLA = rhs.h_TLA;
             return *this;
         }
 
@@ -368,7 +370,8 @@ public:
         //
         // clock_t startTime = clock();
 
-        while (count <= iterationlimit) {
+        //while (count <= iterationlimit) {
+        while (1) {
             // mark this node as the start of the current search (to
             // prevent state pruning based on label)
             start->markStart();
