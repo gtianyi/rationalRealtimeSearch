@@ -80,7 +80,7 @@ def main():
     lookAheadVals = []
     algorithm = []
     solutionCost = []
-    # differenceCost = []
+    differenceCost = []
 
     print("reading in data...")
 
@@ -108,34 +108,34 @@ def main():
         "Algorithm": algorithm
     })
 
-    # for rowdata in df.iterrows():
-    # row = rowdata[1]
-    # relateastar = df[(df["instance"] == row['instance'])
-    # & (df["Algorithm"] == 'A*')]
-    # diffCost = row['Solution Cost'] - relateastar['Solution Cost']
-    # diffCost = diffCost.values[0]
-    # differenceCost.append(diffCost)
+    for rowdata in df.iterrows():
+        row = rowdata[1]
+        relateastar = df[(df["instance"] == row['instance'])
+                         & (df["Algorithm"] == 'A*')]
+        diffCost = row['Solution Cost'] - relateastar['Solution Cost']
+        diffCost = diffCost.values[0]
+        differenceCost.append(diffCost)
 
-    # df["Algorithm Cost - A* Cost"] = differenceCost
+    df["Algorithm Cost - A* Cost"] = differenceCost
 
     # print df
 
     print("building plots...")
-    makeCoverageTable(df)
+    # makeCoverageTable(df)
 
-    #  makeDifferencePlot(13, 10, "Node Expansion Limit",
-    # "Algorithm Cost - A* Cost", df, 0.35, "Algorithm",
-    # limits, algorithms.values(), "Node Expansion Limit",
-    # "Algorithm Cost - A* Cost",
-    # "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
-    # markers)
+    makeDifferencePlot(13, 10, "Node Expansion Limit",
+                       "Algorithm Cost - A* Cost", df, 0.35, "Algorithm",
+                       limits, algorithms.values(), "Node Expansion Limit",
+                       "Algorithm Cost - A* Cost",
+                       "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
+                       markers)
 
     # makeDifferencePlot(13, 10, "Node Expansion Limit",
-                       # "Solution Cost", df, 0.35, "Algorithm", limits,
-                       # algorithms.values(), "Node Expansion Limit",
-                       # "Solution Cost",
-                       # "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
-                       # markers)
+    # "Solution Cost", df, 0.35, "Algorithm", limits,
+    # algorithms.values(), "Node Expansion Limit",
+    # "Solution Cost",
+    # "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
+    # markers)
 
 
 if __name__ == '__main__':

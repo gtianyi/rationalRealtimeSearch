@@ -539,12 +539,12 @@ public:
     template <class Domain>
     static void readData(Domain& domain) {
         string fileName = "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/SlidingTilePuzzle/sampleData/" +
-                domain.getSubDomainName() + "-statSummary.txt";
+                domain.getSubDomainName() + "-statSummary-nomissing.txt";
 
         string fileName_ps = "/home/aifs1/gu/phd/research/workingPaper/"
                              "realtime-nancy/results/SlidingTilePuzzle/"
                              "sampleData/" +
-                domain.getSubDomainName() + "-statSummary-postSearch.txt";
+                domain.getSubDomainName() + "-statSummary-postSearch-nomissing.txt";
 
         ifstream f(fileName);
         ifstream f_ps(fileName_ps);
@@ -568,15 +568,28 @@ public:
         unordered_map<int, vector<DiscreteDistribution::ProbabilityNode>>&
                 table = isPostSearch ? hPostSearchTable : hValueTable;
 
+        bool isShift = false;
+        int deltaH = 1;
+
         if (table.find(hIndex) == table.end()) {
             cout << "not found h" << endl;
             cout << "looking for h index" << hIndex << endl;
-            return;
+            while (table.find(hIndex - deltaH) == table.end())
+                deltaH++;
+
+            cout << "shift from h index" << hIndex - deltaH << endl;
+
+            hIndex -= deltaH;
+
+            isShift = true;
         }
 
         const auto& probNodeList = table[hIndex];
 
         for (auto probNode : probNodeList) {
+            if (isShift)
+                probNode.shift(deltaH);
+
             distribution.insert(probNode);
         }
     }
