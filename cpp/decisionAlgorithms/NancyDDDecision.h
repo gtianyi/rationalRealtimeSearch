@@ -69,7 +69,7 @@ private:
 
         auto cur = tla.open_TLA.top();
 
-        while (cur != nullptr) {
+        while (cur->getParent() != nullptr) {
             persistPath.push(cur);
             cur = cur->getParent();
         }
