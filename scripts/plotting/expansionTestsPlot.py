@@ -15,6 +15,7 @@ from os import listdir
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+import numpy as np
 
 
 def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
@@ -47,11 +48,11 @@ def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
     return
 
 
-def makeCoverageTable(dataframe):
+def makeCoverageTable(dataframe, tileType):
     grp = dataframe.groupby(['Node Expansion Limit',
                              'Algorithm'])['Solution Cost'].count()
     print(grp)
-    grp.to_csv("../../plots/inverse/coverage-inverse.csv")
+    grp.to_csv("../../plots/" + tileType + "/coverage-" + tileType + ".csv")
 
 
 def main():
@@ -63,10 +64,10 @@ def main():
 
     # Hard coded result directories
     tileDimension = "4x4"
-    tileType = "inverse"
+    tileType = "uniform"
     # tileType = "inverse"
     limits = [3, 10, 30, 100, 300, 1000]
-    # limits = [100, 1000]
+    # limits = [3, 10, 30, 100, 300]
     algorithms = {
         "astar": "A*",
         "fhat": "F-Hat",
@@ -99,7 +100,6 @@ def main():
                     lookAheadVals.append(resultData["Lookahead"])
                     algorithm.append(algorithms[alg])
                     solutionCost.append(resultData[algorithms[alg]])
-                    # differenceCost.append(resultData[algo.replace("A*", "A*")] - resultData["A*"])
 
     df = pd.DataFrame({
         "instance": instance,
@@ -112,17 +112,19 @@ def main():
         row = rowdata[1]
         relateastar = df[(df["instance"] == row['instance'])
                          & (df["Algorithm"] == 'A*')]
-        diffCost = row['Solution Cost'] - relateastar['Solution Cost']
-        diffCost = diffCost.values[0]
-        differenceCost.append(diffCost)
+        if relateastar.empty:
+            differenceCost.append(np.nan)
+        else:
+            diffCost = row['Solution Cost'] - relateastar['Solution Cost']
+            diffCost = diffCost.values[0]
+            differenceCost.append(diffCost)
 
     df["Algorithm Cost - A* Cost"] = differenceCost
 
     # print df
 
     print("building plots...")
-    # makeCoverageTable(df)
-
+    # makeCoverageTable(df, tileType)
     makeDifferencePlot(13, 10, "Node Expansion Limit",
                        "Algorithm Cost - A* Cost", df, 0.35, "Algorithm",
                        limits, algorithms.values(), "Node Expansion Limit",
@@ -130,13 +132,13 @@ def main():
                        "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
                        markers)
 
-    # makeDifferencePlot(13, 10, "Node Expansion Limit",
-    # "Solution Cost", df, 0.35, "Algorithm", limits,
-    # algorithms.values(), "Node Expansion Limit",
-    # "Solution Cost",
-    # "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
-    # markers)
 
+# makeDifferencePlot(13, 10, "Node Expansion Limit",
+# "Solution Cost", df, 0.35, "Algorithm", limits,
+# algorithms.values(), "Node Expansion Limit",
+# "Solution Cost",
+# "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
+# markers)
 
 if __name__ == '__main__':
     main()

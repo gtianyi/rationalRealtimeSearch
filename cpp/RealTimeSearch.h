@@ -370,8 +370,8 @@ public:
         //
         // clock_t startTime = clock();
 
-        //while (count <= iterationlimit) {
-        while (1) {
+		while (count <= iterationlimit) {
+        //while (1) {
             // mark this node as the start of the current search (to
             // prevent state pruning based on label)
             start->markStart();
