@@ -31,11 +31,11 @@ void startAlg(SlidingTilePuzzle& domain, string expansionModule, string learning
 
     ResultContainer res = searchAlg->search(1000*200/lookahead);
 
-    if (res.solutionFound && !domain.validatePath(res.path)) {
-        cout << "Invalid path detected from search: " << expansionModule
-             << endl;
-        exit(1);
-    }
+    /*if (res.solutionFound && !domain.validatePath(res.path)) {*/
+        //cout << "Invalid path detected from search: " << expansionModule
+             //<< endl;
+        //exit(1);
+    /*}*/
 
     result += "\""+algName+"\": " + to_string(res.solutionCost) + ", ";
 }
