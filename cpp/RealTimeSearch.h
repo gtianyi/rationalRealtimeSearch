@@ -385,10 +385,7 @@ public:
 
             // Check if a goal has been reached
             if (domain.isGoal(start->getState())) {
-                // Calculate path cost and return solution
-                calculateCost(start, res);
-
-                // cout<<"count "<<count<<"\n";
+                res.solutionFound = true;
 
                 return res;
             }
@@ -419,7 +416,7 @@ public:
             }
 
             // Decision-making Phase
-            start = decisionAlgo->backup(open, tlas, start);
+            start = decisionAlgo->backup(open, tlas, start, closed);
 
             // Learning Phase
 			learningAlgo->learn(open, closed);
@@ -429,6 +426,7 @@ public:
 
             // Add this step to the path taken so far
             res.path.push(start->getState().getLabel());
+			res.solutionCost += start->getGValue();
 		}
 
 		//cout<<"iteration: " << count<<endl;
@@ -662,6 +660,11 @@ private:
 
         // delete all of the nodes from the last expansion phase
         closed.clear();
+
+		//reset start g as 0
+		start->setGValue(0);
+
+		start->setParent(nullptr);
 	}
 
 	void clean()
@@ -674,12 +677,6 @@ private:
 
 		// delete all of the nodes from the last expansion phase
 		closed.clear();
-	}
-
-	void calculateCost(shared_ptr<Node> solution, ResultContainer& res)
-	{
-		res.solutionFound = true;
-		res.solutionCost = solution->getFValue();
 	}
 
     void noSolutionFound(ResultContainer& res) {

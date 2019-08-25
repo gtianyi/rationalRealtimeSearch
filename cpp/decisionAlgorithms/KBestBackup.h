@@ -12,6 +12,7 @@ template <class Domain, class Node, class TopLevelAction>
 class KBestBackup : public DecisionAlgorithm<Domain, Node, TopLevelAction> {
     typedef typename Domain::State State;
     typedef typename Domain::Cost Cost;
+    typedef typename Domain::HashState Hash;
 
 public:
     KBestBackup(Domain& domain, double k, double lookahead)
@@ -21,7 +22,8 @@ public:
 
     shared_ptr<Node> backup(PriorityQueue<shared_ptr<Node>>& open,
             vector<TopLevelAction>& tlas,
-            shared_ptr<Node> start) {
+            shared_ptr<Node> start,
+            unordered_map<State, shared_ptr<Node>, Hash> closed) {
         kBestDecision(tlas);
 
         // Take the TLA with the lowest expected minimum path cost
