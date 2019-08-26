@@ -47,7 +47,7 @@ public:
             // if there is no persist path, go head memoize it
             // if we find a better fhat for root, go head memoize it
             memoizePersistPath(lowestExpectedPathTLA);
-            cout << "persist find better fhat" << endl;
+            cout << "no more persist, find better fhat" << endl;
             cout << "previous fhat " << persistFhat << endl;
             cout << "new fhat "
                  << lowestExpectedPathTLA.expectedMinimumPathCost +
@@ -60,7 +60,7 @@ public:
             auto it = closed.find(persistTarget->getState());
             if (it != closed.end() && !it->second->onOpen()) {
                 memoizePersistPath(lowestExpectedPathTLA);
-                cout << "persist because in target inside lss" << endl;
+                cout << "no more persist because in target inside lss" << endl;
                 cout << "previous fhat " << persistFhat << endl;
                 cout << "new fhat "
                      << lowestExpectedPathTLA.expectedMinimumPathCost +
