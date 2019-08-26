@@ -47,13 +47,16 @@ public:
             // if there is no persist path, go head memoize it
             // if we find a better fhat for root, go head memoize it
             memoizePersistPath(lowestExpectedPathTLA);
+            cout << "persist" << endl;
         } else {
             // if we find a worse fhat, but previous target is inside LSS, 
 			// we then still want to memoize it because the learning then 
 			// will update the previous target.
             auto it = closed.find(persistTarget->getState());
-            if (it != closed.end() && !it->second->onOpen())
+            if (it != closed.end() && !it->second->onOpen()) {
                 memoizePersistPath(lowestExpectedPathTLA);
+                cout << "persist" << endl;
+            }
         }
 
         goalPrime = persistPath.top();
@@ -78,7 +81,8 @@ private:
         }
 
         persistTarget = tla.open_TLA.top();
-        persistFhat = tla.expectedMinimumPathCost;
+        persistFhat =
+                tla.expectedMinimumPathCost + tla.topLevelNode->getGValue();
     }
 
 protected:
