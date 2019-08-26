@@ -47,12 +47,12 @@ public:
             // if there is no persist path, go head memoize it
             // if we find a better fhat for root, go head memoize it
             memoizePersistPath(lowestExpectedPathTLA);
-            cout << "no more persist, find better fhat" << endl;
-            cout << "previous fhat " << persistFhat << endl;
-            cout << "new fhat "
-                 << lowestExpectedPathTLA.expectedMinimumPathCost +
-                            lowestExpectedPathTLA.topLevelNode->getGValue()
-                 << endl;
+            /*cout << "no more persist, find better fhat" << endl;*/
+            //cout << "previous fhat " << persistFhat << endl;
+            //cout << "new fhat "
+                 //<< lowestExpectedPathTLA.expectedMinimumPathCost +
+                            //lowestExpectedPathTLA.topLevelNode->getGValue()
+                 /*<< endl;*/
         } else {
             // if we find a worse fhat, but previous target is inside LSS, 
 			// we then still want to memoize it because the learning then 
@@ -60,13 +60,20 @@ public:
             auto it = closed.find(persistTarget->getState());
             if (it != closed.end() && !it->second->onOpen()) {
                 memoizePersistPath(lowestExpectedPathTLA);
-                cout << "no more persist because in target inside lss" << endl;
+                /*cout << "no more persist because in target inside lss" << endl;*/
+                //cout << "previous fhat " << persistFhat << endl;
+                //cout << "new fhat "
+                     //<< lowestExpectedPathTLA.expectedMinimumPathCost +
+                                //lowestExpectedPathTLA.topLevelNode->getGValue()
+                     /*<< endl;*/
+            } else {
+                cout << "persist" << endl;
                 cout << "previous fhat " << persistFhat << endl;
                 cout << "new fhat "
                      << lowestExpectedPathTLA.expectedMinimumPathCost +
                                 lowestExpectedPathTLA.topLevelNode->getGValue()
                      << endl;
-            }
+			}
         }
 
         goalPrime = persistPath.top();
