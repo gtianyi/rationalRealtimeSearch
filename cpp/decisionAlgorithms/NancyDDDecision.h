@@ -3,7 +3,6 @@
 #include <limits>
 #include <iostream>
 #include <memory>
-#include <stack>
 #include "../utility/PriorityQueue.h"
 #include "DecisionAlgorithm.h"
 #include "NancyDDBackup.h"
@@ -37,54 +36,12 @@ public:
                 lowestExpectedPathTLA = tla;
         }
 
-        shared_ptr<Node> goalPrime;
-
-        if (persistPath.empty() ||
-                lowestExpectedPathTLA.expectedMinimumPathCost +
-                                lowestExpectedPathTLA.topLevelNode
-                                        ->getGValue() <
-                        persistFhat) {
-            // if there is no persist path, go head memoize it
-            // if we find a better fhat for root, go head memoize it
-            memoizePersistPath(lowestExpectedPathTLA);
-        } else {
-            // if we find a worse fhat, but previous target is inside LSS, 
-			// we then still want to memoize it because the learning then 
-			// will update the previous target.
-            auto it = closed.find(persistTarget->getState());
-            if (it != closed.end() && !it->second->onOpen())
-                memoizePersistPath(lowestExpectedPathTLA);
-        }
-
-        goalPrime = persistPath.top();
-		persistPath.pop();
-		persistFhat -= goalPrime->getGValue();
+        shared_ptr<Node> goalPrime = lowestExpectedPathTLA.topLevelNode;
 
         return goalPrime;
     }
 
-private:
-    void memoizePersistPath(TopLevelAction& tla) {
-		//clear the persist path
-        while (!persistPath.empty()) {
-            persistPath.pop();
-        }
-
-        auto cur = tla.open_TLA.top();
-
-        while (cur->getParent() != nullptr) {
-            persistPath.push(cur);
-            cur = cur->getParent();
-        }
-
-        persistTarget = tla.open_TLA.top();
-        persistFhat = tla.expectedMinimumPathCost;
-    }
-
 protected:
     Domain& domain;
-    std::stack<shared_ptr<Node>> persistPath;
-    shared_ptr<Node> persistTarget;
-    Cost persistFhat;
     double lookahead;
 };
