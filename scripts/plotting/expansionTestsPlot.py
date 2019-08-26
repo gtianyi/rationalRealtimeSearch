@@ -64,10 +64,10 @@ def main():
 
     # Hard coded result directories
     tileDimension = "4x4"
-    tileType = "uniform"
-    # tileType = "inverse"
+    # tileType = "uniform"
+    tileType = "inverse"
     limits = [3, 10, 30, 100, 300, 1000]
-    # limits = [3, 10, 30, 100, 300]
+    # limits = [100, 300, 1000]
     algorithms = {
         "astar": "A*",
         "fhat": "F-Hat",
@@ -93,8 +93,9 @@ def main():
                     "../../results/SlidingTilePuzzle/expansionTests/NancyDD/" +
                     tileType + '/' + alg + '/' + tileDimension + "/" +
                     jsonFile) as json_data:
-                resultData = json.load(json_data)
 
+                print jsonFile
+                resultData = json.load(json_data)
                 if float(resultData[algorithms[alg]]) != -1.0:
                     instance.append(str(jsonFile))
                     lookAheadVals.append(resultData["Lookahead"])
@@ -124,13 +125,13 @@ def main():
     # print df
 
     print("building plots...")
-    # makeCoverageTable(df, tileType)
-    makeDifferencePlot(13, 10, "Node Expansion Limit",
-                       "Algorithm Cost - A* Cost", df, 0.35, "Algorithm",
-                       limits, algorithms.values(), "Node Expansion Limit",
-                       "Algorithm Cost - A* Cost",
-                       "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
-                       markers)
+    makeCoverageTable(df, tileType)
+#     makeDifferencePlot(13, 10, "Node Expansion Limit",
+                       # "Algorithm Cost - A* Cost", df, 0.35, "Algorithm",
+                       # limits, algorithms.values(), "Node Expansion Limit",
+                       # "Algorithm Cost - A* Cost",
+                       # "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
+                       # markers)
 
 
 # makeDifferencePlot(13, 10, "Node Expansion Limit",

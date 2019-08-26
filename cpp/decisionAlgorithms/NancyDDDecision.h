@@ -40,9 +40,12 @@ public:
         shared_ptr<Node> goalPrime;
 
         if (persistPath.empty() ||
-                lowestExpectedPathTLA.expectedMinimumPathCost < persistFhat) {
+                lowestExpectedPathTLA.expectedMinimumPathCost +
+                                lowestExpectedPathTLA.topLevelNode
+                                        ->getGValue() <
+                        persistFhat) {
             // if there is no persist path, go head memoize it
-            // if we find a better fhat, go head memoize it
+            // if we find a better fhat for root, go head memoize it
             memoizePersistPath(lowestExpectedPathTLA);
         } else {
             // if we find a worse fhat, but previous target is inside LSS, 
