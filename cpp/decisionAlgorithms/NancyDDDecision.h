@@ -42,7 +42,7 @@ public:
         if (persistPath.empty() ||
                 lowestExpectedPathTLA.expectedMinimumPathCost +
                                 lowestExpectedPathTLA.topLevelNode
-                                        ->getGValue() <
+                                        ->getGValue() <=
                         persistFhat) {
             // if there is no persist path, go head memoize it
             // if we find a better fhat for root, go head memoize it

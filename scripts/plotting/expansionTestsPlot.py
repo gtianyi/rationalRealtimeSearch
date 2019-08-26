@@ -94,7 +94,7 @@ def main():
                     tileType + '/' + alg + '/' + tileDimension + "/" +
                     jsonFile) as json_data:
 
-                print jsonFile
+                # print jsonFile
                 resultData = json.load(json_data)
                 if float(resultData[algorithms[alg]]) != -1.0:
                     instance.append(str(jsonFile))
@@ -126,7 +126,7 @@ def main():
 
     print("building plots...")
     makeCoverageTable(df, tileType)
-#     makeDifferencePlot(13, 10, "Node Expansion Limit",
+    # makeDifferencePlot(13, 10, "Node Expansion Limit",
                        # "Algorithm Cost - A* Cost", df, 0.35, "Algorithm",
                        # limits, algorithms.values(), "Node Expansion Limit",
                        # "Algorithm Cost - A* Cost",
