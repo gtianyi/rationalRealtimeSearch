@@ -18,7 +18,7 @@ public:
 		: sortingFunction(sorting)
 	{}
 
-	shared_ptr<Node> backup(PriorityQueue<shared_ptr<Node> >& open, vector<TopLevelAction>& tlas, shared_ptr<Node> start, unordered_map<State, shared_ptr<Node>, Hash> closed)
+	shared_ptr<Node> backup(PriorityQueue<shared_ptr<Node> >& open, vector<TopLevelAction>& tlas, shared_ptr<Node> start, unordered_map<State, shared_ptr<Node>, Hash>& closed)
 	{
 		// First things first, reorder open so it matches our expansion policy needs
 		sortOpen(open);

@@ -13,5 +13,5 @@ public:
     virtual shared_ptr<Node> backup(PriorityQueue<shared_ptr<Node>>& open,
             vector<TopLevelAction>& tlas,
             shared_ptr<Node> start,
-            unordered_map<State, shared_ptr<Node>, Hash> closed) {}
+            unordered_map<State, shared_ptr<Node>, Hash>& closed) {}
 };
