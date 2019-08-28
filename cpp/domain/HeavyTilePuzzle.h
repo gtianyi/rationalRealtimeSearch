@@ -38,4 +38,6 @@ public:
 
         return manhattanSum;
     }
+
+    virtual string getSubDomainName() const { return "heavy"; }
 };
