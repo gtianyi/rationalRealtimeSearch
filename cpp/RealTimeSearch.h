@@ -370,8 +370,8 @@ public:
         //
         // clock_t startTime = clock();
 
-		while (count <= iterationlimit) {
-        //while (1) {
+		//while (count <= iterationlimit) {
+		while (1) {
             // mark this node as the start of the current search (to
             // prevent state pruning based on label)
             start->markStart();
@@ -419,20 +419,21 @@ public:
             start = decisionAlgo->backup(open, tlas, start, closed);
 
             // Learning Phase
-			learningAlgo->learn(open, closed);
+            learningAlgo->learn(open, closed);
 
-            //cout << "g " << start->getGValue() << " h " << start->getHValue()
-                 //<< endl;
+            cout << "g " << start->getGValue() << " hat " << start->getHHatValueFromDist()
+                 << endl;
 
+            cout << "iteration: " << count << endl;
             // Add this step to the path taken so far
             res.path.push(start->getState().getLabel());
-			res.solutionCost += start->getGValue();
+            res.solutionCost += start->getGValue();
 		}
 
-		//cout<<"iteration: " << count<<endl;
+		cout<<"iteration: " << count<<endl;
 
-		if (count >= iterationlimit)
-            noSolutionFound(res);
+		//if (count >= iterationlimit)
+            //noSolutionFound(res);
 
 		return res;
     }
