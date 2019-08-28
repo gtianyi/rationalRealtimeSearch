@@ -12,10 +12,16 @@ __author__ = 'tianyigu'
 import json
 from os import listdir
 
+import sys
 import matplotlib.pyplot as plt
+import numpy as np
 import pandas as pd
 import seaborn as sns
-import numpy as np
+
+
+def printUsage():
+    print "usage: python expansionTestsPlot.py <plot type>"
+    print "plot type: coverage, pairwise, solutioncost"
 
 
 def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
@@ -56,6 +62,9 @@ def makeCoverageTable(dataframe, tileType):
 
 
 def main():
+    if len(sys.argv) != 2:
+        printUsage()
+        return
 
     markers = [
         "o", "v", "s", "<", "p", "h", "^", "D", "X", ">", "o", "v", "s", "<",
@@ -65,7 +74,8 @@ def main():
     # Hard coded result directories
     tileDimension = "4x4"
     # tileType = "uniform"
-    tileType = "inverse"
+    # tileType = "inverse"
+    tileType = "heavy"
     limits = [3, 10, 30, 100, 300, 1000]
     # limits = [100, 300, 1000]
     algorithms = {
@@ -125,21 +135,27 @@ def main():
     # print df
 
     print("building plots...")
-    makeCoverageTable(df, tileType)
-    # makeDifferencePlot(13, 10, "Node Expansion Limit",
-                       # "Algorithm Cost - A* Cost", df, 0.35, "Algorithm",
-                       # limits, algorithms.values(), "Node Expansion Limit",
-                       # "Algorithm Cost - A* Cost",
-                       # "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
-                       # markers)
 
+    if sys.argv[1] == "coverage":
+        makeCoverageTable(df, tileType)
+    elif sys.argv[1] == "pairwise":
+        makeDifferencePlot(
+            13, 10, "Node Expansion Limit",
+            "Algorithm Cost - A* Cost", df, 0.35, "Algorithm", limits,
+            algorithms.values(), "Node Expansion Limit",
+            "Algorithm Cost - A* Cost",
+            "../../plots/" + tileType + '/' + "CostDD-pairwise" + ".pdf",
+            markers)
+    elif sys.argv[1] == "solutioncost":
+        makeDifferencePlot(
+            13, 10, "Node Expansion Limit", "Solution Cost", df, 0.35,
+            "Algorithm", limits, algorithms.values(), "Node Expansion Limit",
+            "Solution Cost",
+            "../../plots/" + tileType + '/' + "CostDD-solution" + ".pdf",
+            markers)
+    else:
+        printUsage()
 
-# makeDifferencePlot(13, 10, "Node Expansion Limit",
-# "Solution Cost", df, 0.35, "Algorithm", limits,
-# algorithms.values(), "Node Expansion Limit",
-# "Solution Cost",
-# "../../plots/" + tileType + '/' + "CostDD" + ".pdf",
-# markers)
 
 if __name__ == '__main__':
     main()
