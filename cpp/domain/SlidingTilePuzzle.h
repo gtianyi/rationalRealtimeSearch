@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <bitset>
 #include "../utility/SlidingWindow.h"
-#include "../utility/DiscreteDistribution.h"
+#include "../utility/DiscreteDistributionDD.h"
 
 using namespace std;
 
@@ -238,7 +238,7 @@ public:
         return correctedH[state];
     }
 
-    virtual DiscreteDistribution hstart_distribution(const State& state) {
+    virtual DiscreteDistributionDD hstart_distribution(const State& state) {
         // Check if the heuristic h-hat of this state has been updated
         if (correctedDistribution.find(state) != correctedDistribution.end()) {
             return correctedDistribution[state];
@@ -246,15 +246,15 @@ public:
 
         Cost h = manhattanDistance(state);
 
-        correctedDistribution[state] = DiscreteDistribution(h);
-        correctedPostSearchDistribution[state] = DiscreteDistribution(h,true);
+        correctedDistribution[state] = DiscreteDistributionDD(h);
+        correctedPostSearchDistribution[state] = DiscreteDistributionDD(h,true);
 
         updateHeuristic(state, h);
 
         return correctedDistribution[state];
     }
 
-    virtual DiscreteDistribution hstart_distribution_ps(const State& state) {
+    virtual DiscreteDistributionDD hstart_distribution_ps(const State& state) {
         // Check if the heuristic h-hat of this state has been updated
         if (correctedDistribution.find(state) != correctedDistribution.end()) {
             return correctedDistribution[state];
@@ -262,8 +262,8 @@ public:
 
         Cost h = manhattanDistance(state);
 
-        correctedDistribution[state] = DiscreteDistribution(h);
-        correctedPostSearchDistribution[state] = DiscreteDistribution(h,true);
+        correctedDistribution[state] = DiscreteDistributionDD(h);
+        correctedPostSearchDistribution[state] = DiscreteDistributionDD(h,true);
 
         return correctedPostSearchDistribution[state];
     }
@@ -317,12 +317,12 @@ public:
         correctedH[state] = value;
     }
 
-    pair<DiscreteDistribution, DiscreteDistribution> update_two_distribution(
+    pair<DiscreteDistributionDD, DiscreteDistributionDD> update_two_distribution(
             const State& state,
             const State& pred,
             Cost value) {
-        correctedDistribution[state] = DiscreteDistribution(correctedDistribution[pred], value);
-        correctedPostSearchDistribution[state] = DiscreteDistribution(
+        correctedDistribution[state] = DiscreteDistributionDD(correctedDistribution[pred], value);
+        correctedPostSearchDistribution[state] = DiscreteDistributionDD(
                 correctedPostSearchDistribution[pred], value);
 
         return make_pair(correctedDistribution[state],
@@ -559,8 +559,10 @@ public:
         return false;
     }
 
-    virtual void readDistributionData(ifstream& f,
-            unordered_map<int, vector<DiscreteDistribution::ProbabilityNode>>&
+    virtual void readDistributionData(
+            ifstream& f,
+            unordered_map<int,
+                    shared_ptr<vector<DiscreteDistributionDD::ProbabilityNode>>>&
                     hValueTable) const {
         cout << "reading unit or heavy tile data\n";
         string line;
@@ -586,9 +588,9 @@ public:
                 ss >> hs;
                 ss >> hsCount;
 
-                DiscreteDistribution::ProbabilityNode pn(
+                DiscreteDistributionDD::ProbabilityNode pn(
                         hs, (float)hsCount / (float)valueCount);
-                hValueTable[h].push_back(pn);
+                hValueTable[h]->push_back(pn);
             }
         }
 
@@ -612,8 +614,8 @@ public:
     unordered_map<State, Cost, HashState> correctedD;
     unordered_map<State, Cost, HashState> correctedDerr;
 
-    unordered_map<State, DiscreteDistribution, HashState> correctedDistribution;
-    unordered_map<State, DiscreteDistribution, HashState> correctedPostSearchDistribution;
+    unordered_map<State, DiscreteDistributionDD, HashState> correctedDistribution;
+    unordered_map<State, DiscreteDistributionDD, HashState> correctedPostSearchDistribution;
 
     double epsilonHSum;
     double epsilonDSum;

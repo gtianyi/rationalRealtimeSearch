@@ -5,8 +5,8 @@
 #include <random>
 
 class InverseTilePuzzle : public SlidingTilePuzzle {
-    using pNode = DiscreteDistribution::ProbabilityNode;
-    using HDistribuitonMap = unordered_map<int, vector<pNode>>;
+    using pNode = DiscreteDistributionDD::ProbabilityNode;
+    using HDistribuitonMap = unordered_map<int, shared_ptr<vector<pNode>>>;
     using HData = unordered_map<int, vector<double>>;
 
 private:
@@ -108,27 +108,26 @@ private:
         return ret;
    }
 
+   shared_ptr<vector<pNode>> getDistributionBySortedhsList(
+           const vector<double>& sortedhsList) const {
+       shared_ptr<vector<pNode>> ret = make_shared<vector<pNode>>();
+       unordered_map<double, double> frequency;
 
-    vector<pNode> getDistributionBySortedhsList(
-          const vector<double>& sortedhsList) const {
-        vector<pNode> ret;
-        unordered_map<double, double> frequency;
+       for (const auto& hs : sortedhsList) {
+           if (frequency.find(hs) != frequency.end()) {
+               continue;
+           }
+           frequency[hs] =
+                   std::count(sortedhsList.begin(), sortedhsList.end(), hs) /
+                   (double)sortedhsList.size();
+       }
 
-        for (const auto& hs : sortedhsList) {
-            if (frequency.find(hs) != frequency.end()) {
-                continue;
-            }
-            frequency[hs] =
-                    std::count(sortedhsList.begin(), sortedhsList.end(), hs) /
-                    (double)sortedhsList.size();
-        }
+       for (const auto& i : frequency) {
+           DiscreteDistributionDD::ProbabilityNode pn(i.first, i.second);
+           ret->push_back(pn);
+       }
 
-        for (const auto& i : frequency) {
-            DiscreteDistribution::ProbabilityNode pn(i.first, i.second);
-            ret.push_back(pn);
-		}
-
-		return ret;
+       return ret;
     }
 
     void approximateHtableByData(const HData& hvshsData,
@@ -143,7 +142,7 @@ private:
             vector<double> sampledSortedHsList =
                     getApproximateSortedHsList(h, hvshsData);
 
-            vector<pNode> distribution =
+            shared_ptr<vector<pNode>> distribution =
                     getDistributionBySortedhsList(sampledSortedHsList);
             hValueTable.insert({h, distribution});
         }
@@ -167,7 +166,7 @@ public:
         return correctedH[state];
     }
 
-    DiscreteDistribution hstart_distribution(const State& state) {
+    DiscreteDistributionDD hstart_distribution(const State& state) {
         // Check if the heuristic h-hat of this state has been updated
         if (correctedDistribution.find(state) != correctedDistribution.end()) {
             return correctedDistribution[state];
@@ -175,15 +174,15 @@ public:
 
         Cost h = manhattanDistanceWithInverseFaceCost(state) * 10;
 
-        correctedDistribution[state] = DiscreteDistribution(h);
-        correctedPostSearchDistribution[state] = DiscreteDistribution(h,true);
+        correctedDistribution[state] = DiscreteDistributionDD(h);
+        correctedPostSearchDistribution[state] = DiscreteDistributionDD(h,true);
 
         updateHeuristic(state, h);
 
         return correctedDistribution[state];
     }
 
-    DiscreteDistribution hstart_distribution_ps(const State& state) {
+    DiscreteDistributionDD hstart_distribution_ps(const State& state) {
         // Check if the heuristic h-hat of this state has been updated
         if (correctedDistribution.find(state) != correctedDistribution.end()) {
             return correctedDistribution[state];
@@ -191,8 +190,8 @@ public:
 
         Cost h = manhattanDistanceWithInverseFaceCost(state) * 10;
 
-        correctedDistribution[state] = DiscreteDistribution(h);
-        correctedPostSearchDistribution[state] = DiscreteDistribution(h,true);
+        correctedDistribution[state] = DiscreteDistributionDD(h);
+        correctedPostSearchDistribution[state] = DiscreteDistributionDD(h,true);
 
         return correctedPostSearchDistribution[state];
     }

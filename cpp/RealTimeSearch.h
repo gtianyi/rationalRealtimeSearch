@@ -5,6 +5,7 @@
 #include <unordered_map>
 #include <memory>
 #include "utility/DiscreteDistribution.h"
+#include "utility/DiscreteDistributionDD.h"
 #include "utility/PriorityQueue.h"
 #include "utility/ResultContainer.h"
 #include "decisionAlgorithms/DecisionAlgorithm.h"
@@ -46,8 +47,8 @@ public:
         bool open;
         int delayCntr;
         DiscreteDistribution distribution;
-        DiscreteDistribution hStartDistribution;
-        DiscreteDistribution hStartDistribution_ps;
+        DiscreteDistributionDD hStartDistribution;
+        DiscreteDistributionDD hStartDistribution_ps;
 		bool twoDistribtuionCleared;
 
     public:
@@ -71,11 +72,11 @@ public:
         shared_ptr<Node> getParent() const { return parent; }
         int getOwningTLA() const { return owningTLA; }
 
-        DiscreteDistribution getHstartDistribution() const {
+        DiscreteDistributionDD getHstartDistribution() const {
             return hStartDistribution;
         }
 
-        DiscreteDistribution getHstartDistribution_ps() const {
+        DiscreteDistributionDD getHstartDistribution_ps() const {
             return hStartDistribution_ps;
         }
 
@@ -89,11 +90,11 @@ public:
         void setOwningTLA(int tla) { owningTLA = tla; }
         void setParent(shared_ptr<Node> p) { parent = p; }
 
-        void setHStartDistribution(const DiscreteDistribution& dist) {
+        void setHStartDistribution(const DiscreteDistributionDD& dist) {
             hStartDistribution = dist;
         }
 
-        void setHStartDistribution_ps(const DiscreteDistribution& dist) {
+        void setHStartDistribution_ps(const DiscreteDistributionDD& dist) {
             hStartDistribution_ps = dist;
         }
 
@@ -132,8 +133,8 @@ public:
         }
 
         Node(Cost g,
-                const DiscreteDistribution& hstartdist,
-                const DiscreteDistribution& hstartdist_ps,
+                const DiscreteDistributionDD& hstartdist,
+                const DiscreteDistributionDD& hstartdist_ps,
                 Cost h,
                 State state,
                 shared_ptr<Node> parent,
@@ -219,8 +220,8 @@ public:
         Cost expectedMinimumPathCost;
         shared_ptr<Node> topLevelNode;
         vector<shared_ptr<Node>> kBestNodes;
-        DiscreteDistribution belief;
-        DiscreteDistribution belief_ps;
+        DiscreteDistributionDD belief;
+        DiscreteDistributionDD belief_ps;
         Cost h_TLA;
 
 
