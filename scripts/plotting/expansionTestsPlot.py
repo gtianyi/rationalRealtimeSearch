@@ -20,9 +20,9 @@ import seaborn as sns
 
 
 def printUsage():
-    print "usage: python expansionTestsPlot.py <plot type>"
+    print "usage: python expansionTestsPlot.py <plot type> <tile type>"
     print "plot type: coverage, pairwise, solutioncost"
-
+    print "tile type: uniform heavy inverse"
 
 def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
                        orderList, hueOrderList, xLabel, yLabel, outputName,
@@ -62,7 +62,7 @@ def makeCoverageTable(dataframe, tileType):
 
 
 def main():
-    if len(sys.argv) != 2:
+    if len(sys.argv) != 3:
         printUsage()
         return
 
@@ -73,9 +73,7 @@ def main():
 
     # Hard coded result directories
     tileDimension = "4x4"
-    # tileType = "uniform"
-    # tileType = "inverse"
-    tileType = "heavy"
+    tileType = sys.argv[2]
     limits = [3, 10, 30, 100, 300, 1000]
     # limits = [100, 300, 1000]
     algorithms = {
