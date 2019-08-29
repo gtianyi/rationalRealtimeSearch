@@ -55,8 +55,8 @@ public:
         int deltaH = 1;
 
         if (table.find(hIndex) == table.end()) {
-            cout << "not found h" << endl;
-            cout << "looking for h index" << hIndex << endl;
+            cout << "not found h index" << hIndex << endl;
+
             while (table.find(hIndex - deltaH) == table.end())
                 deltaH++;
 
