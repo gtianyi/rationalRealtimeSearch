@@ -361,7 +361,7 @@ public:
                     make_shared<Dijkstra<Domain, Node, TopLevelAction>>(domain);
         } else if (learningModule == "learnDD") {
             learningAlgo = make_shared<
-                    DijkstraDistribution<Domain, Node, TopLevelAction>>(
+                    RaiseOne<Domain, Node, TopLevelAction>>(
                     domain);
         } else {
             learningAlgo =
