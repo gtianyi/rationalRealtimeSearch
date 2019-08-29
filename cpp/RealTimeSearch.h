@@ -21,6 +21,7 @@
 #include "learningAlgorithms/LearningAlgorithm.h"
 #include "learningAlgorithms/Dijkstra.h"
 #include "learningAlgorithms/Dijkstra_distribution.h"
+#include "learningAlgorithms/Raise1_learning.h"
 #include "learningAlgorithms/Ignorance.h"
 
 #include <time.h>
@@ -360,7 +361,7 @@ public:
                     make_shared<Dijkstra<Domain, Node, TopLevelAction>>(domain);
         } else if (learningModule == "learnDD") {
             learningAlgo = make_shared<
-                    DijkstraDistribution<Domain, Node, TopLevelAction>>(
+                    RaiseOne<Domain, Node, TopLevelAction>>(
                     domain);
         } else {
             learningAlgo =
