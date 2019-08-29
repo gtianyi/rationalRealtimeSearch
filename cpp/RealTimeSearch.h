@@ -420,8 +420,7 @@ public:
                     -1);
         }
 
-        // Get the start node
-        int count = 0;
+        //int count = 0;
         //
         // clock_t startTime = clock();
 
@@ -431,7 +430,7 @@ public:
             // prevent state pruning based on label)
             start->markStart();
 
-            count++;
+            //count++;
 
             // if (beliefType == "data") {
             // cout << "rl loop " << count << "h "
@@ -485,7 +484,7 @@ public:
             res.solutionCost += start->getGValue();
 		}
 
-		cout<<"iteration: " << count<<endl;
+		//cout<<"iteration: " << count<<endl;
 
 		//if (count >= iterationlimit)
             //noSolutionFound(res);
