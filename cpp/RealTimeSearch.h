@@ -479,7 +479,7 @@ public:
             //cout << "g " << start->getGValue() << " hat " << start->getHHatValueFromDist()
                  //<< endl;
 
-            //cout << "iteration: " << count << endl;
+			cout << "iteration: " << count << endl;
             // Add this step to the path taken so far
             res.path.push(start->getState().getLabel());
             res.solutionCost += start->getGValue();
