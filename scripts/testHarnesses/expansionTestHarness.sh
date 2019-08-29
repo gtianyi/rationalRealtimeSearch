@@ -95,7 +95,7 @@ then
 	    then 
 	      let instance++
 	    else
-	      timeout 600 ./../../expansionTests ${domainType} ${lookahead} ${tileType} ${algname} ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json < ${file} &
+	      timeout 900 ./../../expansionTests ${domainType} ${lookahead} ${tileType} ${algname} ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json < ${file} &
 	      let instance++
           let numProcs++
 	    fi
