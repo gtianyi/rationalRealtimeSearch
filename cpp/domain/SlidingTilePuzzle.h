@@ -584,6 +584,9 @@ public:
                 cout << "error: duplicate h from data " << h << "\n";
             }
 
+            hValueTable[h] = make_shared<
+                    vector<DiscreteDistributionDD::ProbabilityNode>>();
+
             while (!ss.eof()) {
                 ss >> hs;
                 ss >> hsCount;

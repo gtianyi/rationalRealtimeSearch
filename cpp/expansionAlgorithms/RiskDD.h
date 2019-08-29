@@ -26,11 +26,11 @@ public:
 
     void expand(PriorityQueue<shared_ptr<Node>>& open,
             unordered_map<State, shared_ptr<Node>, Hash>& closed,
-            vector<TopLevelAction>& tlas,
+            vector<shared_ptr<TopLevelAction>>& tlas,
             std::function<bool(shared_ptr<Node>,
                     unordered_map<State, shared_ptr<Node>, Hash>&,
                     PriorityQueue<shared_ptr<Node>>&,
-                    vector<TopLevelAction>&)> duplicateDetection,
+                    vector<shared_ptr<TopLevelAction>>&)> duplicateDetection,
             ResultContainer& res) {
         // This starts at 1, because we had to expand start to get the top level
         // actions
@@ -52,7 +52,7 @@ public:
             int chosenTLAIndex = computeRiskByPSAndGetBestTLA(tlas);
 
             // Expand under the TLA which holds the lowest risk
-            shared_ptr<Node> chosenNode = tlas[chosenTLAIndex].open_TLA.top();
+            shared_ptr<Node> chosenNode = tlas[chosenTLAIndex]->open_TLA.top();
 
             //cout << "exp: choseNode \n" << chosenNode->getState() << endl;
 			//cout << "exp: choseNode \n";
@@ -66,7 +66,7 @@ public:
             }
 
             // Remove the chosen node from open
-            tlas[chosenTLAIndex].open_TLA.pop();
+            tlas[chosenTLAIndex]->open_TLA.pop();
             open.remove(chosenNode);
             chosenNode->close();
 
@@ -102,7 +102,7 @@ public:
                     closed[child] = childNode;
 
                     // Add to open of generating TLA
-                    tlas[chosenTLAIndex].open_TLA.push(childNode);
+                    tlas[chosenTLAIndex]->open_TLA.push(childNode);
                 }
             }
         }
@@ -110,16 +110,16 @@ public:
 
 private:
 	// In DD this is different, we just use the post search belief
-    int computeRiskByPSAndGetBestTLA(vector<TopLevelAction>& tlas) {
+    int computeRiskByPSAndGetBestTLA(vector<shared_ptr<TopLevelAction>>& tlas) {
         int minimalRiskTLA = 0;
         double minimalRisk = numeric_limits<double>::infinity();
 
         // Start by identifying alpha: the TLA with lowest expected cost
         int alphaTLA = 0;
-        double alphaExpectedCost = tlas[0].belief.expectedCost();
+        double alphaExpectedCost = tlas[0]->getBeliefDD().expectedCost();
         for (int i = 1; i < tlas.size(); i++) {
-            if (tlas[i].belief.expectedCost() < alphaExpectedCost) {
-                alphaExpectedCost = tlas[i].belief.expectedCost();
+            if (tlas[i]->getBeliefDD().expectedCost() < alphaExpectedCost) {
+                alphaExpectedCost = tlas[i]->getBeliefDD().expectedCost();
                 alphaTLA = i;
             }
         }
@@ -128,7 +128,7 @@ private:
         for (int i = 0; i < tlas.size(); i++) {
             // If this TLA has no unique subtree, skip its risk calc, it is
             // pruned
-            if (tlas[i].open_TLA.empty())
+            if (tlas[i]->open_TLA.empty())
                 continue;
 
             // Calculate the risk associated with expanding that node (by using
@@ -140,21 +140,21 @@ private:
             // If two actions minimize risk by same value
 			// tie break on fhat - > backed-up  f -> g in this order.
             if (riskCalculation == minimalRisk) {
-                if (tlas[i].topLevelNode->getFHatValueFromDist() ==
+                if (tlas[i]->topLevelNode->getFHatValueFromDist() ==
                         tlas[minimalRiskTLA]
-                                .topLevelNode->getFHatValueFromDist()) {
-                    if (tlas[i].getF_TLA() == tlas[minimalRiskTLA].getF_TLA()) {
-                        if (tlas[i].topLevelNode->getGValue() >
+                                ->topLevelNode->getFHatValueFromDist()) {
+                    if (tlas[i]->getF_TLA() == tlas[minimalRiskTLA]->getF_TLA()) {
+                        if (tlas[i]->topLevelNode->getGValue() >
                                 tlas[minimalRiskTLA]
-                                        .topLevelNode->getGValue()) {
+                                        ->topLevelNode->getGValue()) {
                             minimalRiskTLA = i;
                         }
-                    } else if (tlas[i].getF_TLA() <
-                            tlas[minimalRiskTLA].getF_TLA()) {
+                    } else if (tlas[i]->getF_TLA() <
+                            tlas[minimalRiskTLA]->getF_TLA()) {
                         minimalRiskTLA = i;
                     }
-                } else if (tlas[i].topLevelNode->getFHatValue() <
-                        tlas[minimalRiskTLA].topLevelNode->getFHatValue()) {
+                } else if (tlas[i]->topLevelNode->getFHatValue() <
+                        tlas[minimalRiskTLA]->topLevelNode->getFHatValue()) {
                     minimalRiskTLA = i;
                 }
             } else if (riskCalculation < minimalRisk) {
@@ -172,14 +172,14 @@ private:
 
     double riskAnalysis(int alphaIndex,
             int simulateTLAIndex,
-            const vector<TopLevelAction>& tlas) const {
+            const vector<shared_ptr<TopLevelAction>>& tlas) const {
         double risk = 0;
 
         const auto& alphaBelief = alphaIndex == simulateTLAIndex ?
-                tlas[alphaIndex].belief_ps :
-                tlas[alphaIndex].belief;
+                tlas[alphaIndex]->getBeliefDD_ps() :
+                tlas[alphaIndex]->getBeliefDD();
 
-        const auto alphaGValue = tlas[alphaIndex].topLevelNode->getGValue();
+        const auto alphaGValue = tlas[alphaIndex]->topLevelNode->getGValue();
 
         // Perform numerical integration to calculate risk associated with
         // taking alpha as the expansion
@@ -190,10 +190,10 @@ private:
                     continue;
 
                 const auto& betaBelief = tla == simulateTLAIndex ?
-                        tlas[tla].belief_ps :
-                        tlas[tla].belief;
+                        tlas[tla]->getBeliefDD_ps() :
+                        tlas[tla]->getBeliefDD();
 
-                const auto betaGValue = tlas[tla].topLevelNode->getGValue();
+                const auto betaGValue = tlas[tla]->topLevelNode->getGValue();
 
                 // Integrate over values in beta belief
                 for (const auto& beta : betaBelief) {
@@ -203,7 +203,9 @@ private:
                     if (beta.cost < alpha.cost) {
                         // Calculate the risk
                         double value = alpha.probability * beta.probability *
-                                (alpha.cost + alphaGValue - beta.cost -
+                                (alpha.cost + alphaBelief.getShiftedCost() +
+                                               alphaGValue - beta.cost -
+                                               betaBelief.getShiftedCost() -
                                                betaGValue);
                         risk += value;
                     } else

@@ -17,8 +17,8 @@ public:
 	{
 	}
 
-	virtual void expand(PriorityQueue<shared_ptr<Node> >& open, unordered_map<State, shared_ptr<Node>, Hash>& closed, vector<TopLevelAction>& tlas,
-		std::function<bool(shared_ptr<Node>, unordered_map<State, shared_ptr<Node>, Hash>&, PriorityQueue<shared_ptr<Node> >&, vector<TopLevelAction>&)> duplicateDetection,
+	virtual void expand(PriorityQueue<shared_ptr<Node> >& open, unordered_map<State, shared_ptr<Node>, Hash>& closed, vector<shared_ptr<TopLevelAction>>& tlas,
+		std::function<bool(shared_ptr<Node>, unordered_map<State, shared_ptr<Node>, Hash>&, PriorityQueue<shared_ptr<Node> >&, vector<shared_ptr<TopLevelAction>>&)> duplicateDetection,
 		ResultContainer& res)
 	{
 	}

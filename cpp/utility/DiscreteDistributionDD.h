@@ -38,7 +38,7 @@ private:
     }
 
 public:
-    DiscreteDistributionDD() = delete;
+    DiscreteDistributionDD() {}
 
     DiscreteDistributionDD(double h, bool isPostSearch = false) {
         // hash table key is int
@@ -131,7 +131,13 @@ public:
 		domain.readDistributionData(f_ps, hPostSearchTable);
     }
 
-    
+    vector<ProbabilityNode>::iterator begin() const {
+        return distribution_origin->begin();
+    }
+
+    vector<ProbabilityNode>::iterator end() const { return distribution_origin->end(); }
+
+    double getShiftedCost() const { return shifted_cost; }
 };
 
 unordered_map<int,

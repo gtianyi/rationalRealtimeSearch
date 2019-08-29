@@ -71,9 +71,6 @@ private:
     int maxSamples;
     double var;
 
-    static unordered_map<int, vector<ProbabilityNode>> hValueTable;
-    static unordered_map<int, vector<ProbabilityNode>> hPostSearchTable;
-
     double probabilityDensityFunction(double x, double mu, double var) {
         return ((1 / sqrt(2 * M_PI * var)) *
                 exp(-(pow(x - mu, 2) / (2 * var))));
@@ -535,64 +532,6 @@ public:
 
     set<ProbabilityNode>::iterator end() const { return distribution.end(); }
 
-    // below are code added by tianyi
-    template <class Domain>
-    static void readData(Domain& domain) {
-        string fileName = "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/SlidingTilePuzzle/sampleData/" +
-                domain.getSubDomainName() + "-statSummary-nomissing.txt";
-
-        string fileName_ps = "/home/aifs1/gu/phd/research/workingPaper/"
-                             "realtime-nancy/results/SlidingTilePuzzle/"
-                             "sampleData/" +
-                domain.getSubDomainName() + "-statSummary-postSearch-nomissing.txt";
-
-        ifstream f(fileName);
-        ifstream f_ps(fileName_ps);
-
-        if (!f.good() || !f_ps.good()) {
-            cout << "No distribution data file!\n";
-            exit(1);
-		}
-
-		domain.readDistributionData(f, hValueTable);
-		domain.readDistributionData(f_ps, hPostSearchTable);
-    }
-
-    DiscreteDistribution(double h, bool isPostSearch = false) {
-        // hash table key is int
-        //int hIndex = int(round(h * 100)); //have to fix this for inverse
-        int hIndex = int(h);
-
-        //cout << "see a new state, h: " << hIndex << endl;
-
-        unordered_map<int, vector<DiscreteDistribution::ProbabilityNode>>&
-                table = isPostSearch ? hPostSearchTable : hValueTable;
-
-        bool isShift = false;
-        int deltaH = 1;
-
-        if (table.find(hIndex) == table.end()) {
-            cout << "not found h" << endl;
-            cout << "looking for h index" << hIndex << endl;
-            while (table.find(hIndex - deltaH) == table.end())
-                deltaH++;
-
-            cout << "shift from h index" << hIndex - deltaH << endl;
-
-            hIndex -= deltaH;
-
-            isShift = true;
-        }
-
-        const auto& probNodeList = table[hIndex];
-
-        for (auto probNode : probNodeList) {
-            if (isShift)
-                probNode.shift(deltaH);
-
-            distribution.insert(probNode);
-        }
-    }
 
     DiscreteDistribution(const DiscreteDistribution& rhs) {
         if (&rhs == this) {
@@ -604,23 +543,4 @@ public:
         distribution = rhs.distribution;
         maxSamples = rhs.maxSamples;
     }
-
-    // create a distribution by shifting from the predescssor distribution
-    DiscreteDistribution(const DiscreteDistribution& rhs, double shiftCost) {
-        if (&rhs == this) {
-            return ;
-        }
-
-        distribution.clear();
-
-        for (auto n : rhs.distribution) {
-            n.shift(shiftCost);
-			distribution.insert(n);
-        }
-
-        maxSamples = rhs.maxSamples;
-    }
 };
-
-unordered_map<int, vector<DiscreteDistribution::ProbabilityNode>> DiscreteDistribution::hValueTable;
-unordered_map<int, vector<DiscreteDistribution::ProbabilityNode>> DiscreteDistribution::hPostSearchTable;

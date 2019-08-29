@@ -22,7 +22,7 @@ public:
               lookahead(lookahead) {}
 
     shared_ptr<Node> backup(PriorityQueue<shared_ptr<Node>>& open,
-            vector<TopLevelAction>& tlas,
+            vector<shared_ptr<TopLevelAction>>& tlas,
             shared_ptr<Node> start,
             unordered_map<State, shared_ptr<Node>, Hash>& closed) {
         // we have to do one more back up, because we havn't back up the frontier
@@ -30,18 +30,18 @@ public:
         NancyDDBackup<Node, TopLevelAction>::backup2TLA(tlas);
 
         // Take the TLA with the lowest expected minimum path cost
-        TopLevelAction lowestExpectedPathTLA = tlas[0];
-        for (const TopLevelAction& tla : tlas) {
-            if (tla.expectedMinimumPathCost <
-                    lowestExpectedPathTLA.expectedMinimumPathCost)
+        auto lowestExpectedPathTLA = tlas[0];
+        for (const auto& tla : tlas) {
+            if (tla->expectedMinimumPathCost <
+                    lowestExpectedPathTLA->expectedMinimumPathCost)
                 lowestExpectedPathTLA = tla;
         }
 
         shared_ptr<Node> goalPrime;
 
         if (persistPath.empty() ||
-                lowestExpectedPathTLA.expectedMinimumPathCost +
-                                lowestExpectedPathTLA.topLevelNode
+                lowestExpectedPathTLA->expectedMinimumPathCost +
+                                lowestExpectedPathTLA->topLevelNode
                                         ->getGValue() <=
                         persistFhat) {
             // if there is no persist path, go head memoize it
@@ -50,8 +50,8 @@ public:
             /*cout << "no more persist, find better fhat" << endl;*/
             //cout << "previous fhat " << persistFhat << endl;
             //cout << "new fhat "
-                 //<< lowestExpectedPathTLA.expectedMinimumPathCost +
-                            //lowestExpectedPathTLA.topLevelNode->getGValue()
+                 //<< lowestExpectedPathTLA->expectedMinimumPathCost +
+                            //lowestExpectedPathTLA->topLevelNode->getGValue()
                  /*<< endl;*/
         } else {
             // if we find a worse fhat, but previous target is inside LSS, 
@@ -63,15 +63,15 @@ public:
                 /*cout << "no more persist because in target inside lss" << endl;*/
                 //cout << "previous fhat " << persistFhat << endl;
                 //cout << "new fhat "
-                     //<< lowestExpectedPathTLA.expectedMinimumPathCost +
-                                //lowestExpectedPathTLA.topLevelNode->getGValue()
+                     //<< lowestExpectedPathTLA->expectedMinimumPathCost +
+                                //lowestExpectedPathTLA->topLevelNode->getGValue()
                      /*<< endl;*/
             } else {
                 cout << "persist" << endl;
                 cout << "previous fhat " << persistFhat << endl;
                 cout << "new fhat "
-                     << lowestExpectedPathTLA.expectedMinimumPathCost +
-                                lowestExpectedPathTLA.topLevelNode->getGValue()
+                     << lowestExpectedPathTLA->expectedMinimumPathCost +
+                                lowestExpectedPathTLA->topLevelNode->getGValue()
                      << endl;
 			}
         }
@@ -84,22 +84,22 @@ public:
     }
 
 private:
-    void memoizePersistPath(TopLevelAction& tla) {
+    void memoizePersistPath(shared_ptr<TopLevelAction> tla) {
 		//clear the persist path
         while (!persistPath.empty()) {
             persistPath.pop();
         }
 
-        auto cur = tla.open_TLA.top();
+        auto cur = tla->open_TLA.top();
 
         while (cur->getParent() != nullptr) {
             persistPath.push(cur);
             cur = cur->getParent();
         }
 
-        persistTarget = tla.open_TLA.top();
+        persistTarget = tla->open_TLA.top();
         persistFhat =
-                tla.expectedMinimumPathCost + tla.topLevelNode->getGValue();
+                tla->expectedMinimumPathCost + tla->topLevelNode->getGValue();
     }
 
 protected:

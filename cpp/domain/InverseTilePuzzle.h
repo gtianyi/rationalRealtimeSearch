@@ -6,7 +6,7 @@
 
 class InverseTilePuzzle : public SlidingTilePuzzle {
     using pNode = DiscreteDistributionDD::ProbabilityNode;
-    using HDistribuitonMap = unordered_map<int, shared_ptr<vector<pNode>>>;
+    using HDistributionMap = unordered_map<int, shared_ptr<vector<pNode>>>;
     using HData = unordered_map<int, vector<double>>;
 
 private:
@@ -131,7 +131,7 @@ private:
     }
 
     void approximateHtableByData(const HData& hvshsData,
-            HDistribuitonMap& hValueTable,
+            HDistributionMap& hValueTable,
             const int maxH) const {
         int resolution = 1;
         int  oneBucket = 1;  
@@ -217,7 +217,7 @@ public:
     }
 
     void readDistributionData(ifstream& f,
-            HDistribuitonMap& hValueTable) const {
+            HDistributionMap& hValueTable) const {
         //cout << "reading inverse tile data\n";
         string line;
 

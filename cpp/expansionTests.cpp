@@ -2,7 +2,7 @@
 #include <string>
 #include <fstream>
 #include "RealTimeSearch.h"
-#include "utility/DiscreteDistribution.h"
+#include "utility/DiscreteDistributionDD.h"
 #include "decisionAlgorithms/KBestBackup.h"
 #include "expansionAlgorithms/AStar.h"
 #include "expansionAlgorithms/BreadthFirst.h"
@@ -91,13 +91,13 @@ int main(int argc, char** argv)
 
         if (subDomain == "uniform") {
             world = std::make_shared<SlidingTilePuzzle>(cin);
-            DiscreteDistribution::readData<SlidingTilePuzzle>(*world);
+            DiscreteDistributionDD::readData<SlidingTilePuzzle>(*world);
         } else if (subDomain == "heavy") {
             world = std::make_shared<HeavyTilePuzzle>(cin);
-			DiscreteDistribution::readData<SlidingTilePuzzle>(*world);
+			DiscreteDistributionDD::readData<SlidingTilePuzzle>(*world);
         } else if (subDomain == "inverse") {
             world = std::make_shared<InverseTilePuzzle>(cin);
-			DiscreteDistribution::readData<SlidingTilePuzzle>(*world);
+			DiscreteDistributionDD::readData<SlidingTilePuzzle>(*world);
         }
 
         startAlg(*world,

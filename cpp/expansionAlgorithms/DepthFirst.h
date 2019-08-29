@@ -26,8 +26,8 @@ public:
 		lookahead++;
 	}
 
-	void expand(PriorityQueue<shared_ptr<Node> >& open, unordered_map<State, shared_ptr<Node>, Hash>& closed, vector<TopLevelAction>& tlas,
-		std::function<bool(shared_ptr<Node>, unordered_map<State, shared_ptr<Node>, Hash>&, PriorityQueue<shared_ptr<Node> >&, vector<TopLevelAction>&)> duplicateDetection,
+	void expand(PriorityQueue<shared_ptr<Node> >& open, unordered_map<State, shared_ptr<Node>, Hash>& closed, shared_ptr<vector<TopLevelAction>>& tlas,
+		std::function<bool(shared_ptr<Node>, unordered_map<State, shared_ptr<Node>, Hash>&, PriorityQueue<shared_ptr<Node> >&, shared_ptr<vector<TopLevelAction>>&)> duplicateDetection,
 		ResultContainer& res)
 	{
 		// Start by shoving everything on open onto the stack...

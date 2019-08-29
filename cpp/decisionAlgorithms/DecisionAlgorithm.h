@@ -11,7 +11,7 @@ class DecisionAlgorithm {
 
 public:
     virtual shared_ptr<Node> backup(PriorityQueue<shared_ptr<Node>>& open,
-            vector<TopLevelAction>& tlas,
+            vector<shared_ptr<TopLevelAction>>& tlas,
             shared_ptr<Node> start,
             unordered_map<State, shared_ptr<Node>, Hash>& closed) {}
 };

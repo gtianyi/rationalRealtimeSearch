@@ -24,6 +24,7 @@
 #include "learningAlgorithms/Ignorance.h"
 
 #include <time.h>
+#include <cassert>
 
 using namespace std;
 
@@ -220,43 +221,96 @@ public:
         Cost expectedMinimumPathCost;
         shared_ptr<Node> topLevelNode;
         vector<shared_ptr<Node>> kBestNodes;
-        DiscreteDistributionDD belief;
-        DiscreteDistributionDD belief_ps;
-        Cost h_TLA;
+                Cost h_TLA;
 
 
         TopLevelAction() { open_TLA.swapComparator(Node::compareNodesFHat); }
 
-        TopLevelAction(const TopLevelAction& tla) {
+        TopLevelAction(const TopLevelAction& tla) { copy(tla); }
+
+        TopLevelAction& operator=(const TopLevelAction& rhs) {
+            if (&rhs == this)
+                return *this;
+            copy(rhs);
+            return *this;
+        }
+
+        Cost getF_TLA() const { return this->topLevelNode->getGValue() + h_TLA; }
+
+        DiscreteDistribution getBelief() { return belief; };
+
+        void setBelief(const DiscreteDistribution& _belief) {
+            belief = _belief;
+        };
+
+        virtual void setBeliefDD(const DiscreteDistributionDD& _belief) {
+            cout << "call set beliefDD from base TLA not TLADD: RealTimeSearch.h:247" << endl;
+			assert(false);
+        }
+
+		virtual void setBeliefDD_ps(const DiscreteDistributionDD& _belief) {
+            cout << "call set beliefDD_ps from base TLA not TLADD: RealTimeSearch.h:252" << endl;
+			assert(false);
+        }
+
+		virtual DiscreteDistributionDD getBeliefDD() const {
+            cout << "call get beliefDD from base TLA not TLADD: RealTimeSearch.h:247" << endl;
+			assert(false);
+        }
+
+		virtual DiscreteDistributionDD getBeliefDD_ps() const {
+            cout << "call get beliefDD_ps from base TLA not TLADD: RealTimeSearch.h:247" << endl;
+			assert(false);
+        }
+
+    private:
+        DiscreteDistribution belief;
+
+        void copy(const TopLevelAction& tla) {
             open_TLA = tla.open_TLA;
             expectedMinimumPathCost = tla.expectedMinimumPathCost;
             topLevelNode = tla.topLevelNode;
             kBestNodes = tla.kBestNodes;
             belief = tla.belief;
-			belief_ps = tla.belief_ps;
-			h_TLA = tla.h_TLA;
+            h_TLA = tla.h_TLA;
         }
-
-        TopLevelAction& operator=(const TopLevelAction& rhs) {
-            if (&rhs == this)
-                return *this;
-            open_TLA = rhs.open_TLA;
-            expectedMinimumPathCost = rhs.expectedMinimumPathCost;
-            topLevelNode = rhs.topLevelNode;
-            kBestNodes = rhs.kBestNodes;
-            belief = rhs.belief;
-			belief_ps = rhs.belief_ps;
-			h_TLA = rhs.h_TLA;
-            return *this;
-        }
-
-        Cost getF_TLA() const { return this->topLevelNode->getGValue() + h_TLA; }
     };
 
     struct TopLevelActionDD : public TopLevelAction {
         TopLevelActionDD() {
             this->open_TLA.swapComparator(Node::compareNodesFHatFromDist);
         }
+
+        DiscreteDistributionDD beliefDD;
+        DiscreteDistributionDD beliefDD_ps;
+
+        TopLevelActionDD(const TopLevelActionDD& tla) : TopLevelAction(tla) {
+            copy(tla);
+        }
+
+        TopLevelActionDD& operator=(const TopLevelActionDD& rhs) {
+            if (&rhs == this)
+                return *this;
+            TopLevelAction::operator=(rhs);
+            copy(rhs);
+            return *this;
+        }
+
+        void copy(const TopLevelActionDD& tla) {
+            beliefDD = tla.beliefDD;
+            beliefDD_ps = tla.beliefDD_ps;
+        }
+
+        DiscreteDistributionDD getBeliefDD() const { return beliefDD; };
+        DiscreteDistributionDD getBeliefDD_ps() const { return beliefDD_ps; };
+
+        void setBeliefDD(const DiscreteDistributionDD& _belief) {
+            beliefDD = _belief;
+        };
+
+		void setBeliefDD_ps(const DiscreteDistributionDD& _belief) {
+            beliefDD_ps = _belief;
+		}
     };
 
     RealTimeSearch(Domain& domain,
@@ -422,10 +476,10 @@ public:
             // Learning Phase
             learningAlgo->learn(open, closed);
 
-            cout << "g " << start->getGValue() << " hat " << start->getHHatValueFromDist()
-                 << endl;
+            //cout << "g " << start->getGValue() << " hat " << start->getHHatValueFromDist()
+                 //<< endl;
 
-            cout << "iteration: " << count << endl;
+            //cout << "iteration: " << count << endl;
             // Add this step to the path taken so far
             res.path.push(start->getState().getLabel());
             res.solutionCost += start->getGValue();
@@ -443,7 +497,7 @@ private:
     static bool duplicateDetection(shared_ptr<Node> node,
             unordered_map<State, shared_ptr<Node>, Hash>& closed,
             PriorityQueue<shared_ptr<Node>>& open,
-            vector<TopLevelAction>& tlaList) {
+            vector<shared_ptr<TopLevelAction>>& tlaList) {
         // Check if this state exists
         typename unordered_map<State, shared_ptr<Node>, Hash>::iterator it =
                 closed.find(node->getState());
@@ -454,7 +508,7 @@ private:
             if (it->second->onOpen()) {
                 // This node is on OPEN, keep the better g-value
                 if (node->getGValue() < it->second->getGValue()) {
-                    tlaList[it->second->getOwningTLA()].open_TLA.remove(it->second);
+                    tlaList[it->second->getOwningTLA()]->open_TLA.remove(it->second);
                     it->second->setGValue(node->getGValue());
                     it->second->setParent(node->getParent());
                     it->second->setHValue(node->getHValue());
@@ -464,7 +518,7 @@ private:
                     it->second->setEpsilonD(node->getEpsilonD());
                     it->second->setState(node->getState());
                     it->second->setOwningTLA(node->getOwningTLA());
-                    tlaList[node->getOwningTLA()].open_TLA.push(it->second);
+                    tlaList[node->getOwningTLA()]->open_TLA.push(it->second);
                 }
             } else {
                 // This node is on CLOSED, compare the f-values. If this new
@@ -480,7 +534,7 @@ private:
                     it->second->setEpsilonD(node->getEpsilonD());
                     it->second->setState(node->getState());
                     it->second->setOwningTLA(node->getOwningTLA());
-                    tlaList[node->getOwningTLA()].open_TLA.push(it->second);
+                    tlaList[node->getOwningTLA()]->open_TLA.push(it->second);
                     it->second->reOpen();
                     open.push(it->second);
                 }
@@ -495,7 +549,7 @@ private:
     static bool duplicateDetectionDD(shared_ptr<Node> node,
             unordered_map<State, shared_ptr<Node>, Hash>& closed,
             PriorityQueue<shared_ptr<Node>>& open,
-            vector<TopLevelAction>& tlaList) {
+            vector<shared_ptr<TopLevelAction>>& tlaList) {
         // Check if this state exists
         typename unordered_map<State, shared_ptr<Node>, Hash>::iterator it =
                 closed.find(node->getState());
@@ -510,11 +564,11 @@ private:
 				// since everything else should be identical with the same state
 				// then change the owing tla
                 if (node->getGValue() < it->second->getGValue()) {
-                    tlaList[it->second->getOwningTLA()].open_TLA.remove(it->second);
+                    tlaList[it->second->getOwningTLA()]->open_TLA.remove(it->second);
                     it->second->setGValue(node->getGValue());
                     it->second->setParent(node->getParent());
                     it->second->setOwningTLA(node->getOwningTLA());
-                    tlaList[node->getOwningTLA()].open_TLA.push(it->second);
+                    tlaList[node->getOwningTLA()]->open_TLA.push(it->second);
                 }
             } else {
                 // This node is on CLOSED, compare the f-values. If this new
@@ -527,7 +581,7 @@ private:
                     it->second->setGValue(node->getGValue());
                     it->second->setParent(node->getParent());
                     it->second->setOwningTLA(node->getOwningTLA());
-                    tlaList[node->getOwningTLA()].open_TLA.push(it->second);
+                    tlaList[node->getOwningTLA()]->open_TLA.push(it->second);
                     it->second->reOpen();
                     open.push(it->second);
                 }
@@ -574,8 +628,8 @@ private:
             // No top level action will ever be a duplicate, so no need to
             // check.
             // Make a new top level action and push this node onto its open
-            TopLevelAction tla;
-            tla.topLevelNode = childNode;
+            shared_ptr<TopLevelAction> tla = make_shared<TopLevelAction>();
+            tla->topLevelNode = childNode;
 
             childNode->distribution = DiscreteDistribution(100,
                     childNode->getFValue(),
@@ -583,13 +637,13 @@ private:
                     childNode->getDValue(),
                     childNode->getFHatValue() - childNode->getFValue());
 
-            tla.expectedMinimumPathCost =
+            tla->expectedMinimumPathCost =
                     childNode->distribution.expectedCost();
 
             // Push this node onto open and closed
             closed[child] = childNode;
             open.push(childNode);
-            tla.open_TLA.push(childNode);
+            tla->open_TLA.push(childNode);
 
             // Add this top level action to the list
             tlas.push_back(tla);
@@ -630,23 +684,23 @@ private:
             // No top level action will ever be a duplicate, so no need to
             // check.
             // Make a new top level action and push this node onto its open
-            TopLevelActionDD tla;
-            tla.topLevelNode = childNode;
+            shared_ptr<TopLevelAction> tla = make_shared<TopLevelActionDD>();
+            tla->topLevelNode = childNode;
 
             childNode->hStartDistribution = domain.hstart_distribution(child);
 
             childNode->hStartDistribution_ps = domain.hstart_distribution_ps(child);
 
-            tla.expectedMinimumPathCost =
+            tla->expectedMinimumPathCost =
                     childNode->distribution.expectedCost() +
                     childNode->getGValue();
 
-			tla.h_TLA  = childNode->getHValue();
+			tla->h_TLA  = childNode->getHValue();
 
             // Push this node onto open and closed
             closed[child] = childNode;
             open.push(childNode);
-            tla.open_TLA.push(childNode);
+            tla->open_TLA.push(childNode);
 
             // Add this top level action to the list
             tlas.push_back(tla);
@@ -693,7 +747,7 @@ protected:
 	shared_ptr<DecisionAlgorithm<Domain, Node, TopLevelAction> > decisionAlgo;
 	PriorityQueue<shared_ptr<Node> > open;
 	unordered_map<State, shared_ptr<Node>, Hash> closed;
-	vector<TopLevelAction> tlas;
+	vector<shared_ptr<TopLevelAction>> tlas;
 
 	double lookahead;
 	string beliefType;
