@@ -52,20 +52,29 @@ public:
                                         domain.hstart_distribution(
                                                       cur->getState())
                                                 .expectedCost()) {
-                    // Update the heuristic of this pedecessor
-                    auto distribution_pair = domain.update_two_distribution(s,
-                            cur->getState(),
-                            domain.getEdgeCost(cur->getState()));
-
-                    auto newh = cur->getHValue() +
-                            domain.getEdgeCost(cur->getState());
-                    domain.updateHeuristic(s, newh);
-
-                    it->second->setHStartDistribution(distribution_pair.first);
-                    it->second->setHStartDistribution_ps(
-                            distribution_pair.second);
-                    it->second->setHValue(newh);
                     it->second->markUnClearTwoDistribution();
+
+                    // only update if it raises its hhat
+                    if (it->second->getHHatValueFromDist() <
+                            domain.getEdgeCost(cur->getState()) +
+                                    domain.hstart_distribution(cur->getState())
+                                            .expectedCost()) {
+                        // Update the heuristic of this pedecessor
+                        auto distribution_pair =
+                                domain.update_two_distribution(s,
+                                        cur->getState(),
+                                        domain.getEdgeCost(cur->getState()));
+
+                        auto newh = cur->getHValue() +
+                                domain.getEdgeCost(cur->getState());
+                        domain.updateHeuristic(s, newh);
+
+                        it->second->setHStartDistribution(
+                                distribution_pair.first);
+                        it->second->setHStartDistribution_ps(
+                                distribution_pair.second);
+                        it->second->setHValue(newh);
+                    }
 
                     if (open.find(it->second) == open.end()) {
                         open.push(it->second);
