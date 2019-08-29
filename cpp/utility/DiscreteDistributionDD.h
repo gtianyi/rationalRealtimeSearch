@@ -111,13 +111,13 @@ public:
         string fileName = "/home/aifs1/gu/phd/research/workingPaper/"
                           "realtime-nancy/results/SlidingTilePuzzle/"
                           "sampleData/" +
-                domain.getSubDomainName() + "-statSummary-nomissing.txt";
+                domain.getSubDomainName() + "-statSummary-nomissing-smoothed.txt";
 
         string fileName_ps = "/home/aifs1/gu/phd/research/workingPaper/"
                              "realtime-nancy/results/SlidingTilePuzzle/"
                              "sampleData/" +
                 domain.getSubDomainName() +
-                "-statSummary-postSearch-nomissing.txt";
+                "-statSummary-postSearch-nomissing-smoothed.txt";
 
         ifstream f(fileName);
         ifstream f_ps(fileName_ps);
