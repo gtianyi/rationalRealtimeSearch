@@ -24,6 +24,7 @@ def printUsage():
     print "plot type: coverage, pairwise, solutioncost"
     print "tile type: uniform heavy inverse"
 
+
 def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
                        orderList, hueOrderList, xLabel, yLabel, outputName,
                        markerList):
@@ -77,13 +78,15 @@ def main():
     limits = [3, 10, 30, 100, 300, 1000]
     # limits = [100, 300, 1000]
     algorithms = {
-        "astar": "A*",
+        # "astar": "A*",
         "fhat": "F-Hat",
-        "bfs": "BFS",
+        # "bfs": "BFS",
         "risk": "Risk",
         "riskdd": "RiskDD",
         "lsslrtastar": "LSS-LRTA*"
     }
+
+    baseline = "LSS-LRTA*"
 
     instance = []
     lookAheadVals = []
@@ -120,7 +123,7 @@ def main():
     for rowdata in df.iterrows():
         row = rowdata[1]
         relateastar = df[(df["instance"] == row['instance'])
-                         & (df["Algorithm"] == 'A*')]
+                         & (df["Algorithm"] == baseline)]
         if relateastar.empty:
             differenceCost.append(np.nan)
         else:
@@ -128,7 +131,7 @@ def main():
             diffCost = diffCost.values[0]
             differenceCost.append(diffCost)
 
-    df["Algorithm Cost - A* Cost"] = differenceCost
+    df["Algorithm Cost - " + baseline + " Cost"] = differenceCost
 
     # print df
 
@@ -139,9 +142,9 @@ def main():
     elif sys.argv[1] == "pairwise":
         makeDifferencePlot(
             13, 10, "Node Expansion Limit",
-            "Algorithm Cost - A* Cost", df, 0.35, "Algorithm", limits,
+            "Algorithm Cost - " + baseline + " Cost", df, 0.35, "Algorithm", limits,
             algorithms.values(), "Node Expansion Limit",
-            "Algorithm Cost - A* Cost",
+            "Algorithm Cost - " + baseline + " Cost",
             "../../plots/" + tileType + '/' + "CostDD-pairwise" + ".pdf",
             markers)
     elif sys.argv[1] == "solutioncost":

@@ -420,7 +420,7 @@ public:
                     -1);
         }
 
-        //int count = 0;
+		int count = 0;
         //
         // clock_t startTime = clock();
 
@@ -430,7 +430,7 @@ public:
             // prevent state pruning based on label)
             start->markStart();
 
-            //count++;
+			count++;
 
             // if (beliefType == "data") {
             // cout << "rl loop " << count << "h "

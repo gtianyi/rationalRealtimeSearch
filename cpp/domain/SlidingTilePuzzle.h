@@ -10,6 +10,7 @@
 #include <bitset>
 #include "../utility/SlidingWindow.h"
 #include "../utility/DiscreteDistributionDD.h"
+#include "../utility/rapidjson/document.h"
 
 using namespace std;
 
@@ -565,37 +566,27 @@ public:
                     shared_ptr<vector<DiscreteDistributionDD::ProbabilityNode>>>&
                     hValueTable) const {
         cout << "reading unit or heavy tile data\n";
-        string line;
 
-        int h, valueCount, hsCount;
-		double hs;
+        string jsonStr;
+        getline(f, jsonStr);
+        f.close();
+        rapidjson::Document jsonDoc;
+        jsonDoc.Parse(jsonStr.c_str());
 
-        while (getline(f, line)) {
-            stringstream ss(line);
-
-            ss >> h;
-            ss >> valueCount;
-
-            /*         if (valueCount < 10) {*/
-            // continue;
-            //}
-
-            if (hValueTable.find(h) != hValueTable.end()) {
-                cout << "error: duplicate h from data " << h << "\n";
-            }
-
+        for (auto& m : jsonDoc.GetObject()) {
+            Cost h = stod(m.name.GetString());
             hValueTable[h] = make_shared<
                     vector<DiscreteDistributionDD::ProbabilityNode>>();
 
-            while (!ss.eof()) {
-                ss >> hs;
-                ss >> hsCount;
+            auto& bins = m.value.GetObject()["bins"];
+            for (auto& instance : bins.GetArray()) {
+                Cost hstar = instance["h*"].GetInt();
+                Cost prob = stod(instance["prob"].GetString());
 
-                DiscreteDistributionDD::ProbabilityNode pn(
-                        hs, (float)hsCount / (float)valueCount);
+                DiscreteDistributionDD::ProbabilityNode pn(hstar, prob);
                 hValueTable[h]->push_back(pn);
             }
-        }
+		}
 
 		f.close();
 

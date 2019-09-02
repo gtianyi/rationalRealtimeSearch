@@ -31,41 +31,33 @@ public:
 
         // Take the TLA with the lowest expected minimum path cost
         auto lowestExpectedPathTLA = tlas[0];
-        for (const auto& tla : tlas) {
+        for (auto tla : tlas) {
             if (tla->expectedMinimumPathCost <
                     lowestExpectedPathTLA->expectedMinimumPathCost)
                 lowestExpectedPathTLA = tla;
         }
 
         shared_ptr<Node> goalPrime;
+		auto tlaBest = lowestExpectedPathTLA->open_TLA.top();
 
         if (persistPath.empty() ||
-                lowestExpectedPathTLA->expectedMinimumPathCost +
-                                lowestExpectedPathTLA->topLevelNode
-                                        ->getGValue() <=
-                        persistFhat) {
+                lowestExpectedPathTLA->expectedMinimumPathCost < persistFhat) {
             // if there is no persist path, go head memoize it
             // if we find a better fhat for root, go head memoize it
             memoizePersistPath(lowestExpectedPathTLA);
-            /*cout << "no more persist, find better fhat" << endl;*/
-            //cout << "previous fhat " << persistFhat << endl;
-            //cout << "new fhat "
-                 //<< lowestExpectedPathTLA->expectedMinimumPathCost +
-                            //lowestExpectedPathTLA->topLevelNode->getGValue()
-                 /*<< endl;*/
-        } else {
+        } else if (lowestExpectedPathTLA->expectedMinimumPathCost ==
+                        persistFhat &&
+                tlaBest->getHHatValueFromDist() <=
+                        persistTarget->getHHatValueFromDist()) {
+            // if  fhat ties break ties on h-hat then prefer not persist
+            memoizePersistPath(lowestExpectedPathTLA);
+        } else{
             // if we find a worse fhat, but previous target is inside LSS, 
 			// we then still want to memoize it because the learning then 
 			// will update the previous target.
             auto it = closed.find(persistTarget->getState());
             if (it != closed.end() && !it->second->onOpen()) {
                 memoizePersistPath(lowestExpectedPathTLA);
-                /*cout << "no more persist because in target inside lss" << endl;*/
-                //cout << "previous fhat " << persistFhat << endl;
-                //cout << "new fhat "
-                     //<< lowestExpectedPathTLA->expectedMinimumPathCost +
-                                //lowestExpectedPathTLA->topLevelNode->getGValue()
-                     /*<< endl;*/
             } else {
                 cout << "persist" << endl;
                 cout << "previous fhat " << persistFhat << endl;
@@ -98,8 +90,7 @@ private:
         }
 
         persistTarget = tla->open_TLA.top();
-        persistFhat =
-                tla->expectedMinimumPathCost + tla->topLevelNode->getGValue();
+        persistFhat = tla->expectedMinimumPathCost;
     }
 
 protected:
