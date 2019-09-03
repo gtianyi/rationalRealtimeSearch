@@ -100,12 +100,13 @@ def main():
         for jsonFile in listdir(
                 "../../results/SlidingTilePuzzle/expansionTests/NancyDD/" +
                 tileType + '/' + alg + '/' + tileDimension):
+            if jsonFile[-5:] != ".json":
+                continue
             with open(
                     "../../results/SlidingTilePuzzle/expansionTests/NancyDD/" +
                     tileType + '/' + alg + '/' + tileDimension + "/" +
                     jsonFile) as json_data:
 
-                # print jsonFile
                 resultData = json.load(json_data)
                 if float(resultData[algorithms[alg]]) != -1.0:
                     instance.append(str(jsonFile))
@@ -142,8 +143,8 @@ def main():
     elif sys.argv[1] == "pairwise":
         makeDifferencePlot(
             13, 10, "Node Expansion Limit",
-            "Algorithm Cost - " + baseline + " Cost", df, 0.35, "Algorithm", limits,
-            algorithms.values(), "Node Expansion Limit",
+            "Algorithm Cost - " + baseline + " Cost", df, 0.35, "Algorithm",
+            limits, algorithms.values(), "Node Expansion Limit",
             "Algorithm Cost - " + baseline + " Cost",
             "../../plots/" + tileType + '/' + "CostDD-pairwise" + ".pdf",
             markers)

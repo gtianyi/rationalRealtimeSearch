@@ -472,13 +472,15 @@ public:
             // Decision-making Phase
             start = decisionAlgo->backup(open, tlas, start, closed);
 
+            /*cout << "h " << start->getHValue() << " hat "*/
+                 //<< start->getHHatValueFromDist() << endl;
+
+            //cout << "iteration: " << count << endl;
+
             // Learning Phase
             learningAlgo->learn(open, closed);
 
-            //cout << "g " << start->getGValue() << " hat " << start->getHHatValueFromDist()
-                 //<< endl;
 
-			//cout << "iteration: " << count << endl;
             // Add this step to the path taken so far
             res.path.push(start->getState().getLabel());
             res.solutionCost += start->getGValue();

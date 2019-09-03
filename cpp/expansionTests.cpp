@@ -18,16 +18,26 @@
 
 using namespace std;
 
-void startAlg(SlidingTilePuzzle& domain, string expansionModule, string learningModule, string decisionModule,
-        double lookahead, string algName, string& result, double k = 1, string beliefType = "normal") {
+void startAlg(shared_ptr<SlidingTilePuzzle> domain_ptr,
+        string expansionModule,
+        string learningModule,
+        string decisionModule,
+        double lookahead,
+        string algName,
+        string& result,
+        double k = 1,
+        string beliefType = "normal") {
     shared_ptr<RealTimeSearch<SlidingTilePuzzle>> searchAlg =
-            make_shared<RealTimeSearch<SlidingTilePuzzle>>(domain,
+            make_shared<RealTimeSearch<SlidingTilePuzzle>>(*domain_ptr,
                     expansionModule,
                     learningModule,
                     decisionModule,
                     lookahead,
                     k,
                     beliefType);
+
+    if (algName == "RiskDD")
+        DiscreteDistributionDD::readData<SlidingTilePuzzle>(domain_ptr);
 
     ResultContainer res = searchAlg->search(1000*200/lookahead);
 
@@ -91,16 +101,13 @@ int main(int argc, char** argv)
 
         if (subDomain == "uniform") {
             world = std::make_shared<SlidingTilePuzzle>(cin);
-            DiscreteDistributionDD::readData<SlidingTilePuzzle>(*world);
         } else if (subDomain == "heavy") {
             world = std::make_shared<HeavyTilePuzzle>(cin);
-			DiscreteDistributionDD::readData<SlidingTilePuzzle>(*world);
         } else if (subDomain == "inverse") {
             world = std::make_shared<InverseTilePuzzle>(cin);
-			DiscreteDistributionDD::readData<SlidingTilePuzzle>(*world);
         }
 
-        startAlg(*world,
+        startAlg(world,
                 algorithmsConfig[argv[4]][0],
                 algorithmsConfig[argv[4]][1],
                 algorithmsConfig[argv[4]][2],

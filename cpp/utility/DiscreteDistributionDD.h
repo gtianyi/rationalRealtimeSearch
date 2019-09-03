@@ -107,16 +107,16 @@ public:
     }
 
     template <class Domain>
-    static void readData(Domain& domain) {
+    static void readData(shared_ptr<Domain> domain) {
         string fileName = "/home/aifs1/gu/phd/research/workingPaper/"
                           "realtime-nancy/results/SlidingTilePuzzle/"
                           "sampleData/" +
-                domain.getSubDomainName() + "-statSummary-d.json";
+                domain->getSubDomainName() + "-statSummary-d.json";
 
         string fileName_ps = "/home/aifs1/gu/phd/research/workingPaper/"
                              "realtime-nancy/results/SlidingTilePuzzle/"
                              "sampleData/" +
-                domain.getSubDomainName() +
+                domain->getSubDomainName() +
                 "-statSummary-postd.json";
 
         ifstream f(fileName);
@@ -127,8 +127,8 @@ public:
             exit(1);
 		}
 
-		domain.readDistributionData(f, hValueTable);
-		domain.readDistributionData(f_ps, hPostSearchTable);
+		domain->readDistributionData(f, hValueTable);
+		domain->readDistributionData(f_ps, hPostSearchTable);
     }
 
     vector<ProbabilityNode>::iterator begin() const {
