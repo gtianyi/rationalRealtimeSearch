@@ -200,7 +200,7 @@ public:
         return false;
     }
 
-    Cost distance(const State& state) {
+    virtual Cost distance(const State& state) {
         // Check if the distance of this state has been updated
         if (correctedD.find(state) != correctedD.end()) {
             return correctedD[state];

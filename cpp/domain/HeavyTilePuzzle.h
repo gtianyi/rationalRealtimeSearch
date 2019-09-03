@@ -40,4 +40,47 @@ public:
     }
 
     virtual string getSubDomainName() const { return "heavy"; }
+
+    Cost distance(const State& state) {
+        // Check if the distance of this state has been updated
+        if (correctedD.find(state) != correctedD.end()) {
+            return correctedD[state];
+        }
+
+        Cost d = manhattanDistanceWithFaceCost(state);
+
+        updateDistance(state, d);
+
+        return correctedD[state];
+    }
+
+    virtual DiscreteDistributionDD hstart_distribution(const State& state) {
+        // Check if the heuristic h-hat of this state has been updated
+        if (correctedDistribution.find(state) != correctedDistribution.end()) {
+            return correctedDistribution[state];
+        }
+
+        Cost h = manhattanDistanceWithFaceCost(state);
+
+        correctedDistribution[state] = DiscreteDistributionDD(h);
+        correctedPostSearchDistribution[state] = DiscreteDistributionDD(h,true);
+
+        updateHeuristic(state, h);
+
+        return correctedDistribution[state];
+    }
+
+    virtual DiscreteDistributionDD hstart_distribution_ps(const State& state) {
+        // Check if the heuristic h-hat of this state has been updated
+        if (correctedDistribution.find(state) != correctedDistribution.end()) {
+            return correctedDistribution[state];
+        }
+
+        Cost h = manhattanDistanceWithFaceCost(state);
+
+        correctedDistribution[state] = DiscreteDistributionDD(h);
+        correctedPostSearchDistribution[state] = DiscreteDistributionDD(h,true);
+
+        return correctedPostSearchDistribution[state];
+    }
 };
