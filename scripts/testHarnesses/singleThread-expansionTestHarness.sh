@@ -63,7 +63,7 @@ then
 
 		  echo "runing LA${lookahead}-${instance}" 
 
-	      timeout 600 ./../../expansionTests ${domainType} ${lookahead} ${tileType} ${algname} ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json < ${file}
+	      timeout 1800 ./../../expansionTests ${domainType} ${lookahead} ${tileType} ${algname} ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json < ${file}
 
 		  if [ -f ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json ]
 		  then

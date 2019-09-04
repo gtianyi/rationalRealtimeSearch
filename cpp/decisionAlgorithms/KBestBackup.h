@@ -20,7 +20,7 @@ public:
               k(k),
               lookahead(lookahead) {}
 
-    shared_ptr<Node> backup(PriorityQueue<shared_ptr<Node>>& open,
+    virtual shared_ptr<Node> backup(PriorityQueue<shared_ptr<Node>>& open,
             vector<shared_ptr<TopLevelAction>>& tlas,
             shared_ptr<Node> start,
             unordered_map<State, shared_ptr<Node>, Hash>& closed) {
@@ -39,7 +39,7 @@ public:
         return goalPrime;
     }
 
-private:
+protected:
     void csernaBackup(shared_ptr<TopLevelAction> tla) {
         // We assume in k-best that only the k-best nodes matter.
         if (!tla->kBestNodes.empty()) {

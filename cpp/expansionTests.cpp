@@ -68,6 +68,7 @@ int main(int argc, char** argv)
     vector<string> lsslrtastarConfig{
             "a-star", "learn", "minimin", "LSS-LRTA*", "normal"};
     vector<string> riskConfig{"risk", "learn", "k-best", "Risk", "normal"};
+    vector<string> riskPersistConfig{"risk", "learn", "k-best-persist", "PRisk", "normal"};
     vector<string> riskddConfig{
             "riskDD", "learnDD", "nancyDD", "RiskDD", "data"};
     unordered_map<string, vector<string>> algorithmsConfig({{"bfs", bfsConfig},
@@ -75,6 +76,7 @@ int main(int argc, char** argv)
             {"fhat", fhatConfig},
             {"lsslrtastar", lsslrtastarConfig},
             {"risk", riskConfig},
+            {"prisk", riskPersistConfig},
             {"riskdd", riskddConfig}});
 
     if (algorithmsConfig.find(argv[4]) == algorithmsConfig.end()) {

@@ -10,6 +10,7 @@
 #include "utility/ResultContainer.h"
 #include "decisionAlgorithms/DecisionAlgorithm.h"
 #include "decisionAlgorithms/KBestBackup.h"
+#include "decisionAlgorithms/KbestBackupPersistency.h"
 #include "decisionAlgorithms/NancyDDDecision.h"
 #include "decisionAlgorithms/ScalarBackup.h"
 #include "expansionAlgorithms/ExpansionAlgorithm.h"
@@ -378,6 +379,10 @@ public:
         } else if (decisionModule == "k-best") {
             decisionAlgo =
                     make_shared<KBestBackup<Domain, Node, TopLevelAction>>(
+                            domain, k, lookahead);
+        } else if (decisionModule == "k-best-persist") {
+            decisionAlgo =
+                    make_shared<KBestBackupPersistency<Domain, Node, TopLevelAction>>(
                             domain, k, lookahead);
         } else if (decisionModule == "nancyDD") {
             decisionAlgo = make_shared<
