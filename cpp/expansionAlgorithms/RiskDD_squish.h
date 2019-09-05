@@ -5,26 +5,25 @@
 #include <unordered_map>
 #include "../utility/PriorityQueue.h"
 #include "../utility/ResultContainer.h"
-#include "ExpansionAlgorithm.h"
-#include "../decisionAlgorithms/NancyDDBackup.h"
+#include "RiskDD.h"
 
 using namespace std;
 
 template <class Domain, class Node, class TopLevelAction>
-class RiskDD : public ExpansionAlgorithm<Domain, Node, TopLevelAction> {
+class RiskDDSquish : public RiskDD<Domain, Node, TopLevelAction> {
     typedef typename Domain::State State;
     typedef typename Domain::Cost Cost;
     typedef typename Domain::HashState Hash;
 
 public:
-    RiskDD(Domain& domain, double lookahead, int expansionAllocation)
-            : domain(domain),
-              lookahead(lookahead),
-              expansionsPerIteration(expansionAllocation) {}
+    RiskDDSquish(Domain& domain, double lookahead, int expansionAllocation)
+            : RiskDD<Domain, Node, TopLevelAction>(domain,
+                      lookahead,
+                      expansionAllocation) {}
 
-    void incrementLookahead() { lookahead++; }
+    void incrementLookahead() { this->lookahead++; }
 
-    virtual void expand(PriorityQueue<shared_ptr<Node>>& open,
+    void expand(PriorityQueue<shared_ptr<Node>>& open,
             unordered_map<State, shared_ptr<Node>, Hash>& closed,
             vector<shared_ptr<TopLevelAction>>& tlas,
             std::function<bool(shared_ptr<Node>,
@@ -36,7 +35,7 @@ public:
         // actions
         int expansions = 1;
 
-        while (expansions < lookahead && !open.empty()) {
+        while (expansions < this->lookahead && !open.empty()) {
             // At the beginning of each expansion we are going to update our
             // beliefs at every TLA.
             // Why? Because this could be the first expansion in the phase.
@@ -54,6 +53,9 @@ public:
             // Expand under the TLA which holds the lowest risk
             shared_ptr<Node> chosenNode = tlas[chosenTLAIndex]->open_TLA.top();
 
+
+			this->domain.pushDelayWindow(chosenNode->getDelayCntr());
+
             //cout << "exp: choseNode \n" << chosenNode->getState() << endl;
 			//cout << "exp: choseNode \n";
             //cout << "g " << chosenNode->getGValue() << " h "
@@ -61,7 +63,7 @@ public:
 
             // Check if current node is goal. If it is, then the expansion phase
             // is over, time to move.
-            if (domain.isGoal(chosenNode->getState())) {
+            if (this->domain.isGoal(chosenNode->getState())) {
                 return;
             }
 
@@ -74,8 +76,13 @@ public:
             res.nodesExpanded++;
             expansions++;
 
+            // Increment the delay counts of every other node on open...
+            for (shared_ptr<Node> n : open) {
+                n->incDelayCntr();
+            }
+
             // Generate the successors of the chosen node
-            vector<State> children = domain.successors(chosenNode->getState());
+            vector<State> children = this->domain.successors(chosenNode->getState());
 
             // Book keeping for number of nodes generated
             res.nodesGenerated += children.size();
@@ -84,10 +91,10 @@ public:
             for (State child : children) {
                 // Create a node for this state
                 shared_ptr<Node> childNode = make_shared<Node>(
-                        chosenNode->getGValue() + domain.getEdgeCost(child),
-                        domain.hstart_distribution(child),
-                        domain.hstart_distribution_ps(child),
-                        domain.heuristic(child),
+                        chosenNode->getGValue() + this->domain.getEdgeCost(child),
+                        this->domain.hstart_distribution(child),
+                        this->domain.hstart_distribution_ps(child),
+                        this->domain.heuristic(child),
                         child,
                         chosenNode,
                         chosenNode->getOwningTLA());
@@ -110,7 +117,7 @@ public:
 
 private:
 	// In DD this is different, we just use the post search belief
-    virtual int computeRiskByPSAndGetBestTLA(vector<shared_ptr<TopLevelAction>>& tlas) {
+    int computeRiskByPSAndGetBestTLA(vector<shared_ptr<TopLevelAction>>& tlas) {
         int minimalRiskTLA = 0;
         double minimalRisk = numeric_limits<double>::infinity();
 
@@ -170,13 +177,18 @@ private:
         return minimalRiskTLA;
     }
 
-    virtual double riskAnalysis(int alphaIndex,
+    double riskAnalysis(int alphaIndex,
             int simulateTLAIndex,
             const vector<shared_ptr<TopLevelAction>>& tlas) const {
         double risk = 0;
 
+        double ds = this->expansionsPerIteration /
+                this->domain.averageDelayWindow();
+        double dy = tlas[alphaIndex]->open_TLA.top()->getDValue();
+        double squishFactor = min(1.0, (ds / dy));
+
         const auto& alphaBelief = alphaIndex == simulateTLAIndex ?
-                tlas[alphaIndex]->getBeliefDD_ps() :
+                tlas[alphaIndex]->getBeliefDD().squish(squishFactor) :
                 tlas[alphaIndex]->getBeliefDD();
 
         const auto alphaGValue = tlas[alphaIndex]->topLevelNode->getGValue();
@@ -189,8 +201,15 @@ private:
                 if (tla == alphaIndex)
                     continue;
 
+                double ds = this->expansionsPerIteration /
+                        this->domain.averageDelayWindow();
+                double dy = tlas[tla]->open_TLA.top()->getDValue();
+                double squishFactor = min(1.0, (ds / dy));
+
+
+
                 const auto& betaBelief = tla == simulateTLAIndex ?
-                        tlas[tla]->getBeliefDD_ps() :
+                        tlas[tla]->getBeliefDD().squish(squishFactor) :
                         tlas[tla]->getBeliefDD();
 
                 const auto betaGValue = tlas[tla]->topLevelNode->getGValue();
@@ -217,11 +236,4 @@ private:
 
         return risk;
     }
-
-protected:
-    Domain& domain;
-    double lookahead;
-    string sortingFunction;
-    int k = 1;
-    int expansionsPerIteration;
 };

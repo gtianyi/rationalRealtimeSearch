@@ -19,6 +19,7 @@
 #include "expansionAlgorithms/DepthFirst.h"
 #include "expansionAlgorithms/Risk.h"
 #include "expansionAlgorithms/RiskDD.h"
+#include "expansionAlgorithms/RiskDD_squish.h"
 #include "learningAlgorithms/LearningAlgorithm.h"
 #include "learningAlgorithms/Dijkstra.h"
 #include "learningAlgorithms/Dijkstra_distribution.h"
@@ -346,6 +347,9 @@ public:
                     domain, lookahead, 1);
         } else if (expansionModule == "riskDD") {
             expansionAlgo = make_shared<RiskDD<Domain, Node, TopLevelAction>>(
+                    domain, lookahead, 1);
+        }  else if (expansionModule == "riskDDSquish") {
+            expansionAlgo = make_shared<RiskDDSquish<Domain, Node, TopLevelAction>>(
                     domain, lookahead, 1);
         } else {
             expansionAlgo = make_shared<AStar<Domain, Node, TopLevelAction>>(

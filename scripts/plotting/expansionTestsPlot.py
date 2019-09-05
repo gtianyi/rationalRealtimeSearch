@@ -30,7 +30,7 @@ def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
                        markerList):
     sns.set(rc={
         'figure.figsize': (width, height),
-        'font.size': 26,
+        'font.size': 27,
         'text.color': 'black'
     })
     ax = sns.pointplot(x=xAxis,
@@ -75,14 +75,29 @@ def main():
     # Hard coded result directories
     tileDimension = "4x4"
     tileType = sys.argv[2]
-    limits = [3, 10, 30, 100, 300, 1000]
+    # limits = [3, 10, 30, 100, 300, 1000]
+    # limits = [10, 30, 100, 300, 1000]
+    limits = [30, 100, 300, 1000]
     # limits = [100, 300, 1000]
-    algorithms = {
+    algorithms_data = {
         # "astar": "A*",
-        "fhat": "F-Hat",
+        # "fhat": "F-Hat",
         # "bfs": "BFS",
         "risk": "Risk",
         "riskdd": "RiskDD",
+        "prisk": "PRisk",
+        "riskddSquish": "RiskDDSquish",
+        "lsslrtastar": "LSS-LRTA*"
+    }
+
+    algorithms = {
+        # "astar": "A*",
+        # "fhat": "F-Hat",
+        # "bfs": "BFS",
+        "risk": "Nancy",
+        "riskdd": "Nancy (DD PE)",
+        "prisk": "Nancy (pers.)",
+        "riskddSquish": "Nancy (DD)",
         "lsslrtastar": "LSS-LRTA*"
     }
 
@@ -107,19 +122,32 @@ def main():
                     tileType + '/' + alg + '/' + tileDimension + "/" +
                     jsonFile) as json_data:
 
+                # print "../../results/SlidingTilePuzzle/expansionTests/NancyDD/", tileType, '/', alg + '/', tileDimension, "/", jsonFile
+
                 resultData = json.load(json_data)
-                if float(resultData[algorithms[alg]]) != -1.0:
+                if float(resultData[algorithms_data[alg]]) != -1.0:
                     instance.append(str(jsonFile))
                     lookAheadVals.append(resultData["Lookahead"])
                     algorithm.append(algorithms[alg])
-                    solutionCost.append(resultData[algorithms[alg]])
+                    solutionCost.append(resultData[algorithms_data[alg]])
 
-    df = pd.DataFrame({
+    rawdf = pd.DataFrame({
         "instance": instance,
         "Node Expansion Limit": lookAheadVals,
         "Solution Cost": solutionCost,
         "Algorithm": algorithm
     })
+
+    df = pd.DataFrame()
+    df["instance"] = np.nan
+    df["Node Expansion Limit"] = np.nan
+    df["Solution Cost"] = np.nan
+    df["Algorithm"] = np.nan
+
+    for instance in rawdf["instance"].unique():
+        dfins = rawdf[rawdf["instance"] == instance]
+        if len(dfins) == len(algorithms):
+            df = df.append(dfins)
 
     for rowdata in df.iterrows():
         row = rowdata[1]
@@ -139,21 +167,23 @@ def main():
     print("building plots...")
 
     if sys.argv[1] == "coverage":
-        makeCoverageTable(df, tileType)
+        makeCoverageTable(rawdf, tileType)
+
     elif sys.argv[1] == "pairwise":
         makeDifferencePlot(
             13, 10, "Node Expansion Limit",
             "Algorithm Cost - " + baseline + " Cost", df, 0.35, "Algorithm",
             limits, algorithms.values(), "Node Expansion Limit",
             "Algorithm Cost - " + baseline + " Cost",
-            "../../plots/" + tileType + '/' + "CostDD-pairwise" + ".pdf",
+            "../../plots/" + tileType + '/' + tileType+"-tile-pairwise" + ".eps",
             markers)
+
     elif sys.argv[1] == "solutioncost":
         makeDifferencePlot(
             13, 10, "Node Expansion Limit", "Solution Cost", df, 0.35,
             "Algorithm", limits, algorithms.values(), "Node Expansion Limit",
             "Solution Cost",
-            "../../plots/" + tileType + '/' + "CostDD-solution" + ".pdf",
+            "../../plots/" + tileType + '/' + tileType+"-tile-solution-cost" + ".eps",
             markers)
     else:
         printUsage()

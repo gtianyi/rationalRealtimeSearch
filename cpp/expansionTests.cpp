@@ -36,7 +36,7 @@ void startAlg(shared_ptr<SlidingTilePuzzle> domain_ptr,
                     k,
                     beliefType);
 
-    if (algName == "RiskDD")
+    if (algName == "RiskDD" || algName == "RiskDDSquish")
         DiscreteDistributionDD::readData<SlidingTilePuzzle>(domain_ptr);
 
     ResultContainer res = searchAlg->search(1000*200/lookahead);
@@ -71,12 +71,15 @@ int main(int argc, char** argv)
     vector<string> riskPersistConfig{"risk", "learn", "k-best-persist", "PRisk", "normal"};
     vector<string> riskddConfig{
             "riskDD", "learnDD", "nancyDD", "RiskDD", "data"};
+vector<string> riskddSquishConfig{
+            "riskDDSquish", "learnDD", "nancyDD", "RiskDDSquish", "data"};
     unordered_map<string, vector<string>> algorithmsConfig({{"bfs", bfsConfig},
             {"astar", astarConfig},
             {"fhat", fhatConfig},
             {"lsslrtastar", lsslrtastarConfig},
             {"risk", riskConfig},
             {"prisk", riskPersistConfig},
+            {"riskddSquish", riskddSquishConfig},
             {"riskdd", riskddConfig}});
 
     if (algorithmsConfig.find(argv[4]) == algorithmsConfig.end()) {

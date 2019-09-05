@@ -138,6 +138,38 @@ public:
     vector<ProbabilityNode>::iterator end() const { return distribution_origin->end(); }
 
     double getShiftedCost() const { return shifted_cost; }
+
+	//this is for testing the squish assumption
+	DiscreteDistributionDD squish(double factor) {
+		DiscreteDistributionDD ret;
+		ret.original_mean = original_mean;
+		ret.shifted_cost = shifted_cost;
+		ret.distribution_origin = make_shared<vector<ProbabilityNode>>();
+		auto& newDistribution = ret.distribution_origin;
+
+        // If the squish factor is 1, all values in distribution will be moved
+        // to the mean.
+        if (factor == 1) {
+			newDistribution->push_back(ProbabilityNode(original_mean, 1.0));
+            return ret;
+        }
+
+        for (const auto& n : *distribution_origin) {
+            double distanceToMean = abs(n.cost - original_mean);
+            double distanceToShift = distanceToMean * factor;
+
+            double shiftedCost = n.cost;
+
+            if (shiftedCost > original_mean)
+                shiftedCost -= distanceToShift;
+            else if (shiftedCost < original_mean)
+                shiftedCost += distanceToShift;
+
+            newDistribution->push_back(ProbabilityNode(shiftedCost, n.probability));
+        }
+
+        return ret;
+    }
 };
 
 unordered_map<int,
