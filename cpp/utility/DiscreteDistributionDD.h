@@ -127,7 +127,10 @@ public:
             exit(1);
 		}
 
+		cout << "read d\n";
 		domain->readDistributionData(f, hValueTable);
+
+		cout << "read postd\n";
 		domain->readDistributionData(f_ps, hPostSearchTable);
     }
 

@@ -87,7 +87,9 @@ def main():
         "riskdd": "RiskDD",
         "prisk": "PRisk",
         "riskddSquish": "RiskDDSquish",
-        "lsslrtastar": "LSS-LRTA*"
+        "lsslrtastar": "LSS-LRTA*",
+        "riskdd-lssTr": "RiskDD",
+        "riskddSquish-lssTr": "RiskDDSquish"
     }
 
     algorithms = {
@@ -98,7 +100,10 @@ def main():
         "riskdd": "Nancy (DD PE)",
         "prisk": "Nancy (pers.)",
         "riskddSquish": "Nancy (DD)",
-        "lsslrtastar": "LSS-LRTA*"
+        "lsslrtastar": "LSS-LRTA*",
+        "riskdd-lssTr": "Nancy (DD PE LSSTR)",
+        "riskddSquish-lssTr": "Nancy (DD LSSTR)"
+
     }
 
     baseline = "LSS-LRTA*"
@@ -175,7 +180,7 @@ def main():
             "Algorithm Cost - " + baseline + " Cost", df, 0.35, "Algorithm",
             limits, algorithms.values(), "Node Expansion Limit",
             "Algorithm Cost - " + baseline + " Cost",
-            "../../plots/" + tileType + '/' + tileType+"-tile-pairwise" + ".eps",
+            "../../plots/" + tileType + '/' + tileType+"-tile-pairwise" + ".png",
             markers)
 
     elif sys.argv[1] == "solutioncost":
@@ -183,7 +188,7 @@ def main():
             13, 10, "Node Expansion Limit", "Solution Cost", df, 0.35,
             "Algorithm", limits, algorithms.values(), "Node Expansion Limit",
             "Solution Cost",
-            "../../plots/" + tileType + '/' + tileType+"-tile-solution-cost" + ".eps",
+            "../../plots/" + tileType + '/' + tileType+"-tile-solution-cost" + ".png",
             markers)
     else:
         printUsage()
