@@ -17,6 +17,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
+from datetime import datetime
 
 
 def printUsage():
@@ -103,7 +104,6 @@ def main():
         "lsslrtastar": "LSS-LRTA*",
         "riskdd-lssTr": "Nancy (DD PE LSSTR)",
         "riskddSquish-lssTr": "Nancy (DD LSSTR)"
-
     }
 
     baseline = "LSS-LRTA*"
@@ -171,6 +171,8 @@ def main():
 
     print("building plots...")
 
+    nowstr = datetime.now().strftime("%d%m%Y-%H%M")
+
     if sys.argv[1] == "coverage":
         makeCoverageTable(rawdf, tileType)
 
@@ -179,17 +181,16 @@ def main():
             13, 10, "Node Expansion Limit",
             "Algorithm Cost - " + baseline + " Cost", df, 0.35, "Algorithm",
             limits, algorithms.values(), "Node Expansion Limit",
-            "Algorithm Cost - " + baseline + " Cost",
-            "../../plots/" + tileType + '/' + tileType+"-tile-pairwise" + ".png",
+            "Algorithm Cost - " + baseline + " Cost", "../../plots/" +
+            tileType + '/' + tileType + "-tile-pairwisei-" + nowstr + ".png",
             markers)
 
     elif sys.argv[1] == "solutioncost":
         makeDifferencePlot(
             13, 10, "Node Expansion Limit", "Solution Cost", df, 0.35,
             "Algorithm", limits, algorithms.values(), "Node Expansion Limit",
-            "Solution Cost",
-            "../../plots/" + tileType + '/' + tileType+"-tile-solution-cost" + ".png",
-            markers)
+            "Solution Cost", "../../plots/" + tileType + '/' + tileType +
+            "-tile-solution-cost-" + nowstr + ".png", markers)
     else:
         printUsage()
 

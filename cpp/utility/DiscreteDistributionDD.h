@@ -111,13 +111,13 @@ public:
         string fileName = "/home/aifs1/gu/phd/research/workingPaper/"
                           "realtime-nancy/results/SlidingTilePuzzle/"
                           "sampleData/" +
-                domain->getSubDomainName() + "-statSummary-d.json";
+                domain->getSubDomainName() + "-lsslrtastar-statSummary-d.json";
 
         string fileName_ps = "/home/aifs1/gu/phd/research/workingPaper/"
                              "realtime-nancy/results/SlidingTilePuzzle/"
                              "sampleData/" +
                 domain->getSubDomainName() +
-                "-statSummary-postd.json";
+                "-lsslrtastar-statSummary-postd.json";
 
         ifstream f(fileName);
         ifstream f_ps(fileName_ps);
