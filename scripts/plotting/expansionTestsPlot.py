@@ -3,6 +3,7 @@ plotting code for generate nancydd related plots
 
 Author: Tianyi Gu
 Date: 08/15/2019
+Update: 10/15/2019
 '''
 
 #!/usr/bin/env python
@@ -78,19 +79,24 @@ def main():
     tileType = sys.argv[2]
     # limits = [3, 10, 30, 100, 300, 1000]
     # limits = [10, 30, 100, 300, 1000]
-    limits = [30, 100, 300, 1000]
+    # limits = [30, 100, 300, 1000]
+    limits = [30]
     # limits = [100, 300, 1000]
     algorithms_data = {
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
         "risk": "Risk",
-        "riskdd": "RiskDD",
-        "prisk": "PRisk",
-        "riskddSquish": "RiskDDSquish",
-        "lsslrtastar": "LSS-LRTA*",
-        "riskdd-lssTr": "RiskDD",
-        "riskddSquish-lssTr": "RiskDDSquish"
+        "risk-new": "Risk",
+        "risk-old": "Risk",
+        # "riskdd": "RiskDD",
+        # "prisk": "PRisk",
+        # "prisk-new": "PRisk",
+        # "riskddSquish": "RiskDDSquish",
+        # "lsslrtastar": "LSS-LRTA*",
+        # "lsslrtastar-new": "LSS-LRTA*",
+        # "riskdd-lssTr": "RiskDD",
+        # "riskddSquish-lssTr": "RiskDDSquish"
     }
 
     algorithms = {
@@ -98,15 +104,19 @@ def main():
         # "fhat": "F-Hat",
         # "bfs": "BFS",
         "risk": "Nancy",
-        "riskdd": "Nancy (DD PE)",
-        "prisk": "Nancy (pers.)",
-        "riskddSquish": "Nancy (DD)",
-        "lsslrtastar": "LSS-LRTA*",
-        "riskdd-lssTr": "Nancy (DD PE LSSTR)",
-        "riskddSquish-lssTr": "Nancy (DD LSSTR)"
+        "risk-old": "Nancy OLD",
+        "risk-new": "Nancy BUG",
+        # "riskdd": "Nancy (DD PE)",
+        # "prisk": "Nancy (pers.)",
+        # "prisk-new": "Nancy (pers. BUG)",
+        # "riskddSquish": "Nancy (DD)",
+        # "lsslrtastar": "LSS-LRTA*",
+        # "lsslrtastar-new": "LSS-LRTA* BUG",
+        # "riskdd-lssTr": "Nancy (DD PE LSSTR)",
+        # "riskddSquish-lssTr": "Nancy (DD LSSTR)"
     }
 
-    baseline = "LSS-LRTA*"
+    baseline = "Nancy"
 
     instance = []
     lookAheadVals = []
@@ -126,8 +136,6 @@ def main():
                     "../../results/SlidingTilePuzzle/expansionTests/NancyDD/" +
                     tileType + '/' + alg + '/' + tileDimension + "/" +
                     jsonFile) as json_data:
-
-                # print "../../results/SlidingTilePuzzle/expansionTests/NancyDD/", tileType, '/', alg + '/', tileDimension, "/", jsonFile
 
                 resultData = json.load(json_data)
                 if float(resultData[algorithms_data[alg]]) != -1.0:
