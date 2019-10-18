@@ -241,7 +241,7 @@ private:
 
 			// Get the expected value of the resulting Cserna Distribution
 			tla->expectedMinimumPathCost = tla->kBestNodes[0]->distribution.expectedCost();
-			tla->getBelief() = tla->kBestNodes[0]->distribution;
+			tla->setBelief(tla->kBestNodes[0]->distribution);
 		}
 		else
 		{
