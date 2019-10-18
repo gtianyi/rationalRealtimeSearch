@@ -153,8 +153,12 @@ private:
 			double squishFactor = min(1.0, (ds / dy));
 
 			// Now squish the simulated belief by factor
-			vector<shared_ptr<TopLevelAction>> squishedTopLevelActions = tlas;
-			squishedTopLevelActions[i]->getBelief().squish(squishFactor);
+		    vector<TopLevelAction> squishedTopLevelActions;
+            for (auto a : tlas) {
+                squishedTopLevelActions.push_back(*a);
+            }
+
+            squishedTopLevelActions[i].squishBelief(squishFactor);
 
 			// Calculate the risk associated with expanding that node (by using the simulated belief as alpha in risk analysis)
 			double riskCalculation = riskAnalysis(alphaTLA, squishedTopLevelActions);
@@ -193,12 +197,12 @@ private:
 		return minimalRiskTLA;
 	}
 
-	double riskAnalysis(int alphaIndex, vector<shared_ptr<TopLevelAction>>& squishedTopLevelActions)
+	double riskAnalysis(int alphaIndex, vector<TopLevelAction>& squishedTopLevelActions)
 	{
 		double risk = 0;
 
 		// Perform numerical integration to calculate risk associated with taking alpha as the expansion
-		for (auto alpha : squishedTopLevelActions[alphaIndex]->getBelief())
+		for (auto& alpha : squishedTopLevelActions[alphaIndex].getBelief())
 		{
 			for (int tla = 0; tla < squishedTopLevelActions.size(); tla++)
 			{
@@ -207,7 +211,7 @@ private:
 					continue;
 
 				// Integrate over values in beta belief
-				for (auto beta : squishedTopLevelActions[tla]->getBelief())
+				for (auto& beta : squishedTopLevelActions[tla].getBelief())
 				{
 					// Only use beta costs less than alpha cost in risk analysis
 					if (beta.cost < alpha.cost)
