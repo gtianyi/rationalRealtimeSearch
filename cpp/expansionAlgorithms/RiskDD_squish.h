@@ -206,8 +206,6 @@ private:
                 double dy = tlas[tla]->open_TLA.top()->getDValue();
                 double squishFactor = min(1.0, (ds / dy));
 
-
-
                 const auto& betaBelief = tla == simulateTLAIndex ?
                         tlas[tla]->getBeliefDD().squish(squishFactor) :
                         tlas[tla]->getBeliefDD();

@@ -240,6 +240,7 @@ public:
         Cost getF_TLA() const { return this->topLevelNode->getGValue() + h_TLA; }
 
         DiscreteDistribution getBelief() { return belief; };
+
         void squishBelief(double factor) { belief.squish(factor); };
 
         void setBelief(const DiscreteDistribution& _belief) {
