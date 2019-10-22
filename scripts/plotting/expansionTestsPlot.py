@@ -79,22 +79,21 @@ def main():
     tileType = sys.argv[2]
     # limits = [3, 10, 30, 100, 300, 1000]
     # limits = [10, 30, 100, 300, 1000]
-    # limits = [30, 100, 300, 1000]
-    limits = [30]
+    limits = [30, 100, 300, 1000]
+    # limits = [30]
     # limits = [100, 300, 1000]
     algorithms_data = {
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
         "risk": "Risk",
-        "risk-new": "Risk",
-        "risk-old": "Risk",
+        # "risk-nobug": "Risk",
         # "riskdd": "RiskDD",
-        # "prisk": "PRisk",
-        # "prisk-new": "PRisk",
-        # "riskddSquish": "RiskDDSquish",
-        # "lsslrtastar": "LSS-LRTA*",
-        # "lsslrtastar-new": "LSS-LRTA*",
+        "prisk": "PRisk",
+        # "prisk-nobug": "PRisk",
+        "riskddSquish": "RiskDDSquish",
+        "riskddSquish-1kt": "RiskDDSquish",
+        "lsslrtastar": "LSS-LRTA*",
         # "riskdd-lssTr": "RiskDD",
         # "riskddSquish-lssTr": "RiskDDSquish"
     }
@@ -104,19 +103,19 @@ def main():
         # "fhat": "F-Hat",
         # "bfs": "BFS",
         "risk": "Nancy",
-        "risk-old": "Nancy OLD",
-        "risk-new": "Nancy BUG",
+        # "risk-nobug": "Nancy NOBUG",
         # "riskdd": "Nancy (DD PE)",
-        # "prisk": "Nancy (pers.)",
-        # "prisk-new": "Nancy (pers. BUG)",
-        # "riskddSquish": "Nancy (DD)",
-        # "lsslrtastar": "LSS-LRTA*",
+        "prisk": "Nancy (pers.)",
+        # "prisk-nobug": "Nancy (pers. NOBUG)",
+        "riskddSquish": "Nancy (DD)",
+        "riskddSquish-1kt": "Nancy (DD 1kt)",
+        "lsslrtastar": "LSS-LRTA*",
         # "lsslrtastar-new": "LSS-LRTA* BUG",
         # "riskdd-lssTr": "Nancy (DD PE LSSTR)",
         # "riskddSquish-lssTr": "Nancy (DD LSSTR)"
     }
 
-    baseline = "Nancy"
+    baseline = "LSS-LRTA*"
 
     instance = []
     lookAheadVals = []
