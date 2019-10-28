@@ -18,6 +18,21 @@
 
 using namespace std;
 
+void getCpuStatistic(vector<double>& lookaheadCpuTime,
+        vector<double>& percentiles,
+        double& mean) {
+    sort(lookaheadCpuTime.begin(), lookaheadCpuTime.end());
+
+    mean = accumulate(lookaheadCpuTime.begin(), lookaheadCpuTime.end(), 0.0) /
+            lookaheadCpuTime.size();
+
+    for (int i = 1; i <= 100; i++) {
+        int percentID =
+                (int)(((double)i / 100) * (lookaheadCpuTime.size() - 1));
+        percentiles.push_back(lookaheadCpuTime[percentID]);
+    }
+}
+
 void startAlg(shared_ptr<SlidingTilePuzzle> domain_ptr,
         string expansionModule,
         string learningModule,
@@ -42,19 +57,26 @@ void startAlg(shared_ptr<SlidingTilePuzzle> domain_ptr,
     ResultContainer res = searchAlg->search(1000*200/lookahead);
 
     /*if (res.solutionFound && !domain.validatePath(res.path)) {*/
-        //cout << "Invalid path detected from search: " << expansionModule
-             //<< endl;
-        //exit(1);
+    // cout << "Invalid path detected from search: " << expansionModule
+    //<< endl;
+    // exit(1);
     /*}*/
 
     result += "\"" + algName + "\": " + to_string(res.solutionCost) +
-            ", \"cpu-time\": [";
-    for (auto& t : res.lookaheadCpuTime) {
+            ", \"cpu-percentiles\": [";
+
+    vector<double> cpuPercentiles;
+    double cpuMean;
+
+    getCpuStatistic(res.lookaheadCpuTime, cpuPercentiles, cpuMean);
+
+    for (auto& t : cpuPercentiles) {
         result += to_string(t) + ", ";
     }
-	result.pop_back();
-	result.pop_back();
-	result += "],";
+
+    result.pop_back();
+    result.pop_back();
+    result += "], \"cpu-mean\": " + to_string(cpuMean) + ", ";
 }
 
 int main(int argc, char** argv)

@@ -36,13 +36,8 @@ def makeCpuPlot(width, height, xAxis, yAxis, xerr, yerr, dataframe, dodge, hue,
     })
 
     g = sns.FacetGrid(data=dataframe, hue=hue, height=height)
-    g.map(plt.errorbar,
-          xAxis,
-          yAxis,
-          xerr,
-          yerr,
-          fmt='o',
-          elinewidth=3)
+    g.map(plt.errorbar, xAxis, yAxis, xerr, yerr, fmt='o',
+          elinewidth=3).set(xscale="log")
     g.add_legend()
 
     # ax.tick_params(colors='black', labelsize=12)
@@ -113,18 +108,18 @@ def main():
     tileType = sys.argv[2]
     limits = [10, 30, 100, 300, 1000]
     algorithms_data = {
-        # "risk-cpu-dtb": "Risk",
-        # "prisk-cpu-dtb": "PRisk",
-        # "riskddSquish-cpu-dtb": "RiskDDSquish",
-        # "riskdd-cpu-dtb": "RiskDD",
+        "risk-cpu-dtb": "Risk",
+        "prisk-cpu-dtb": "PRisk",
+        "riskddSquish-cpu-dtb": "RiskDDSquish",
+        "riskdd-cpu-dtb": "RiskDD",
         "lsslrtastar-cpu-dtb": "LSS-LRTA*"
     }
 
     algorithms = {
-        # "risk-cpu-dtb": "Nancy",
-        # "prisk-cpu-dtb": "Nancy (pers.)",
-        # "riskddSquish-cpu-dtb": "Nancy (DD)",
-        # "riskdd-cpu-dtb": "Nancy (DD PE)",
+        "risk-cpu-dtb": "Nancy",
+        "prisk-cpu-dtb": "Nancy (pers.)",
+        "riskddSquish-cpu-dtb": "Nancy (DD)",
+        "riskdd-cpu-dtb": "Nancy (DD PE)",
         "lsslrtastar-cpu-dtb": "LSS-LRTA*"
     }
 
