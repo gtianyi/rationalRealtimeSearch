@@ -150,8 +150,18 @@ private:
                 if (tlas[i]->topLevelNode->getFHatValueFromDist() ==
                         tlas[minimalRiskTLA]
                                 ->topLevelNode->getFHatValueFromDist()) {
-                    if (tlas[i]->getF_TLA() == tlas[minimalRiskTLA]->getF_TLA()) {
-                        if (tlas[i]->topLevelNode->getGValue() >
+                    if (tlas[i]->getF_TLA() ==
+                            tlas[minimalRiskTLA]->getF_TLA()) {
+                        if (tlas[i]->topLevelNode->getGValue() ==
+                                tlas[minimalRiskTLA]
+                                        ->topLevelNode->getGValue()) {
+                            if (tlas[i]->topLevelNode->getState().key() >
+                                    tlas[minimalRiskTLA]
+                                            ->topLevelNode->getState()
+                                            .key()) {
+                                minimalRiskTLA = i;
+                            }
+                        } else if (tlas[i]->topLevelNode->getGValue() >
                                 tlas[minimalRiskTLA]
                                         ->topLevelNode->getGValue()) {
                             minimalRiskTLA = i;

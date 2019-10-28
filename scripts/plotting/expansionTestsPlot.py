@@ -14,11 +14,11 @@ import json
 from os import listdir
 
 import sys
+from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from datetime import datetime
 
 
 def printUsage():
@@ -79,21 +79,26 @@ def main():
     tileType = sys.argv[2]
     # limits = [3, 10, 30, 100, 300, 1000]
     # limits = [10, 30, 100, 300, 1000]
-    limits = [30, 100, 300, 1000]
+    limits = [10, 30, 100, 300, 1000]
     # limits = [30]
     # limits = [100, 300, 1000]
     algorithms_data = {
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        "risk": "Risk",
+        # "risk": "Risk",
+        "risk-cpu-dtb": "Risk",
         # "risk-nobug": "Risk",
+        "riskdd-cpu-dtb": "RiskDD",
         # "riskdd": "RiskDD",
-        "prisk": "PRisk",
+        # "prisk": "PRisk",
+        "prisk-cpu-dtb": "PRisk",
         # "prisk-nobug": "PRisk",
-        "riskddSquish": "RiskDDSquish",
-        "riskddSquish-1kt": "RiskDDSquish",
-        "lsslrtastar": "LSS-LRTA*",
+        # "riskddSquish": "RiskDDSquish",
+        "riskddSquish-cpu-dtb": "RiskDDSquish",
+        # "riskddSquish-1kt": "RiskDDSquish",
+        # "lsslrtastar": "LSS-LRTA*",
+        "lsslrtastar-cpu-dtb": "LSS-LRTA*",
         # "riskdd-lssTr": "RiskDD",
         # "riskddSquish-lssTr": "RiskDDSquish"
     }
@@ -102,14 +107,19 @@ def main():
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        "risk": "Nancy",
+        # "risk": "Nancy",
+        "risk-cpu-dtb": "Nancy",
         # "risk-nobug": "Nancy NOBUG",
         # "riskdd": "Nancy (DD PE)",
-        "prisk": "Nancy (pers.)",
+        "riskdd-cpu-dtb": "Nancy (DD PE)",
+        # "prisk": "Nancy (pers.)",
+        "prisk-cpu-dtb": "Nancy (pers.)",
         # "prisk-nobug": "Nancy (pers. NOBUG)",
-        "riskddSquish": "Nancy (DD)",
-        "riskddSquish-1kt": "Nancy (DD 1kt)",
-        "lsslrtastar": "LSS-LRTA*",
+        # "riskddSquish": "Nancy (DD)",
+        "riskddSquish-cpu-dtb": "Nancy (DD)",
+        # "riskddSquish-1kt": "Nancy (DD 1kt)",
+        # "lsslrtastar": "LSS-LRTA*",
+        "lsslrtastar-cpu-dtb": "LSS-LRTA*",
         # "lsslrtastar-new": "LSS-LRTA* BUG",
         # "riskdd-lssTr": "Nancy (DD PE LSSTR)",
         # "riskddSquish-lssTr": "Nancy (DD LSSTR)"

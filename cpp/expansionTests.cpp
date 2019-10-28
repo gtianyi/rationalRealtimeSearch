@@ -47,7 +47,14 @@ void startAlg(shared_ptr<SlidingTilePuzzle> domain_ptr,
         //exit(1);
     /*}*/
 
-    result += "\""+algName+"\": " + to_string(res.solutionCost) + ", ";
+    result += "\"" + algName + "\": " + to_string(res.solutionCost) +
+            ", \"cpu-time\": [";
+    for (auto& t : res.lookaheadCpuTime) {
+        result += to_string(t) + ", ";
+    }
+	result.pop_back();
+	result.pop_back();
+	result += "],";
 }
 
 int main(int argc, char** argv)

@@ -11,6 +11,7 @@ struct ResultContainer
 	double solutionCost;
 	int nodesGenerated;
 	int nodesExpanded;
+	vector<double> lookaheadCpuTime;
 
 	ResultContainer()
 	{
@@ -27,6 +28,7 @@ struct ResultContainer
 		nodesGenerated = res.nodesGenerated;
 		nodesExpanded = res.nodesExpanded;
         path = res.path;
+		lookaheadCpuTime = res.lookaheadCpuTime;
 	}
 
 	ResultContainer& operator=(const ResultContainer& rhs)
@@ -40,6 +42,7 @@ struct ResultContainer
 			nodesGenerated = rhs.nodesGenerated;
 			nodesExpanded = rhs.nodesExpanded;
             path = rhs.path;
+			lookaheadCpuTime = rhs.lookaheadCpuTime;
 			return *this;
 		}
 	}

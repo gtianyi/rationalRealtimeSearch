@@ -189,6 +189,9 @@ public:
             if (n1->getFHatValue() == n2->getFHatValue()) {
                 if (n1->getFValue() == n2->getFValue())
                 {
+                    if (n1->getGValue() == n2->getGValue()) {
+                        return n1->getState().key() > n2->getState().key();
+                    }
 				    return n1->getGValue() > n2->getGValue();
                 }
                 return n1->getFValue() < n2->getFValue();
@@ -201,6 +204,9 @@ public:
             // Tie break on f-value then g-value
             if (n1->getFHatValueFromDist() == n2->getFHatValueFromDist()) {
                 if (n1->getFValue() == n2->getFValue()) {
+                    if (n1->getGValue() == n2->getGValue()) {
+                        return n1->getState().key() > n2->getState().key();
+                    }
                     return n1->getGValue() > n2->getGValue();
                 }
                 return n1->getFValue() < n2->getFValue();
@@ -431,12 +437,12 @@ public:
                     -1);
         }
 
-		int count = 0;
-        //
-        // clock_t startTime = clock();
+        int count = 0;
 
-		//while (count <= iterationlimit) {
-		while (1) {
+        // while (count <= iterationlimit) {
+        while (1) {
+            clock_t startTime = clock();
+
             // mark this node as the start of the current search (to
             // prevent state pruning based on label)
             start->markStart();
@@ -495,14 +501,17 @@ public:
             // Add this step to the path taken so far
             res.path.push(start->getState().getLabel());
             res.solutionCost += start->getGValue();
-		}
 
-		//cout<<"iteration: " << count<<endl;
+            res.lookaheadCpuTime.push_back(
+                    double(clock() - startTime) / CLOCKS_PER_SEC);
+        }
 
-		//if (count >= iterationlimit)
-            //noSolutionFound(res);
+        // cout<<"iteration: " << count<<endl;
 
-		return res;
+        // if (count >= iterationlimit)
+        // noSolutionFound(res);
+
+        return res;
     }
 
 private:
