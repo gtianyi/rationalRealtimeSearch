@@ -108,18 +108,18 @@ def main():
     tileType = sys.argv[2]
     limits = [10, 30, 100, 300, 1000]
     algorithms_data = {
-        "risk-cpu-dtb": "Risk",
-        "prisk-cpu-dtb": "PRisk",
-        "riskddSquish-cpu-dtb": "RiskDDSquish",
-        "riskdd-cpu-dtb": "RiskDD",
+        # "risk-cpu-dtb": "Risk",
+        # "prisk-cpu-dtb": "PRisk",
+        # "riskddSquish-cpu-dtb": "RiskDDSquish",
+        # "riskdd-cpu-dtb": "RiskDD",
         "lsslrtastar-cpu-dtb": "LSS-LRTA*"
     }
 
     algorithms = {
-        "risk-cpu-dtb": "Nancy",
-        "prisk-cpu-dtb": "Nancy (pers.)",
-        "riskddSquish-cpu-dtb": "Nancy (DD)",
-        "riskdd-cpu-dtb": "Nancy (DD PE)",
+        # "risk-cpu-dtb": "Nancy",
+        # "prisk-cpu-dtb": "Nancy (pers.)",
+        # "riskddSquish-cpu-dtb": "Nancy (DD)",
+        # "riskdd-cpu-dtb": "Nancy (DD PE)",
         "lsslrtastar-cpu-dtb": "LSS-LRTA*"
     }
 
@@ -149,8 +149,7 @@ def main():
                 if float(resultData[algorithms_data[alg]]) != -1.0:
                     instance.append(str(jsonFile))
                     lookAheadVals.append(resultData["Lookahead"])
-                    cpu = np.array(resultData["cpu-time"])
-                    cpu95.append(np.percentile(cpu, 95))
+                    cpu95.append(resultData["cpu-percentiles"][94])
                     algorithm.append(algorithms[alg])
                     solutionCost.append(resultData[algorithms_data[alg]])
 
