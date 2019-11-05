@@ -152,7 +152,7 @@ vector<string> riskddSquishConfig{
                 1,
                 algorithmsConfig[argv[4]][4]);
 
-    } else if (domain == "RandomTree") {
+    } else if (domain == "TreeWorld") {
         // Make a tile puzzle
         std::shared_ptr<TreeWorld> world = std::make_shared<TreeWorld>(cin);
 
