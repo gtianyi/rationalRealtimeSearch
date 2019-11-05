@@ -33,7 +33,8 @@ void getCpuStatistic(vector<double>& lookaheadCpuTime,
     }
 }
 
-void startAlg(shared_ptr<SlidingTilePuzzle> domain_ptr,
+template<class Domain>
+void startAlg(shared_ptr<Domain> domain_ptr,
         string expansionModule,
         string learningModule,
         string decisionModule,
@@ -42,8 +43,8 @@ void startAlg(shared_ptr<SlidingTilePuzzle> domain_ptr,
         string& result,
         double k = 1,
         string beliefType = "normal") {
-    shared_ptr<RealTimeSearch<SlidingTilePuzzle>> searchAlg =
-            make_shared<RealTimeSearch<SlidingTilePuzzle>>(*domain_ptr,
+    shared_ptr<RealTimeSearch<Domain>> searchAlg =
+            make_shared<RealTimeSearch<Domain>>(*domain_ptr,
                     expansionModule,
                     learningModule,
                     decisionModule,
@@ -51,8 +52,8 @@ void startAlg(shared_ptr<SlidingTilePuzzle> domain_ptr,
                     k,
                     beliefType);
 
-    if (algName == "RiskDD" || algName == "RiskDDSquish")
-        DiscreteDistributionDD::readData<SlidingTilePuzzle>(domain_ptr);
+	if (algName == "RiskDD" || algName == "RiskDDSquish")
+		DiscreteDistributionDD::readData<Domain>(domain_ptr);
 
     ResultContainer res = searchAlg->search(1000*200/lookahead);
 
@@ -141,7 +142,7 @@ vector<string> riskddSquishConfig{
             world = std::make_shared<InverseTilePuzzle>(cin);
         }
 
-        startAlg(world,
+        startAlg<SlidingTilePuzzle>(world,
                 algorithmsConfig[argv[4]][0],
                 algorithmsConfig[argv[4]][1],
                 algorithmsConfig[argv[4]][2],
@@ -151,7 +152,21 @@ vector<string> riskddSquishConfig{
                 1,
                 algorithmsConfig[argv[4]][4]);
 
-    } else {
+    } else if (domain == "RandomTree") {
+        // Make a tile puzzle
+        std::shared_ptr<TreeWorld> world = std::make_shared<TreeWorld>(cin);
+
+        startAlg<TreeWorld>(world,
+                algorithmsConfig[argv[4]][0],
+                algorithmsConfig[argv[4]][1],
+                algorithmsConfig[argv[4]][2],
+                lookaheadDepth,
+                algorithmsConfig[argv[4]][3],
+                result,
+                1,
+                algorithmsConfig[argv[4]][4]);
+
+    }else {
         cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
         exit(1);
     }

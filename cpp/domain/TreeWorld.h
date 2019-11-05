@@ -9,6 +9,8 @@
 #include "../utility/Random.h"
 #include "../utility/SlidingWindow.h"
 
+#include "../utility/DiscreteDistributionDD.h"
+
 using namespace std;
 
 class TreeWorld {
@@ -383,6 +385,92 @@ public:
             return true;
 
         return false;
+    }
+
+	// place holder for compilation
+    DiscreteDistributionDD hstart_distribution(const State& state) {
+        /*    // Check if the heuristic h-hat of this state has been updated*/
+        //if (correctedDistribution.find(state) != correctedDistribution.end()) {
+            //return correctedDistribution[state];
+        //}
+
+        //Cost h = manhattanDistance(state);
+
+        //correctedDistribution[state] = DiscreteDistributionDD(h);
+        //correctedPostSearchDistribution[state] = DiscreteDistributionDD(h,true);
+
+        //updateHeuristic(state, h);
+
+        /*return correctedDistribution[state];*/
+		 return DiscreteDistributionDD();
+    }
+
+	// place holder for compilation
+    DiscreteDistributionDD hstart_distribution_ps(const State& state) {
+        /* // Check if the heuristic h-hat of this state has been updated*/
+        //if (correctedDistribution.find(state) != correctedDistribution.end()) {
+            //return correctedDistribution[state];
+        //}
+
+        //Cost h = manhattanDistance(state);
+
+        //correctedDistribution[state] = DiscreteDistributionDD(h);
+        //correctedPostSearchDistribution[state] = DiscreteDistributionDD(h,true);
+
+        /*return correctedPostSearchDistribution[state];*/
+			 return DiscreteDistributionDD();
+    }
+
+	//place holder for compilation
+    pair<DiscreteDistributionDD, DiscreteDistributionDD>
+    update_two_distribution(const State& state, const State& pred, Cost value) {
+        /*    correctedDistribution[state] =
+         * DiscreteDistributionDD(correctedDistribution[pred], value);*/
+        //correctedPostSearchDistribution[state] = DiscreteDistributionDD(
+                //correctedPostSearchDistribution[pred], value);
+
+        //return make_pair(correctedDistribution[state],
+                /*correctedPostSearchDistribution[state]);*/
+		return make_pair(DiscreteDistributionDD(),DiscreteDistributionDD());
+    }
+
+
+	//place holder
+    string getSubDomainName() const { return ""; }
+
+	//place holder
+    void readDistributionData(
+            ifstream& f,
+            unordered_map<int,
+                    shared_ptr<vector<
+                            DiscreteDistributionDD::ProbabilityNode>>>&
+                    hValueTable) const {
+        /*    cout << "reading unit or heavy tile data\n";*/
+
+        //string jsonStr;
+        //getline(f, jsonStr);
+        //f.close();
+        //rapidjson::Document jsonDoc;
+        //jsonDoc.Parse(jsonStr.c_str());
+
+        //for (auto& m : jsonDoc.GetObject()) {
+            //Cost h = stod(m.name.GetString());
+            //hValueTable[h] = make_shared<
+                    //vector<DiscreteDistributionDD::ProbabilityNode>>();
+
+            //auto& bins = m.value.GetObject()["bins"];
+            //for (auto& instance : bins.GetArray()) {
+                //Cost hstar = instance["h*"].GetInt();
+                //Cost prob = stod(instance["prob"].GetString());
+
+                //DiscreteDistributionDD::ProbabilityNode pn(hstar, prob);
+                //hValueTable[h]->push_back(pn);
+            //}
+		//}
+
+		//f.close();
+
+		/*cout << "total h buckets " << hValueTable.size() << "\n";*/
     }
 
 	State startState;
