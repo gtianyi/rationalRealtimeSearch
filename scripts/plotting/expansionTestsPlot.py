@@ -51,6 +51,10 @@ def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
     ax.tick_params(colors='black', labelsize=12)
     plt.ylabel(yLabel, color='black', fontsize=18)
     plt.xlabel(xLabel, color='black', fontsize=18)
+
+    plt.setp(ax.get_legend().get_texts(), fontsize='18') # for legend text
+    plt.setp(ax.get_legend().get_title(), fontsize='18') # for legend title
+
     plt.savefig(outputName, bbox_inches="tight", pad_inches=0)
     plt.close()
     plt.clf()
