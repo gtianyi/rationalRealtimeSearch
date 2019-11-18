@@ -15,6 +15,7 @@ from os import listdir
 
 import sys
 from datetime import datetime
+from collections import OrderedDict
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -79,55 +80,58 @@ def main():
     tileType = sys.argv[2]
     # limits = [3, 10, 30, 100, 300, 1000]
     # limits = [10, 30, 100, 300, 1000]
-    limits = [10, 30, 100, 300, 1000]
+    limits = [30, 100, 300, 1000]
     # limits = [30]
     # limits = [100, 300, 1000]
     algorithms_data = {
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        # "risk": "Risk",
-        "risk-cpu-dtb": "Risk",
+        "risk": "Risk",
+        # "risk-cpu-dtb": "Risk",
         # "risk-nobug": "Risk",
-        "riskdd-cpu-dtb": "RiskDD",
-        "riskdd-nopersist": "RiskDD",
+        # "riskdd-cpu-dtb": "RiskDD",
+        # "riskdd-nopersist": "RiskDD",
         # "riskdd": "RiskDD",
-        # "prisk": "PRisk",
-        "prisk-cpu-dtb": "PRisk",
+        "prisk": "PRisk",
+        # "prisk-cpu-dtb": "PRisk",
         # "prisk-nobug": "PRisk",
         # "riskddSquish": "RiskDDSquish",
-        "riskddSquish-cpu-dtb": "RiskDDSquish",
-        "riskddSquish-nopersist": "RiskDDSquish",
+        # "riskddSquish-nopersist": "RiskDDSquish",
         # "riskddSquish-1kt": "RiskDDSquish",
-        # "lsslrtastar": "LSS-LRTA*",
-        "lsslrtastar-cpu-dtb": "LSS-LRTA*",
+        "lsslrtastar": "LSS-LRTA*",
+        # "lsslrtastar-cpu-dtb": "LSS-LRTA*",
         # "riskdd-lssTr": "RiskDD",
         # "riskddSquish-lssTr": "RiskDDSquish"
+        "riskddSquish-cpu-dtb-dumpallcpu": "RiskDDSquish"
     }
 
-    algorithms = {
+    algorithms = OrderedDict({
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        # "risk": "Nancy",
-        "risk-cpu-dtb": "Nancy",
+        "risk": "Nancy",
+        # "risk-cpu-dtb": "Nancy",
         # "risk-nobug": "Nancy NOBUG",
         # "riskdd": "Nancy (DD PE)",
-        "riskdd-cpu-dtb": "Nancy (DD PE)",
-        "riskdd-nopersist": "Nancy (DD PE Nper)",
-        # "prisk": "Nancy (pers.)",
-        "prisk-cpu-dtb": "Nancy (pers.)",
+        # "riskdd-cpu-dtb": "Nancy (DD PE)",
+        # "riskdd-nopersist": "Nancy (DD PE Nper)",
+        "prisk": "Nancy (pers.)",
+        # "prisk-cpu-dtb": "Nancy (pers.)",
         # "prisk-nobug": "Nancy (pers. NOBUG)",
         # "riskddSquish": "Nancy (DD)",
-        "riskddSquish-cpu-dtb": "Nancy (DD)",
-        "riskddSquish-nopersist": "Nancy (DD Nper)",
+        # "riskddSquish-nopersist": "Nancy (DD Nper)",
         # "riskddSquish-1kt": "Nancy (DD 1kt)",
-        # "lsslrtastar": "LSS-LRTA*",
-        "lsslrtastar-cpu-dtb": "LSS-LRTA*",
+        "lsslrtastar": "LSS-LRTA*",
+        # "lsslrtastar-cpu-dtb": "LSS-LRTA*",
         # "lsslrtastar-new": "LSS-LRTA* BUG",
         # "riskdd-lssTr": "Nancy (DD PE LSSTR)",
         # "riskddSquish-lssTr": "Nancy (DD LSSTR)"
-    }
+        "riskddSquish-cpu-dtb-dumpallcpu": "Nancy (DD)"
+    })
+
+    #specify the order for camera ready of AAAI-20
+    algorithm_order = ['Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)', 'Nancy']
 
     baseline = "LSS-LRTA*"
 
@@ -201,9 +205,9 @@ def main():
         makeDifferencePlot(
             13, 10, "Node Expansion Limit",
             "Algorithm Cost - " + baseline + " Cost", df, 0.35, "Algorithm",
-            limits, algorithms.values(), "Node Expansion Limit",
+            limits, algorithm_order, "Node Expansion Limit",
             "Algorithm Cost - " + baseline + " Cost", "../../plots/" +
-            tileType + '/' + tileType + "-tile-pairwisei-" + nowstr + ".png",
+            tileType + '/' + tileType + "-tile-pairwisei-" + nowstr + ".eps",
             markers)
 
     elif sys.argv[1] == "solutioncost":
