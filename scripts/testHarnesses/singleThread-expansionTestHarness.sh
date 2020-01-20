@@ -48,27 +48,27 @@ then
     for lookahead in "${@:$algstop}"
     do
       echo "lookahead $lookahead"
-	  mkdir -p ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-nopersist/${dimensions}x${dimensions}
+	  mkdir -p ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-cpu-dtb/${dimensions}x${dimensions}
       instance=$firstInstance
       while ((instance < lastInstance))
       do
 	    file="../../worlds/slidingTile/${instance}-${dimensions}x${dimensions}.st"
         		  
-	    if [ -f ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-nopersist/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json ] || [ -f ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-nopersist/${dimensions}x${dimensions}/LA${lookahead}-${instance}.temp ]
+	    if [ -f ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-cpu-dtb/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json ] || [ -f ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-cpu-dtb/${dimensions}x${dimensions}/LA${lookahead}-${instance}.temp ]
 	    then 
 	      let instance++
 	    else
 
-		  echo "ph" > ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-nopersist/${dimensions}x${dimensions}/LA${lookahead}-${instance}.temp
+		  echo "ph" > ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-cpu-dtb/${dimensions}x${dimensions}/LA${lookahead}-${instance}.temp
 
 		  echo "runing LA${lookahead}-${instance}" 
 
-	      timeout 1800 ./../../expansionTests ${domainType} ${lookahead} ${tileType} ${algname} ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-nopersist/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json < ${file}
+	      timeout 1800 ./../../expansionTests ${domainType} ${lookahead} ${tileType} ${algname} ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-cpu-dtb/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json < ${file}
 
-		  if [ -f ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-nopersist/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json ]
+		  if [ -f ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-cpu-dtb/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json ]
 		  then
 
-		     rm ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-nopersist/${dimensions}x${dimensions}/LA${lookahead}-${instance}.temp 
+		     rm ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-cpu-dtb/${dimensions}x${dimensions}/LA${lookahead}-${instance}.temp 
 
 		  fi
 
