@@ -457,6 +457,8 @@ public:
             // Check if a goal has been reached
             if (domain.isGoal(start->getState())) {
                 res.solutionFound = true;
+				res.epsilonHGlobal = domain.epsilonHGlobal();
+				res.epsilonDGlobal = domain.epsilonDGlobal();
 
                 return res;
             }

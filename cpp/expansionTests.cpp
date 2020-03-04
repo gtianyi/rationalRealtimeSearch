@@ -64,6 +64,8 @@ void startAlg(shared_ptr<Domain> domain_ptr,
     /*}*/
 
     result += "\"" + algName + "\": " + to_string(res.solutionCost) +
+            ", \"epsilonHGlobal\": " + to_string(res.epsilonHGlobal) +
+            ", \"epsilonDGlobal\": " + to_string(res.epsilonDGlobal) +
             ", \"cpu-percentiles\": [";
 
     vector<double> cpuPercentiles;
