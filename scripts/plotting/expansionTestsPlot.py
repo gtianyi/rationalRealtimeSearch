@@ -107,7 +107,8 @@ def main():
         # "lsslrtastar-cpu-dtb": "LSS-LRTA*",
         # "riskdd-lssTr": "RiskDD",
         # "riskddSquish-lssTr": "RiskDDSquish"
-        "riskddSquish-cpu-dtb-dumpallcpu": "RiskDDSquish"
+        "riskddSquish-cpu-dtb-dumpallcpu": "RiskDDSquish",
+        "riskddSquish-withassump": "RiskDDSquish"
     }
 
     algorithms = OrderedDict({
@@ -131,11 +132,12 @@ def main():
         # "lsslrtastar-new": "LSS-LRTA* BUG",
         # "riskdd-lssTr": "Nancy (DD PE LSSTR)",
         # "riskddSquish-lssTr": "Nancy (DD LSSTR)"
-        "riskddSquish-cpu-dtb-dumpallcpu": "Nancy (DD)"
+        "riskddSquish-cpu-dtb-dumpallcpu": "Nancy (DD)",
+        "riskddSquish-withassump": "Nancy (Assumption-DD)"
     })
 
     #specify the order for camera ready of AAAI-20
-    algorithm_order = ['Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)', 'Nancy']
+    algorithm_order = ['Nancy (DD)', 'Nancy (Assumption-DD)', 'LSS-LRTA*', 'Nancy (pers.)', 'Nancy']
 
     baseline = "LSS-LRTA*"
 
