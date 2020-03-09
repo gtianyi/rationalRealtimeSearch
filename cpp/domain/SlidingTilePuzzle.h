@@ -580,7 +580,7 @@ public:
 
             auto& bins = m.value.GetObject()["bins"];
             for (auto& instance : bins.GetArray()) {
-                Cost hstar = instance["h*"].GetInt();
+                Cost hstar = instance["h*"].GetDouble();
                 Cost prob = stod(instance["prob"].GetString());
 
                 DiscreteDistributionDD::ProbabilityNode pn(hstar, prob);
