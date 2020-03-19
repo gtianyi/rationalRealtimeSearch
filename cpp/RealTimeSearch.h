@@ -64,10 +64,10 @@ public:
         Cost getEpsilonD() const { return epsD; }
         Cost getFHatValue() const { return g + getHHatValue(); }
         Cost getFHatValueFromDist() const { return g + getHHatValueFromDist(); }
-        //Cost getDHatValue() const { return (derr / (1.0 - epsD)); }
-        Cost getDHatValue() const { return (derr / (1.0 - 0.18500444)); }
-        //Cost getHHatValue() const { return h + getDHatValue() * epsH; }
-        Cost getHHatValue() const { return h + getDHatValue() * 0.18500444; }
+		//Cost getDHatValue() const { return (derr / (1.0 - epsD)); }
+		Cost getDHatValue() const { return (derr / (1.0 - 0.18500444)); }
+		//Cost getHHatValue() const { return h + getDHatValue() * epsH; }
+		Cost getHHatValue() const { return h + getDHatValue() * 0.18500444; }
         Cost getHHatValueFromDist() const {
             if (twoDistribtuionCleared)
                 return numeric_limits<double>::infinity();

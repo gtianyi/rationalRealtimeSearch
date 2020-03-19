@@ -92,23 +92,27 @@ def main():
         # "fhat": "F-Hat",
         # "bfs": "BFS",
         "risk": "Risk",
+        # "risk-withassump": "Risk",
         # "risk-cpu-dtb": "Risk",
         # "risk-nobug": "Risk",
         # "riskdd-cpu-dtb": "RiskDD",
         # "riskdd-nopersist": "RiskDD",
         # "riskdd": "RiskDD",
         "prisk": "PRisk",
+        # "prisk-withassump": "PRisk",
+        "prisk-nop-withassump": "PRisk",
         # "prisk-cpu-dtb": "PRisk",
         # "prisk-nobug": "PRisk",
         # "riskddSquish": "RiskDDSquish",
         # "riskddSquish-nopersist": "RiskDDSquish",
+        "riskddSquish-nop-withassump": "RiskDDSquish",
         # "riskddSquish-1kt": "RiskDDSquish",
         "lsslrtastar": "LSS-LRTA*",
         # "lsslrtastar-cpu-dtb": "LSS-LRTA*",
         # "riskdd-lssTr": "RiskDD",
         # "riskddSquish-lssTr": "RiskDDSquish"
-        "riskddSquish-cpu-dtb-dumpallcpu": "RiskDDSquish",
-        "riskddSquish-withassump": "RiskDDSquish"
+        "riskddSquish-cpu-dtb-dumpallcpu": "RiskDDSquish"
+        # "riskddSquish-withassump": "RiskDDSquish"
     }
 
     algorithms = OrderedDict({
@@ -116,28 +120,32 @@ def main():
         # "fhat": "F-Hat",
         # "bfs": "BFS",
         "risk": "Nancy",
+        # "risk-withassump": "Nancy-fix-assumption",
         # "risk-cpu-dtb": "Nancy",
         # "risk-nobug": "Nancy NOBUG",
         # "riskdd": "Nancy (DD PE)",
         # "riskdd-cpu-dtb": "Nancy (DD PE)",
         # "riskdd-nopersist": "Nancy (DD PE Nper)",
         "prisk": "Nancy (pers.)",
+        "prisk-nop-withassump": "Nancy (pers-nop-fix-assumption.)",
+        # "prisk-withassump": "Nancy (pers-fix-assumption.)",
         # "prisk-cpu-dtb": "Nancy (pers.)",
         # "prisk-nobug": "Nancy (pers. NOBUG)",
         # "riskddSquish": "Nancy (DD)",
         # "riskddSquish-nopersist": "Nancy (DD Nper)",
+        "riskddSquish-nop-withassump": "Nancy (Assumption-DD Nper)",
         # "riskddSquish-1kt": "Nancy (DD 1kt)",
         "lsslrtastar": "LSS-LRTA*",
         # "lsslrtastar-cpu-dtb": "LSS-LRTA*",
         # "lsslrtastar-new": "LSS-LRTA* BUG",
         # "riskdd-lssTr": "Nancy (DD PE LSSTR)",
         # "riskddSquish-lssTr": "Nancy (DD LSSTR)"
-        "riskddSquish-cpu-dtb-dumpallcpu": "Nancy (DD)",
-        "riskddSquish-withassump": "Nancy (Assumption-DD)"
+        "riskddSquish-cpu-dtb-dumpallcpu": "Nancy (DD)"
+        # "riskddSquish-withassump": "Nancy (Assumption-DD)"
     })
 
     #specify the order for camera ready of AAAI-20
-    algorithm_order = ['Nancy (DD)', 'Nancy (Assumption-DD)', 'LSS-LRTA*', 'Nancy (pers.)', 'Nancy']
+    algorithm_order = ['Nancy (DD)', 'Nancy (Assumption-DD Nper)', 'LSS-LRTA*', 'Nancy (pers.)', 'Nancy (pers-nop-fix-assumption.)', 'Nancy']
 
     baseline = "LSS-LRTA*"
 
