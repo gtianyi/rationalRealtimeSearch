@@ -120,7 +120,8 @@ public:
                           "sampleData/" +
                 domain->getSubDomainName()
                 //+ "-lsslrtastar-statSummary-d.json";
-                + "-assumption-statSummary-d.json";
+                //+ "-assumption-statSummary-d.json";
+				+ "-wastar-statSummary-d.json";
 
         string fileName_ps = "/home/aifs1/gu/phd/research/workingPaper/"
                              "realtime-nancy/results/SlidingTilePuzzle/"

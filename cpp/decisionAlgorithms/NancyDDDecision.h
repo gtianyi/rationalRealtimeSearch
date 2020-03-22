@@ -37,44 +37,47 @@ public:
                 lowestExpectedPathTLA = tla;
         }
 
-		return lowestExpectedPathTLA->topLevelNode;
+		//return lowestExpectedPathTLA->topLevelNode;
 
-   /*     shared_ptr<Node> goalPrime;*/
-		//auto tlaBest = lowestExpectedPathTLA->open_TLA.top();
+		shared_ptr<Node> goalPrime;
+		auto tlaBest = lowestExpectedPathTLA->open_TLA.top();
 
-		//if (persistPath.empty() ||
-				//lowestExpectedPathTLA->expectedMinimumPathCost < persistFhat) {
-			//// if there is no persist path, go head memoize it
-			//// if we find a better fhat for root, go head memoize it
-			//memoizePersistPath(lowestExpectedPathTLA);
-		//} else if (lowestExpectedPathTLA->expectedMinimumPathCost ==
-						//persistFhat &&
-				//tlaBest->getHHatValueFromDist() <=
-						//persistTarget->getHHatValueFromDist()) {
-			//// if  fhat ties break ties on h-hat then prefer not persist
-			//memoizePersistPath(lowestExpectedPathTLA);
-		//} else{
-			//// if we find a worse fhat, but previous target is inside LSS, 
-			//// we then still want to memoize it because the learning then 
-			//// will update the previous target.
-			//auto it = closed.find(persistTarget->getState());
-			//if (it != closed.end() && !it->second->onOpen()) {
-				//memoizePersistPath(lowestExpectedPathTLA);
-			//} else {
-				//cout << "persist" << endl;
-				//cout << "previous fhat " << persistFhat << endl;
-				//cout << "new fhat "
-					 //<< lowestExpectedPathTLA->expectedMinimumPathCost +
-								//lowestExpectedPathTLA->topLevelNode->getGValue()
-					 //<< endl;
-			//}
-		//}
+		if (persistPath.empty() ||
+				lowestExpectedPathTLA->expectedMinimumPathCost < persistFhat) {
+			// if there is no persist path, go head memoize it
+			// if we find a better fhat for root, go head memoize it
+			memoizePersistPath(lowestExpectedPathTLA);
+		} else if (lowestExpectedPathTLA->expectedMinimumPathCost ==
+						persistFhat &&
+				tlaBest->getHHatValueFromDist() <=
+						persistTarget->getHHatValueFromDist()) {
+			// if  fhat ties break ties on h-hat then prefer not persist
+			memoizePersistPath(lowestExpectedPathTLA);
+		} else{
+			// if we find a worse fhat, but previous target is inside LSS, 
+			// we then still want to memoize it because the learning then 
+			// will update the previous target.
+			auto it = closed.find(persistTarget->getState());
+			if (it != closed.end() && !it->second->onOpen()) {
+				memoizePersistPath(lowestExpectedPathTLA);
+			} else {
+				cout << "persist" << endl;
+				cout << "previous fhat " << persistFhat << endl;
+				cout << "new fhat "
+					 << lowestExpectedPathTLA->expectedMinimumPathCost +
+								lowestExpectedPathTLA->topLevelNode->getGValue()
+					 << endl;
+			}
+		}
 
-		//goalPrime = persistPath.top();
-		//persistPath.pop();
-		//persistFhat -= goalPrime->getGValue();
+		goalPrime = persistPath.top();
+		auto goalPrimeG = persistG.top();
+		persistPath.pop();
+		persistG.pop();
 
-		/*return goalPrime;*/
+		persistFhat -= goalPrimeG;
+
+		return goalPrime;
     }
 
 private:
@@ -82,14 +85,21 @@ private:
 		//clear the persist path
         while (!persistPath.empty()) {
             persistPath.pop();
+			persistG.pop();
         }
 
         auto cur = tla->open_TLA.top();
 
         while (cur->getParent() != nullptr) {
             persistPath.push(cur);
+			auto curG = cur->getGValue();
             cur = cur->getParent();
+
+			auto parentG = cur->getGValue();
+			persistG.push(curG-parentG);
         }
+
+        assert(persistG.size() == persistPath.size());
 
         persistTarget = tla->open_TLA.top();
         persistFhat = tla->expectedMinimumPathCost;
@@ -99,6 +109,7 @@ protected:
     Domain& domain;
     std::stack<shared_ptr<Node>> persistPath;
     shared_ptr<Node> persistTarget;
+    std::stack<Cost> persistG;
     Cost persistFhat;
     double lookahead;
 };

@@ -99,13 +99,16 @@ def main():
         # "riskdd-nopersist": "RiskDD",
         # "riskdd": "RiskDD",
         "prisk": "PRisk",
-        # "prisk-withassump": "PRisk",
-        "prisk-nop-withassump": "PRisk",
+        "prisk-withassump": "PRisk",
+        # "prisk-nop-withassump": "PRisk",
+        "prisk-withassump-learnhhat": "PRisk",
         # "prisk-cpu-dtb": "PRisk",
         # "prisk-nobug": "PRisk",
         # "riskddSquish": "RiskDDSquish",
         # "riskddSquish-nopersist": "RiskDDSquish",
         "riskddSquish-nop-withassump": "RiskDDSquish",
+        "riskddSquish-newP-withassump": "RiskDDSquish",
+        "riskddSquish-newP": "RiskDDSquish",
         # "riskddSquish-1kt": "RiskDDSquish",
         "lsslrtastar": "LSS-LRTA*",
         # "lsslrtastar-cpu-dtb": "LSS-LRTA*",
@@ -127,13 +130,15 @@ def main():
         # "riskdd-cpu-dtb": "Nancy (DD PE)",
         # "riskdd-nopersist": "Nancy (DD PE Nper)",
         "prisk": "Nancy (pers.)",
-        "prisk-nop-withassump": "Nancy (pers-nop-fix-assumption.)",
-        # "prisk-withassump": "Nancy (pers-fix-assumption.)",
+        "prisk-withassump-learnhhat": "Nancy (pers-fix-assumption-hhat.)",
+        "prisk-withassump": "Nancy (pers-fix-assumption.)",
         # "prisk-cpu-dtb": "Nancy (pers.)",
         # "prisk-nobug": "Nancy (pers. NOBUG)",
         # "riskddSquish": "Nancy (DD)",
         # "riskddSquish-nopersist": "Nancy (DD Nper)",
         "riskddSquish-nop-withassump": "Nancy (Assumption-DD Nper)",
+        "riskddSquish-newP-withassump": "Nancy (Assumption-DD NewPer)",
+        "riskddSquish-newP": "Nancy (DD NewPer)",
         # "riskddSquish-1kt": "Nancy (DD 1kt)",
         "lsslrtastar": "LSS-LRTA*",
         # "lsslrtastar-cpu-dtb": "LSS-LRTA*",
@@ -145,7 +150,7 @@ def main():
     })
 
     #specify the order for camera ready of AAAI-20
-    algorithm_order = ['Nancy (DD)', 'Nancy (Assumption-DD Nper)', 'LSS-LRTA*', 'Nancy (pers.)', 'Nancy (pers-nop-fix-assumption.)', 'Nancy']
+    algorithm_order = ['Nancy (DD)', 'Nancy (DD NewPer)', 'Nancy (Assumption-DD NewPer)', 'LSS-LRTA*', 'Nancy (pers.)', 'Nancy (pers-fix-assumption.)', 'Nancy (pers-fix-assumption-hhat.)']
 
     baseline = "LSS-LRTA*"
 

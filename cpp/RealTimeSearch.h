@@ -223,6 +223,14 @@ public:
             }
             return n1->getHValue() < n2->getHValue();
         }
+
+        static bool compareNodesHHat(const shared_ptr<Node> n1,
+                const shared_ptr<Node> n2) {
+            if (n1->getHHatValue() == n2->getHHatValue()) {
+                return n1->getGValue() > n2->getGValue();
+            }
+            return n1->getHHatValue() < n2->getHHatValue();
+        }
     };
 
     struct TopLevelAction {
