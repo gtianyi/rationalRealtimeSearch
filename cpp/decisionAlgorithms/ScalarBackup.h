@@ -11,13 +11,14 @@ class ScalarBackup : public DecisionAlgorithm<Domain, Node, TopLevelAction>
 {
 	typedef typename Domain::State State;
 	typedef typename Domain::Cost Cost;
+    typedef typename Domain::HashState Hash;
 
 public:
 	ScalarBackup(string sorting)
 		: sortingFunction(sorting)
 	{}
 
-	shared_ptr<Node> backup(PriorityQueue<shared_ptr<Node> >& open, vector<TopLevelAction>& tlas, shared_ptr<Node> start)
+	shared_ptr<Node> backup(PriorityQueue<shared_ptr<Node> >& open, vector<shared_ptr<TopLevelAction>>& tlas, shared_ptr<Node> start, unordered_map<State, shared_ptr<Node>, Hash>& closed)
 	{
 		// First things first, reorder open so it matches our expansion policy needs
 		sortOpen(open);

@@ -26,14 +26,14 @@ public:
 		lookahead++;
 	}
 
-	void expand(PriorityQueue<shared_ptr<Node> >& open, unordered_map<State, shared_ptr<Node>, Hash>& closed, vector<TopLevelAction>& tlas,
-		std::function<bool(shared_ptr<Node>, unordered_map<State, shared_ptr<Node>, Hash>&, PriorityQueue<shared_ptr<Node> >&, vector<TopLevelAction>&)> duplicateDetection,
+	void expand(PriorityQueue<shared_ptr<Node> >& open, unordered_map<State, shared_ptr<Node>, Hash>& closed, shared_ptr<vector<TopLevelAction>>& tlas,
+		std::function<bool(shared_ptr<Node>, unordered_map<State, shared_ptr<Node>, Hash>&, PriorityQueue<shared_ptr<Node> >&, shared_ptr<vector<TopLevelAction>>&)> duplicateDetection,
 		ResultContainer& res)
 	{
 		// Start by shoving everything on open onto the stack...
 		while (!open.empty())
 		{
-			tlas[open.top()->getOwningTLA()].open.remove(open.top());
+			tlas[open.top()->getOwningTLA()].open_TLA.remove(open.top());
 
 			// Pairs on stack represent <State's node, the depth it was generated in DFS>
 			theStack.push(make_pair(open.top(), 2));
@@ -52,7 +52,7 @@ public:
 			{
 				// Add this node to open and TLA open
 				open.push(cur.first);
-				tlas[cur.first->getOwningTLA()].open.push(cur.first);
+				tlas[cur.first->getOwningTLA()].open_TLA.push(cur.first);
 			}
 			else
 			{

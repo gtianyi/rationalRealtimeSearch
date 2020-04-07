@@ -26,8 +26,8 @@ public:
 		lookahead++;
 	}
 
-	void expand(PriorityQueue<shared_ptr<Node> >& open, unordered_map<State, shared_ptr<Node>, Hash>& closed, vector<TopLevelAction>& tlas,
-		std::function<bool(shared_ptr<Node>, unordered_map<State, shared_ptr<Node>, Hash>&, PriorityQueue<shared_ptr<Node> >&, vector<TopLevelAction>&)> duplicateDetection,
+	void expand(PriorityQueue<shared_ptr<Node> >& open, unordered_map<State, shared_ptr<Node>, Hash>& closed, vector<shared_ptr<TopLevelAction>>& tlas,
+		std::function<bool(shared_ptr<Node>, unordered_map<State, shared_ptr<Node>, Hash>&, PriorityQueue<shared_ptr<Node> >&, vector<shared_ptr<TopLevelAction>>&)> duplicateDetection,
 		ResultContainer& res)
 	{
 		// Empty any old values out of the queue
@@ -63,7 +63,7 @@ public:
 			open.remove(cur);
 
 			// Remove this node from the open list of any TLAs
-			tlas[cur->getOwningTLA()].open.remove(cur);
+			tlas[cur->getOwningTLA()]->open_TLA.remove(cur);
 
 			vector<State> children = domain.successors(cur->getState());
 			res.nodesGenerated += children.size();
@@ -93,7 +93,7 @@ public:
 					closed[child] = childNode;
 
 					// Add to open of generating TLA
-					tlas[childNode->getOwningTLA()].open.push(childNode);
+					tlas[childNode->getOwningTLA()]->open_TLA.push(childNode);
 				}
 			}
 

@@ -2,160 +2,181 @@
 #include <string>
 #include <fstream>
 #include "RealTimeSearch.h"
+#include "utility/DiscreteDistributionDD.h"
 #include "decisionAlgorithms/KBestBackup.h"
 #include "expansionAlgorithms/AStar.h"
 #include "expansionAlgorithms/BreadthFirst.h"
 #include "expansionAlgorithms/DepthFirst.h"
 #include "expansionAlgorithms/Risk.h"
+#include "expansionAlgorithms/RiskDD.h"
 #include "learningAlgorithms/Ignorance.h"
 #include "learningAlgorithms/Dijkstra.h"
 #include "domain/TreeWorld.h"
-#include "domain/SlidingTilePuzzle.h"
+#include "domain/HeavyTilePuzzle.h"
+#include "domain/InverseTilePuzzle.h"
+#include <memory>
 
 using namespace std;
 
+void getCpuStatistic(vector<double>& lookaheadCpuTime,
+        vector<double>& percentiles,
+        double& mean) {
+    sort(lookaheadCpuTime.begin(), lookaheadCpuTime.end());
+
+    mean = accumulate(lookaheadCpuTime.begin(), lookaheadCpuTime.end(), 0.0) /
+            lookaheadCpuTime.size();
+
+    for (int i = 1; i <= 100; i++) {
+        int percentID =
+                (int)(((double)i / 100) * (lookaheadCpuTime.size() - 1));
+        percentiles.push_back(lookaheadCpuTime[percentID]);
+    }
+}
+
+template<class Domain>
+void startAlg(shared_ptr<Domain> domain_ptr,
+        string expansionModule,
+        string learningModule,
+        string decisionModule,
+        double lookahead,
+        string algName,
+        string& result,
+        double k = 1,
+        string beliefType = "normal") {
+    shared_ptr<RealTimeSearch<Domain>> searchAlg =
+            make_shared<RealTimeSearch<Domain>>(*domain_ptr,
+                    expansionModule,
+                    learningModule,
+                    decisionModule,
+                    lookahead,
+                    k,
+                    beliefType);
+
+	if (algName == "RiskDD" || algName == "RiskDDSquish")
+		DiscreteDistributionDD::readData<Domain>(domain_ptr);
+
+    ResultContainer res = searchAlg->search(1000*200/lookahead);
+
+    /*if (res.solutionFound && !domain.validatePath(res.path)) {*/
+    // cout << "Invalid path detected from search: " << expansionModule
+    //<< endl;
+    // exit(1);
+    /*}*/
+
+    result += "\"" + algName + "\": " + to_string(res.solutionCost) +
+            ", \"epsilonHGlobal\": " + to_string(res.epsilonHGlobal) +
+            ", \"epsilonDGlobal\": " + to_string(res.epsilonDGlobal) +
+            ", \"cpu-percentiles\": [";
+
+    vector<double> cpuPercentiles;
+    double cpuMean;
+
+    getCpuStatistic(res.lookaheadCpuTime, cpuPercentiles, cpuMean);
+
+    for (auto& t : cpuPercentiles) {
+        result += to_string(t) + ", ";
+    }
+
+    result.pop_back();
+    result.pop_back();
+    result += "], \"cpu-mean\": " + to_string(cpuMean) + ", ";
+}
+
 int main(int argc, char** argv)
 {
-	if (argc > 4 || argc < 3)
-	{
-		cout << "Wrong number of arguments: ./expansionTests.sh <Domain Type> <expansion limit> <optional: output file> < <domain file>" << endl;
-		cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
-		exit(1);
-	}
+    if (argc != 6) {
+        cout << "Wrong number of arguments: ./expansionTests.sh <Domain Type> <expansion limit> <sub domain type> <algorithm> <output file> < <domain file>"
+             << endl;
+        cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
+        cout << "tree domains are na" << endl;
+        cout << "Puzzle sub-domains are uniform, heavy, inverse, sroot" << endl;
+        cout << "Available algorithm are bfs, astar, fhat, lsslrtastar, risk, riskdd" << endl;
+        exit(1);
+    }
 
-	// Get the lookahead depth
-	int lookaheadDepth = stoi(argv[2]);
+    vector<string> bfsConfig{"bfs", "learn", "k-best", "BFS", "normal"};
+    vector<string> astarConfig{"a-star", "learn", "k-best", "A*", "normal"};
+    vector<string> fhatConfig{"f-hat", "learn", "k-best", "F-Hat", "normal"};
+    vector<string> lsslrtastarConfig{
+            "a-star", "learn", "minimin", "LSS-LRTA*", "normal"};
+    vector<string> riskConfig{"risk", "learn", "k-best", "Risk", "normal"};
+    vector<string> riskPersistConfig{"risk", "learn", "k-best-persist", "PRisk", "normal"};
+    vector<string> riskddConfig{
+            "riskDD", "learnDD", "nancyDD", "RiskDD", "data"};
+vector<string> riskddSquishConfig{
+            "riskDDSquish", "learnDD", "nancyDD", "RiskDDSquish", "data"};
+    unordered_map<string, vector<string>> algorithmsConfig({{"bfs", bfsConfig},
+            {"astar", astarConfig},
+            {"fhat", fhatConfig},
+            {"lsslrtastar", lsslrtastarConfig},
+            {"risk", riskConfig},
+            {"prisk", riskPersistConfig},
+            {"riskddSquish", riskddSquishConfig},
+            {"riskdd", riskddConfig}});
 
-	// Get the domain type
-	string domain = argv[1];
+    if (algorithmsConfig.find(argv[4]) == algorithmsConfig.end()) {
+        cout << "Available algorithm are bfs, astar, fhat, lsslrtastar, "
+                "risk, riskdd"
+             << endl;
+        exit(1);
+    }
 
-	ResultContainer bfsRes;
-	ResultContainer astarRes;
-	ResultContainer fhatRes;
-	ResultContainer riskRes;
-    ResultContainer confidenceRes;
-	ResultContainer lsslrtaRes;
+    // Get the lookahead depth
+    int lookaheadDepth = stoi(argv[2]);
 
-	if (domain == "TreeWorld")
-	{
-		// Make a tree world
-		TreeWorld world = TreeWorld(cin);
+    // Get the domain type
+    string domain = argv[1];
 
-		RealTimeSearch<TreeWorld> bfs(world, "bfs", "none", "k-best", lookaheadDepth, 1, "normal");
-		RealTimeSearch<TreeWorld> astar(world, "a-star", "none", "k-best", lookaheadDepth, 1, "normal");
-		RealTimeSearch<TreeWorld> fhat(world, "f-hat", "none", "k-best", lookaheadDepth, 1, "normal");
-		RealTimeSearch<TreeWorld> risk(world, "risk", "none", "k-best", lookaheadDepth, 1, "normal");
-        RealTimeSearch<TreeWorld> confidence(world, "confidence", "learn", "k-best", lookaheadDepth, 1, "normal");
-		RealTimeSearch<TreeWorld> lsslrta(world, "a-star", "none", "minimin", lookaheadDepth);
+    // Get sub-domain type
+    string subDomain = argv[3];
 
-		astarRes = astar.search();
-        if (!world.validatePath(astarRes.path))
-        {
-            cout << "Invalid path detected from f search!" << endl;
-            exit(1);
+    string result = "{ ";
+
+    if (domain == "SlidingPuzzle") {
+        // Make a tile puzzle
+        std::shared_ptr<SlidingTilePuzzle> world;
+
+        if (subDomain == "uniform") {
+            world = std::make_shared<SlidingTilePuzzle>(cin);
+        } else if (subDomain == "heavy") {
+            world = std::make_shared<HeavyTilePuzzle>(cin);
+        } else if (subDomain == "inverse") {
+            world = std::make_shared<InverseTilePuzzle>(cin);
         }
 
-		riskRes = risk.search();
-        if (!world.validatePath(riskRes.path))
-        {
-            cout << "Invalid path detected from risk search!" << endl;
-            exit(1);
-        }
-        
-        //confidenceRes = confidence.search();
-		fhatRes = fhat.search();
-        if (!world.validatePath(fhatRes.path))
-        {
-            cout << "Invalid path detected from f-hat search!" << endl;
-            exit(1);
-        }
+        startAlg<SlidingTilePuzzle>(world,
+                algorithmsConfig[argv[4]][0],
+                algorithmsConfig[argv[4]][1],
+                algorithmsConfig[argv[4]][2],
+                lookaheadDepth,
+                algorithmsConfig[argv[4]][3],
+                result,
+                1,
+                algorithmsConfig[argv[4]][4]);
 
-		bfsRes = bfs.search();
-        if (!world.validatePath(bfsRes.path))
-        {
-            cout << "Invalid path detected from BFS search!" << endl;
-            exit(1);
-        }
-        
-        lsslrtaRes = lsslrta.search();
-        if (!world.validatePath(lsslrtaRes.path))
-        {
-            cout << "Invalid path detected from LSS-LRTA* search!" << endl;
-            exit(1);
-        }
-	}
-	else if (domain == "SlidingPuzzle")
-	{
-		// Make a tile puzzle
-		SlidingTilePuzzle world = SlidingTilePuzzle(cin);
+    } else if (domain == "TreeWorld") {
+        // Make a tile puzzle
+        std::shared_ptr<TreeWorld> world = std::make_shared<TreeWorld>(cin);
 
-		RealTimeSearch<SlidingTilePuzzle> bfs(world, "bfs", "learn", "k-best", lookaheadDepth, 1, "normal");
-		RealTimeSearch<SlidingTilePuzzle> astar(world, "a-star", "learn", "k-best", lookaheadDepth, 1, "normal");
-		RealTimeSearch<SlidingTilePuzzle> fhat(world, "f-hat", "learn", "k-best", lookaheadDepth, 1, "normal");
-		RealTimeSearch<SlidingTilePuzzle> risk(world, "risk", "learn", "k-best", lookaheadDepth, 1, "normal");
-        //RealTimeSearch<SlidingTilePuzzle> confidence(world, "confidence", "learn", "k-best", lookaheadDepth, 1, "normal");
-		RealTimeSearch<SlidingTilePuzzle> lsslrta(world, "a-star", "learn", "minimin", lookaheadDepth);
+        startAlg<TreeWorld>(world,
+                algorithmsConfig[argv[4]][0],
+                algorithmsConfig[argv[4]][1],
+                algorithmsConfig[argv[4]][2],
+                lookaheadDepth,
+                algorithmsConfig[argv[4]][3],
+                result,
+                1,
+                algorithmsConfig[argv[4]][4]);
 
-		astarRes = astar.search();
-        if (!world.validatePath(astarRes.path))
-        {
-            cout << "Invalid path detected from f search!" << endl;
-            exit(1);
-        }
+    }else {
+        cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
+        exit(1);
+    }
 
-		riskRes = risk.search();
-        if (!world.validatePath(riskRes.path))
-        {
-            cout << "Invalid path detected from risk search!" << endl;
-            exit(1);
-        }
-        
-        //confidenceRes = confidence.search();
-		fhatRes = fhat.search();
-        if (!world.validatePath(fhatRes.path))
-        {
-            cout << "Invalid path detected from f-hat search!" << endl;
-            exit(1);
-        }
+    result += "\"Lookahead\": " + to_string(lookaheadDepth) + " }";
 
-		bfsRes = bfs.search();
-        if (!world.validatePath(bfsRes.path))
-        {
-            cout << "Invalid path detected from BFS search!" << endl;
-            exit(1);
-        }
-        
-        lsslrtaRes = lsslrta.search();
-        if (!world.validatePath(lsslrtaRes.path))
-        {
-            cout << "Invalid path detected from LSS-LRTA* search!" << endl;
-            exit(1);
-        }
-	}
-	else
-	{
-		cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
-		exit(1);
-	}
+    ofstream out(argv[5]);
 
-	string result = "{ \"BFS\": " + to_string(bfsRes.solutionCost) + 
-        ", \"A*\": " + to_string(astarRes.solutionCost) + 
-        ", \"F-Hat\": " + to_string(fhatRes.solutionCost) +
-		", \"Risk\": " + to_string(riskRes.solutionCost) + 
-        ", \"Confidence\": " + to_string(confidenceRes.solutionCost) +
-        ", \"LSS-LRTA*\": " + to_string(lsslrtaRes.solutionCost) +
-		", \"Lookahead\": " + to_string(lookaheadDepth) + " }";
-
-	if (argc < 4)
-	{
-		cout << result << endl;
-	}
-	else
-	{
-		ofstream out(argv[3]);
-
-		out << result;
-		out.close();
-	}
-
+    out << result;
+    out.close();
 }

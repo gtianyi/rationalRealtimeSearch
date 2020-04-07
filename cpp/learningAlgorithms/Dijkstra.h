@@ -29,7 +29,7 @@ public:
 		}
 
 		// Order open by h
-		open.swapComparator(Node::compareNodesH);
+		open.swapComparator(Node::compareNodesHHat);
 
 		// Perform reverse dijkstra while closed is not empy
 		while (!closed.empty() && !open.empty())
