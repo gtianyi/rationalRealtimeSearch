@@ -91,7 +91,8 @@ def main():
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        "risk": "Risk",
+        # "risk": "Risk",
+        # "risk-learnhhat": "Risk",
         # "risk-withassump": "Risk",
         # "risk-cpu-dtb": "Risk",
         # "risk-nobug": "Risk",
@@ -99,30 +100,34 @@ def main():
         # "riskdd-nopersist": "RiskDD",
         # "riskdd": "RiskDD",
         "prisk": "PRisk",
+        "prisk-nop-learnhhat": "PRisk",
+        # "prisk-withassump": "PRisk",
         "prisk-withassump": "PRisk",
-        # "prisk-nop-withassump": "PRisk",
-        "prisk-withassump-learnhhat": "PRisk",
+        # "prisk-withassump-learnhhat": "PRisk",
         # "prisk-cpu-dtb": "PRisk",
         # "prisk-nobug": "PRisk",
         # "riskddSquish": "RiskDDSquish",
         # "riskddSquish-nopersist": "RiskDDSquish",
-        "riskddSquish-nop-withassump": "RiskDDSquish",
-        "riskddSquish-newP-withassump": "RiskDDSquish",
-        "riskddSquish-newP": "RiskDDSquish",
+        # "riskddSquish-nop-withassump": "RiskDDSquish",
+        # "riskddSquish-newP-withassump": "RiskDDSquish",
+        # "riskddSquish-newP": "RiskDDSquish",
         # "riskddSquish-1kt": "RiskDDSquish",
         "lsslrtastar": "LSS-LRTA*",
         # "lsslrtastar-cpu-dtb": "LSS-LRTA*",
         # "riskdd-lssTr": "RiskDD",
         # "riskddSquish-lssTr": "RiskDDSquish"
-        "riskddSquish-cpu-dtb-dumpallcpu": "RiskDDSquish"
-        # "riskddSquish-withassump": "RiskDDSquish"
+        # "riskddSquish-cpu-dtb-dumpallcpu": "RiskDDSquish"
+        # "riskddSquish": "RiskDDSquish",
+        "riskddSquish-newP": "RiskDDSquish",
+        "riskddSquish-nop-withassump": "RiskDDSquish"
     }
 
     algorithms = OrderedDict({
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        "risk": "Nancy",
+        # "risk": "Nancy",
+        # "risk-learnhhat": "Nancy-hhat",
         # "risk-withassump": "Nancy-fix-assumption",
         # "risk-cpu-dtb": "Nancy",
         # "risk-nobug": "Nancy NOBUG",
@@ -130,27 +135,31 @@ def main():
         # "riskdd-cpu-dtb": "Nancy (DD PE)",
         # "riskdd-nopersist": "Nancy (DD PE Nper)",
         "prisk": "Nancy (pers.)",
-        "prisk-withassump-learnhhat": "Nancy (pers-fix-assumption-hhat.)",
+        # "prisk-withassump-learnhhat": "Nancy (pers-fix-assumption-hhat.)",
+        "prisk-nop-learnhhat": "Nancy (pers-hhat.)",
         "prisk-withassump": "Nancy (pers-fix-assumption.)",
         # "prisk-cpu-dtb": "Nancy (pers.)",
         # "prisk-nobug": "Nancy (pers. NOBUG)",
         # "riskddSquish": "Nancy (DD)",
         # "riskddSquish-nopersist": "Nancy (DD Nper)",
-        "riskddSquish-nop-withassump": "Nancy (Assumption-DD Nper)",
-        "riskddSquish-newP-withassump": "Nancy (Assumption-DD NewPer)",
-        "riskddSquish-newP": "Nancy (DD NewPer)",
+        # "riskddSquish-nop-withassump": "Nancy (Assumption-DD Nper)",
+        # "riskddSquish-newP-withassump": "Nancy (Assumption-DD NewPer)",
+        # "riskddSquish-newP": "Nancy (DD NewPer)",
         # "riskddSquish-1kt": "Nancy (DD 1kt)",
         "lsslrtastar": "LSS-LRTA*",
         # "lsslrtastar-cpu-dtb": "LSS-LRTA*",
         # "lsslrtastar-new": "LSS-LRTA* BUG",
         # "riskdd-lssTr": "Nancy (DD PE LSSTR)",
         # "riskddSquish-lssTr": "Nancy (DD LSSTR)"
-        "riskddSquish-cpu-dtb-dumpallcpu": "Nancy (DD)"
-        # "riskddSquish-withassump": "Nancy (Assumption-DD)"
+        # "riskddSquish-cpu-dtb": "Nancy (DD)"
+        # "riskddSquish": "Nancy (DD)",
+        "riskddSquish-newP": "Nancy (DD)",
+        "riskddSquish-nop-withassump": "Nancy (Assumption-DD)"
     })
 
     #specify the order for camera ready of AAAI-20
-    algorithm_order = ['Nancy (DD)', 'Nancy (DD NewPer)', 'Nancy (Assumption-DD NewPer)', 'LSS-LRTA*', 'Nancy (pers.)', 'Nancy (pers-fix-assumption.)', 'Nancy (pers-fix-assumption-hhat.)']
+    # algorithm_order = ['Nancy (DD)', 'Nancy (DD NewPer)', 'Nancy (Assumption-DD NewPer)', 'LSS-LRTA*', 'Nancy (pers.)',  'Nancy', 'Nancy-hhat', 'Nancy (pers-fix-assumption.)', 'Nancy (pers-fix-assumption-hhat.)', 'Nancy (pers-hhat.)']
+    algorithm_order = ['Nancy (DD)', 'Nancy (Assumption-DD)', 'LSS-LRTA*', 'Nancy (pers.)', 'Nancy (pers-hhat.)', 'Nancy (pers-fix-assumption.)']
 
     baseline = "LSS-LRTA*"
 
@@ -226,7 +235,7 @@ def main():
             "Algorithm Cost - " + baseline + " Cost", df, 0.35, "Algorithm",
             limits, algorithm_order, "Node Expansion Limit",
             "Algorithm Cost - " + baseline + " Cost", "../../plots/" +
-            tileType + '/' + tileType + "-tile-pairwisei-" + nowstr + ".eps",
+            tileType + '/' + tileType + "-tile-pairwise-" + nowstr + ".eps",
             markers)
 
     elif sys.argv[1] == "solutioncost":
