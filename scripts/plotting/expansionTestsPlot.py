@@ -16,16 +16,18 @@ from os import listdir
 import sys
 from datetime import datetime
 from collections import OrderedDict
-import matplotlib.pyplot as plt
+iemport matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 
 
 def printUsage():
-    print "usage: python expansionTestsPlot.py <plot type> <tile type>"
+    print "usage: python expansionTestsPlot.py <plot type> <domain type> <subdomain type>"
     print "plot type: coverage, pairwise, solutioncost"
-    print "tile type: uniform heavy inverse"
+    print "domain type: slidingtilepuzzle, pancake"
+    print "tile sub type: uniform heavy inverse"
+    print "pancake sub type: regular, heavy"
 
 
 def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
@@ -62,11 +64,11 @@ def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
     return
 
 
-def makeCoverageTable(dataframe, tileType):
+def makeCoverageTable(dataframe, subdomainType):
     grp = dataframe.groupby(['Node Expansion Limit',
                              'Algorithm'])['Solution Cost'].count()
     print(grp)
-    grp.to_csv("../../plots/" + tileType + "/coverage-" + tileType + ".csv")
+    grp.to_csv("../../plots/" + subdomainType + "/coverage-" + subdomainType + ".csv")
 
 
 def main():
@@ -80,18 +82,20 @@ def main():
     ]
 
     # Hard coded result directories
-    tileDimension = "4x4"
-    tileType = sys.argv[2]
-    # limits = [3, 10, 30, 100, 300, 1000]
+    tileDimension = "16"
+    # tileDimension = "4x4"
+    domainType = sys.argv[2]
+    subdomainType = sys.argv[3]
+    limits = [3, 10, 30, 100, 300, 1000]
     # limits = [10, 30, 100, 300, 1000]
-    limits = [30, 100, 300, 1000]
+    # limits = [30, 100, 300, 1000]
     # limits = [30]
     # limits = [100, 300, 1000]
     algorithms_data = {
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        # "risk": "Risk",
+        "risk": "Risk",
         # "risk-learnhhat": "Risk",
         # "risk-withassump": "Risk",
         # "risk-cpu-dtb": "Risk",
@@ -99,10 +103,10 @@ def main():
         # "riskdd-cpu-dtb": "RiskDD",
         # "riskdd-nopersist": "RiskDD",
         # "riskdd": "RiskDD",
-        "prisk": "PRisk",
-        "prisk-nop-learnhhat": "PRisk",
+        # "prisk": "PRisk",
+        # "prisk-nop-learnhhat": "PRisk",
         # "prisk-withassump": "PRisk",
-        "prisk-withassump": "PRisk",
+        # "prisk-withassump": "PRisk",
         # "prisk-withassump-learnhhat": "PRisk",
         # "prisk-cpu-dtb": "PRisk",
         # "prisk-nobug": "PRisk",
@@ -117,16 +121,16 @@ def main():
         # "riskdd-lssTr": "RiskDD",
         # "riskddSquish-lssTr": "RiskDDSquish"
         # "riskddSquish-cpu-dtb-dumpallcpu": "RiskDDSquish"
-        # "riskddSquish": "RiskDDSquish",
-        "riskddSquish-newP": "RiskDDSquish",
-        "riskddSquish-nop-withassump": "RiskDDSquish"
+        "riskddSquish": "RiskDDSquish"
+        # "riskddSquish-newP": "RiskDDSquish",
+        # "riskddSquish-nop-withassump": "RiskDDSquish"
     }
 
     algorithms = OrderedDict({
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        # "risk": "Nancy",
+        "risk": "Nancy (pers.)",
         # "risk-learnhhat": "Nancy-hhat",
         # "risk-withassump": "Nancy-fix-assumption",
         # "risk-cpu-dtb": "Nancy",
@@ -134,10 +138,10 @@ def main():
         # "riskdd": "Nancy (DD PE)",
         # "riskdd-cpu-dtb": "Nancy (DD PE)",
         # "riskdd-nopersist": "Nancy (DD PE Nper)",
-        "prisk": "Nancy (pers.)",
+        # "prisk": "Nancy (pers.)",
         # "prisk-withassump-learnhhat": "Nancy (pers-fix-assumption-hhat.)",
-        "prisk-nop-learnhhat": "Nancy (pers-hhat.)",
-        "prisk-withassump": "Nancy (pers-fix-assumption.)",
+        # "prisk-nop-learnhhat": "Nancy (pers-hhat.)",
+        # "prisk-withassump": "Nancy (pers-fix-assumption.)",
         # "prisk-cpu-dtb": "Nancy (pers.)",
         # "prisk-nobug": "Nancy (pers. NOBUG)",
         # "riskddSquish": "Nancy (DD)",
@@ -152,14 +156,14 @@ def main():
         # "riskdd-lssTr": "Nancy (DD PE LSSTR)",
         # "riskddSquish-lssTr": "Nancy (DD LSSTR)"
         # "riskddSquish-cpu-dtb": "Nancy (DD)"
-        # "riskddSquish": "Nancy (DD)",
-        "riskddSquish-newP": "Nancy (DD)",
-        "riskddSquish-nop-withassump": "Nancy (Assumption-DD)"
+        "riskddSquish": "Nancy (DD)"
+        # "riskddSquish-newP": "Nancy (DD)",
+        # "riskddSquish-nop-withassump": "Nancy (Assumption-DD)"
     })
 
     #specify the order for camera ready of AAAI-20
     # algorithm_order = ['Nancy (DD)', 'Nancy (DD NewPer)', 'Nancy (Assumption-DD NewPer)', 'LSS-LRTA*', 'Nancy (pers.)',  'Nancy', 'Nancy-hhat', 'Nancy (pers-fix-assumption.)', 'Nancy (pers-fix-assumption-hhat.)', 'Nancy (pers-hhat.)']
-    algorithm_order = ['Nancy (DD)', 'Nancy (Assumption-DD)', 'LSS-LRTA*', 'Nancy (pers.)', 'Nancy (pers-hhat.)', 'Nancy (pers-fix-assumption.)']
+    algorithm_order = ['Nancy (DD)',  'LSS-LRTA*', 'Nancy (pers.)', ]
 
     baseline = "LSS-LRTA*"
 
@@ -173,13 +177,15 @@ def main():
 
     for alg in algorithms:
         for jsonFile in listdir(
-                "../../results/SlidingTilePuzzle/expansionTests/NancyDD/" +
-                tileType + '/' + alg + '/' + tileDimension):
+                # "../../results/SlidingTilePuzzle/expansionTests/NancyDD/" +
+                "../../results/"+domainType+"/expansionTests/NancyDD/" +
+                subdomainType + '/' + alg + '/' + tileDimension):
             if jsonFile[-5:] != ".json":
                 continue
             with open(
-                    "../../results/SlidingTilePuzzle/expansionTests/NancyDD/" +
-                    tileType + '/' + alg + '/' + tileDimension + "/" +
+                    # "../../results/SlidingTilePuzzle/expansionTests/NancyDD/" +
+                    "../../results/"+domainType+"/expansionTests/NancyDD/" +
+                    subdomainType + '/' + alg + '/' + tileDimension + "/" +
                     jsonFile) as json_data:
 
                 resultData = json.load(json_data)
@@ -227,22 +233,22 @@ def main():
     nowstr = datetime.now().strftime("%d%m%Y-%H%M")
 
     if sys.argv[1] == "coverage":
-        makeCoverageTable(rawdf, tileType)
+        makeCoverageTable(rawdf, subdomainType)
 
     elif sys.argv[1] == "pairwise":
         makeDifferencePlot(
             13, 10, "Node Expansion Limit",
             "Algorithm Cost - " + baseline + " Cost", df, 0.35, "Algorithm",
             limits, algorithm_order, "Node Expansion Limit",
-            "Algorithm Cost - " + baseline + " Cost", "../../plots/" +
-            tileType + '/' + tileType + "-tile-pairwise-" + nowstr + ".eps",
+            "Algorithm Cost - " + baseline + " Cost", "../../plots/" + domainType + '/' +
+            subdomainType + '/' + subdomainType + "-tile-pairwise-" + nowstr + ".eps",
             markers)
 
     elif sys.argv[1] == "solutioncost":
         makeDifferencePlot(
             13, 10, "Node Expansion Limit", "Solution Cost", df, 0.35,
             "Algorithm", limits, algorithms.values(), "Node Expansion Limit",
-            "Solution Cost", "../../plots/" + tileType + '/' + tileType +
+            "Solution Cost", "../../plots/" + domainType + '/' +subdomainType + '/' + subdomainType +
             "-tile-solution-cost-" + nowstr + ".png", markers)
     else:
         printUsage()

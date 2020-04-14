@@ -32,10 +32,10 @@ domainType=$3
 
 trap "exit" INT
 
-if [ "$domainType" = "SlidingPuzzle" ]
+if [ "$domainType" = "SlidingPuzzle" ] || [ "$domainType" = "pancake" ]
 then
   dimensions=$4
-  tileType=$5
+  subdomain=$5
   algNum=$6
 
 
@@ -48,29 +48,30 @@ then
     for lookahead in "${@:$algstop}"
     do
       echo "lookahead $lookahead"
-	  mkdir -p ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-newp/${dimensions}x${dimensions}
+	  mkdir -p ../../results/pancake/expansionTests/NancyDD/${subdomain}/${algname}/${dimensions}
+	  #mkdir -p ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${subdomain}/${algname}/${dimensions}x${dimensions}
       instance=$firstInstance
       while ((instance < lastInstance))
       do
-	    file="../../worlds/slidingTile/${instance}-${dimensions}x${dimensions}.st"
+	    infile="../../../worlds/pancake/${instance}-${dimensions}.pan"
+		#file="../../worlds/pancake/${instance}-${dimensions}x${dimensions}.st"
+		file_name="../../results/pancake/expansionTests/NancyDD/\
+${subdomain}/${algname}/${dimensions}/LA${lookahead}-${instance}"
+		outfile="${file_name}.json"
+		tempfile="${file_name}.temp"
         		  
-	    if [ -f ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-newp/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json ] || [ -f ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-newp/${dimensions}x${dimensions}/LA${lookahead}-${instance}.temp ]
-	    then 
+	    if [ -f ${outfile} ] || [ -f ${tempfile} ]; then 
 	      let instance++
 	    else
 
-		  echo "ph" > ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-newp/${dimensions}x${dimensions}/LA${lookahead}-${instance}.temp
-
+		  echo "ph" > ${tempfile}
 		  echo "runing LA${lookahead}-${instance}" 
 
-	      timeout 1800 ./../../expansionTests ${domainType} ${lookahead} ${tileType} ${algname} ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-newp/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json < ${file}
+	      timeout 1800 ./../../expansionTests ${domainType} ${lookahead} ${subdomain} ${algname} ${outfile} < ${infile}
 
-		  if [ -f ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-newp/${dimensions}x${dimensions}/LA${lookahead}-${instance}.json ]
-		  then
-
-		     rm ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${tileType}/${algname}-newp/${dimensions}x${dimensions}/LA${lookahead}-${instance}.temp 
-
-		  fi
+		  if [ -f ${outfile} ]; then
+		     rm ${tempfile}
+	      fi
 
 	      let instance++
 	    fi
@@ -78,8 +79,8 @@ then
     done
   done
 else
-  echo "Available domain types are TreeWorld and SlidingPuzzle"
+  echo "Available domain types are pancake and SlidingPuzzle"
   echo "Domain variables for TreeWorld: <branching factor> <tree depth>"
-  echo "Domain variables for SlidingPuzzle: <puzzle dimensions>"
+  echo "Domain variables for SlidingPuzzle: <puzzle dimensions> <puzzle type>"
   exit 1
 fi
