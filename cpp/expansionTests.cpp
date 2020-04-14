@@ -88,8 +88,9 @@ int main(int argc, char** argv)
     if (argc != 6) {
         cout << "Wrong number of arguments: ./expansionTests.sh <Domain Type> <expansion limit> <sub domain type> <algorithm> <output file> < <domain file>"
              << endl;
-        cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
-        cout << "tree domains are na" << endl;
+        cout << "Available domains are TreeWorld, SlidingPuzzle, pancake" << endl;
+        cout << "tree subdomains are na" << endl;
+        cout << "pancake subdomains are regular, heavy" << endl;
         cout << "Puzzle sub-domains are uniform, heavy, inverse, sroot" << endl;
         cout << "Available algorithm are bfs, astar, fhat, lsslrtastar, risk, riskdd" << endl;
         exit(1);
