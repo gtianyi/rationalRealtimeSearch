@@ -108,27 +108,9 @@ public:
 
     template <class Domain>
     static void readData(shared_ptr<Domain> domain) {
-        //string fileName = "/home/aifs1/gu/phd/research/workingPaper/"
-                          //"realtime-nancy/results/SlidingTilePuzzle/"
-                          //"sampleData/" +
-                //domain->getSubDomainName() 
-				////+ "-lsslrtastar-statSummary-d.json";
-				//+ "-wastar-statSummary-d.json";
 
-        string fileName = "/home/aifs1/gu/phd/research/workingPaper/"
-                          "realtime-nancy/results/SlidingTilePuzzle/"
-                          "sampleData/" +
-                domain->getSubDomainName()
-                //+ "-lsslrtastar-statSummary-d.json";
-                //+ "-assumption-statSummary-d.json";
-				+ "-wastar-statSummary-d.json";
-
-        string fileName_ps = "/home/aifs1/gu/phd/research/workingPaper/"
-                             "realtime-nancy/results/SlidingTilePuzzle/"
-                             "sampleData/" +
-                domain->getSubDomainName() +
-                //"-lsslrtastar-statSummary-postd.json";
-				"-wastar-statSummary-postd.json";
+        string fileName = domain->getDistributionFile();
+        string fileName_ps = domain->getDistributionFile_ps();
 
         ifstream f(fileName);
         ifstream f_ps(fileName_ps);

@@ -595,6 +595,13 @@ public:
 
     virtual string getSubDomainName() const { return "uniform"; }
 
+    virtual string getDistributionFile() const { 
+			return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/SlidingTilePuzzle/sampleData/uniform-wastar-statSummary-d.json" ; }
+
+	virtual string getDistributionFile_ps() const { 
+			return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/SlidingTilePuzzle/sampleData/uniform-wastar-statSummary-postd.json" ; }
+
+
     int getCorrectDistributionSize() const {
         return correctedDistribution.size();
     }

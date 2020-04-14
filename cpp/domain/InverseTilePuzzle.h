@@ -260,5 +260,12 @@ public:
 		//cout << "total h " << hValueTable.size() << "\n";
     }
 
-    virtual string getSubDomainName() const { return "inverse"; }
+    string getSubDomainName() const { return "inverse"; }
+
+    string getDistributionFile() const { 
+			return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/SlidingTilePuzzle/sampleData/inverse-wastar-statSummary-d.json" ; }
+
+	string getDistributionFile_ps() const { 
+			return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/SlidingTilePuzzle/sampleData/inverse-wastar-statSummary-postd.json" ; }
+
 };

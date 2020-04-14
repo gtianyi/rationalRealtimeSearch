@@ -14,6 +14,7 @@
 #include "domain/TreeWorld.h"
 #include "domain/HeavyTilePuzzle.h"
 #include "domain/InverseTilePuzzle.h"
+#include "domain/PancakePuzzle.h"
 #include <memory>
 
 using namespace std;
@@ -133,7 +134,7 @@ vector<string> riskddSquishConfig{
     string result = "{ ";
 
     if (domain == "SlidingPuzzle") {
-        // Make a tile puzzle
+
         std::shared_ptr<SlidingTilePuzzle> world;
 
         if (subDomain == "uniform") {
@@ -155,7 +156,7 @@ vector<string> riskddSquishConfig{
                 algorithmsConfig[argv[4]][4]);
 
     } else if (domain == "TreeWorld") {
-        // Make a tile puzzle
+
         std::shared_ptr<TreeWorld> world = std::make_shared<TreeWorld>(cin);
 
         startAlg<TreeWorld>(world,
@@ -168,8 +169,21 @@ vector<string> riskddSquishConfig{
                 1,
                 algorithmsConfig[argv[4]][4]);
 
+	} else if (domain == "pancake") {
+
+		std::shared_ptr<PancakePuzzle> world = std::make_shared<PancakePuzzle>(cin);
+
+		startAlg<PancakePuzzle>(world,
+				algorithmsConfig[argv[4]][0],
+				algorithmsConfig[argv[4]][1],
+				algorithmsConfig[argv[4]][2],
+				lookaheadDepth,
+				algorithmsConfig[argv[4]][3],
+				result,
+				1,
+				algorithmsConfig[argv[4]][4]);
     }else {
-        cout << "Available domains are TreeWorld and SlidingPuzzle" << endl;
+        cout << "Available domains are TreeWorld, SlidingPuzzle, pancake" << endl;
         exit(1);
     }
 

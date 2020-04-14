@@ -438,6 +438,11 @@ public:
 	//place holder
     string getSubDomainName() const { return ""; }
 
+    string getDistributionFile() const { return "" ; }
+
+	string getDistributionFile_ps() const { return "" ; }
+
+
 	//place holder
     void readDistributionData(
             ifstream& f,
