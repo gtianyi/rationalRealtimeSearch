@@ -599,7 +599,7 @@ public:
 			return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/SlidingTilePuzzle/sampleData/uniform-wastar-statSummary-d.json" ; }
 
 	virtual string getDistributionFile_ps() const { 
-			return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/SlidingTilePuzzle/sampleData/uniform-wastar-statSummary-postd.json" ; }
+			return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/SlidingTilePuzzle/sampleData/uniform-wastar-statSummary-d.json" ; }
 
 
     int getCorrectDistributionSize() const {
