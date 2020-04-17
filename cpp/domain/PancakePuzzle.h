@@ -11,6 +11,8 @@
 #include <bitset>
 #include <unordered_map>
 #include "../utility/SlidingWindow.h"
+#include "../utility/DiscreteDistributionDD.h"
+#include "../utility/rapidjson/document.h"
 
 #include <bitset>
 
@@ -531,43 +533,49 @@ public:
     string getSubDomainName() const { return ""; }
 
     string getDistributionFile() const {
-		  	return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/pancake/sampleData/regular-wastar-2-16-statSummary-d.json";
+        return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/"
+               "results/pancake/sampleData/"
+               "regular-wastar-2-16-statSummary-d.json";
    	}
 
-	string getDistributionFile_ps() const { return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/pancake/sampleData/regular-wastar-2-16-statSummary-d.json"; }
+        string getDistributionFile_ps() const {
+            return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/"
+                   "results/pancake/sampleData/"
+                   "regular-wastar-2-16-statSummary-d.json";
+        }
 
-    void readDistributionData(
-            ifstream& f,
-            unordered_map<int,
-                    shared_ptr<vector<
-                            DiscreteDistributionDD::ProbabilityNode>>>&
-                    hValueTable) const {
-			cout << "reading pancake data\n";
+        void readDistributionData(
+                ifstream& f,
+                unordered_map<int,
+                        shared_ptr<vector<
+                                DiscreteDistributionDD::ProbabilityNode>>>&
+                        hValueTable) const {
+            cout << "reading pancake data\n";
 
-		string jsonStr;
-		getline(f, jsonStr);
-		f.close();
-		rapidjson::Document jsonDoc;
-		jsonDoc.Parse(jsonStr.c_str());
+            string jsonStr;
+            getline(f, jsonStr);
+            f.close();
+            rapidjson::Document jsonDoc;
+            jsonDoc.Parse(jsonStr.c_str());
 
-		for (auto& m : jsonDoc.GetObject()) {
-			Cost h = stod(m.name.GetString());
-			hValueTable[h] = make_shared<
-					vector<DiscreteDistributionDD::ProbabilityNode>>();
+            for (auto& m : jsonDoc.GetObject()) {
+                Cost h = stod(m.name.GetString());
+                hValueTable[h] = make_shared<
+                        vector<DiscreteDistributionDD::ProbabilityNode>>();
 
-			auto& bins = m.value.GetObject()["bins"];
-			for (auto& instance : bins.GetArray()) {
-				Cost hstar = stoi(instance["h*"].GetString());
-				Cost prob = stod(instance["prob"].GetString());
+                auto& bins = m.value.GetObject()["bins"];
+                for (auto& instance : bins.GetArray()) {
+                    Cost hstar = stoi(instance["h*"].GetString());
+                    Cost prob = stod(instance["prob"].GetString());
 
-				DiscreteDistributionDD::ProbabilityNode pn(hstar, prob);
-				hValueTable[h]->push_back(pn);
-			}
-		}
+                    DiscreteDistributionDD::ProbabilityNode pn(hstar, prob);
+                    hValueTable[h]->push_back(pn);
+                }
+            }
 
-		f.close();
+            f.close();
 
-		cout << "total h buckets " << hValueTable.size() << "\n";
+            cout << "total h buckets " << hValueTable.size() << "\n";
     }
 
 

@@ -41,12 +41,15 @@ public:
 
     string getSubDomainName() const { return "heavy"; }
 
+    string getDistributionFile() const {
+        return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/"
+               "results/SlidingTilePuzzle/sampleData/"
+               "heavy-wastar-statSummary-d.json"; }
 
-    string getDistributionFile() const { 
-			return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/SlidingTilePuzzle/sampleData/heavy-wastar-statSummary-d.json" ; }
-
-	string getDistributionFile_ps() const { 
-			return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/results/SlidingTilePuzzle/sampleData/heavy-wastar-statSummary-postd.json" ; }
+    string getDistributionFile_ps() const {
+        return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/"
+               "results/SlidingTilePuzzle/sampleData/"
+               "heavy-wastar-statSummary-postd.json"; }
 
 
     Cost distance(const State& state) {
