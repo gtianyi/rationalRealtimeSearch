@@ -126,9 +126,6 @@ fi
 
 echo "algorithms_dir ${algorithms_dir[*]}"
 
-exit 1
-
-
 last=$(( $first + $n_of_i ))
 
 ###############################################
@@ -137,8 +134,8 @@ trap "exit" INT
 
 for algid in "${!algorithms[@]}"; do 
 
-	algname=algorithms[algid]
-	algdir=algorithms_dir[algid]
+	algname=${algorithms[$algid]}
+	algdir=${algorithms_dir[$algid]}
 	echo $algname
 	echo $algdir
 
@@ -165,7 +162,7 @@ ${subdomain}/${algdir}/${size}/LA${lookahead}-${instance}"
 
 	      timeout 1800 ./../../expansionTests ${domain} ${lookahead} ${subdomain} ${algname} ${outfile} < ${infile}
 
-		  if [ -f ${outfile} -a -f ${tempfile}]; then
+		  if [ -f ${outfile} -a -f ${tempfile} ]; then
 		     rm ${tempfile}
 	      fi
 
