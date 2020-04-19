@@ -12,8 +12,7 @@ Update: 04/18/2020
 __author__ = 'tianyigu'
 
 import json
-from os import listdir
-from os import mkdir
+import os
 
 import sys
 from datetime import datetime
@@ -85,7 +84,7 @@ def main():
     ]
 
     # Hard coded result directories
-    domainSize = "32"
+    domainSize = "50"
     # domainSize = "4x4"
     domainType = sys.argv[2]
     subdomainType = sys.argv[3]
@@ -98,7 +97,7 @@ def main():
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        "risk": "Risk",
+        # "risk": "Risk",
         # "risk-learnhhat": "Risk",
         # "risk-withassump": "Risk",
         # "risk-cpu-dtb": "Risk",
@@ -133,7 +132,7 @@ def main():
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        "risk": "Nancy (pers.)",
+        # "risk": "Nancy (pers.)",
         # "risk-learnhhat": "Nancy-hhat",
         # "risk-withassump": "Nancy-fix-assumption",
         # "risk-cpu-dtb": "Nancy",
@@ -173,8 +172,8 @@ def main():
     # ]
     algorithm_order = [
         'Nancy (DD)',
-        'LSS-LRTA*',
-        'Nancy (pers.)',
+        'LSS-LRTA*'
+        # 'Nancy (pers.)',
     ]
 
     baseline = "LSS-LRTA*"
@@ -188,7 +187,7 @@ def main():
     print("reading in data...")
 
     for alg in algorithms:
-        for jsonFile in listdir(
+        for jsonFile in os.listdir(
                 # "../../results/SlidingTilePuzzle/expansionTests/NancyDD/" +
                 "../../results/" + domainType + "/expansionTests/NancyDD/" +
                 subdomainType + '/' + alg + '/' + domainSize):
@@ -245,7 +244,10 @@ def main():
     nowstr = datetime.now().strftime("%d%m%Y-%H%M")
 
     out_dir = "../../plots/" + domainType
-    mkdir(out_dir)
+
+    if not os.path.exists(out_dir):
+        mkdir(out_dir)
+
     out_file = out_dir + '/' + domainType + "-" + subdomainType + "-" + domainSize + '-' + nowstr
 
     if sys.argv[1] == "coverage":

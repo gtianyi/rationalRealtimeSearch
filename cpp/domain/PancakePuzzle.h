@@ -535,13 +535,13 @@ public:
     string getDistributionFile() const {
         return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/"
                "results/pancake/sampleData/"
-               "regular-wastar-2-32-statSummary-d.json";
+               "regular-wastar-2-50-statSummary-d.json";
    	}
 
         string getDistributionFile_ps() const {
             return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/"
                    "results/pancake/sampleData/"
-                   "regular-wastar-2-32-statSummary-d.json";
+                   "regular-wastar-2-50-statSummary-d.json";
         }
 
         void readDistributionData(
