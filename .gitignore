@@ -5,8 +5,8 @@ results/
 distributions/
 backupTestsAS
 backupTestsDFS
-expansionTests
-expansionTests-debug
+realtimeSolver
+realtimeSolver-debug
 generateTrees
 lastIncremental
 *.txt

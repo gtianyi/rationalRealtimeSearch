@@ -5,7 +5,7 @@
 using namespace std;
 
 struct ResultContainer {
-    queue<int> path;
+    queue<string> path;
     bool solutionFound;
     double solutionCost;
     int nodesGenerated;

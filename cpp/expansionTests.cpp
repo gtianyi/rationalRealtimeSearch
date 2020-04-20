@@ -15,7 +15,9 @@
 #include "domain/HeavyTilePuzzle.h"
 #include "domain/InverseTilePuzzle.h"
 #include "domain/PancakePuzzle.h"
+#include "domain/RaceTrack.h"
 #include <memory>
+#include "utility/cxxopts/include/cxxopts.hpp"
 
 using namespace std;
 
@@ -34,14 +36,39 @@ void getCpuStatistic(vector<double>& lookaheadCpuTime,
     }
 }
 
+void parseResult(ResultContainer& res, string& outString, string algName){
+/*if (res.solutionFound && !domain.validatePath(res.path)) {*/
+    // cout << "Invalid path detected from search: " << expansionModule
+    //<< endl;
+    // exit(1);
+    /*}*/
+
+    outString += "\"" + algName + "\": " + to_string(res.solutionCost) +
+            ", \"epsilonHGlobal\": " + to_string(res.epsilonHGlobal) +
+            ", \"epsilonDGlobal\": " + to_string(res.epsilonDGlobal) +
+            ", \"cpu-percentiles\": [";
+
+    vector<double> cpuPercentiles;
+    double cpuMean;
+
+    getCpuStatistic(res.lookaheadCpuTime, cpuPercentiles, cpuMean);
+
+    for (auto& t : cpuPercentiles) {
+        outString += to_string(t) + ", ";
+    }
+
+    outString.pop_back();
+    outString.pop_back();
+    outString += "], \"cpu-mean\": " + to_string(cpuMean) + ", ";
+}
+
 template<class Domain>
-void startAlg(shared_ptr<Domain> domain_ptr,
+ResultContainer startAlg(shared_ptr<Domain> domain_ptr,
         string expansionModule,
         string learningModule,
         string decisionModule,
         double lookahead,
         string algName,
-        string& result,
         double k = 1,
         string beliefType = "normal") {
     shared_ptr<RealTimeSearch<Domain>> searchAlg =
@@ -53,34 +80,10 @@ void startAlg(shared_ptr<Domain> domain_ptr,
                     k,
                     beliefType);
 
-	if (algName == "RiskDD" || algName == "RiskDDSquish")
-		DiscreteDistributionDD::readData<Domain>(domain_ptr);
+    if (algName == "RiskDD" || algName == "RiskDDSquish")
+        DiscreteDistributionDD::readData<Domain>(domain_ptr);
 
-    ResultContainer res = searchAlg->search(1000*200/lookahead);
-
-    /*if (res.solutionFound && !domain.validatePath(res.path)) {*/
-    // cout << "Invalid path detected from search: " << expansionModule
-    //<< endl;
-    // exit(1);
-    /*}*/
-
-    result += "\"" + algName + "\": " + to_string(res.solutionCost) +
-            ", \"epsilonHGlobal\": " + to_string(res.epsilonHGlobal) +
-            ", \"epsilonDGlobal\": " + to_string(res.epsilonDGlobal) +
-            ", \"cpu-percentiles\": [";
-
-    vector<double> cpuPercentiles;
-    double cpuMean;
-
-    getCpuStatistic(res.lookaheadCpuTime, cpuPercentiles, cpuMean);
-
-    for (auto& t : cpuPercentiles) {
-        result += to_string(t) + ", ";
-    }
-
-    result.pop_back();
-    result.pop_back();
-    result += "], \"cpu-mean\": " + to_string(cpuMean) + ", ";
+     return searchAlg->search(1000 * 200 / lookahead);
 }
 
 int main(int argc, char** argv)
@@ -95,6 +98,48 @@ int main(int argc, char** argv)
         cout << "Available algorithm are bfs, astar, fhat, lsslrtastar, risk, riskdd" << endl;
         exit(1);
     }
+
+
+    cxxopts::Options options("./realtimeSolver",
+            "This is a realtime search program");
+
+    options.add_options()
+
+		("d,domain", "domain type: randomtree, tile, pancake, racetrack", 
+		 cxxopts::value<std::string>()->default_value("racetrack"))
+
+		("s,subdomain", "puzzle type: uniform, inverse, heavy, sqrt; "
+		                "pancake type: regular, heavy;"
+						"racetrack map : barto-bigger, hanse-bigger-double, uniform", 
+		 cxxopts::value<std::string>()->default_value("barto-bigger"))
+
+        ("a,alg", "realtime algorithm: bfs, astar, fhat, lsslrtastar, risk, riskdd, riskddSquish", 
+		 cxxopts::value<std::string>()->default_value("risk"))
+
+        ("l,lookahead", "expansion limit", 
+		 cxxopts::value<int>()->default_value("100"))
+
+		("o,performenceOut", "performence Out file", 
+		 cxxopts::value<std::string>()->default_value("out.txt"))
+
+		("v,pathOut", "path Out file", cxxopts::value<std::string>())
+
+        ("h,help", "Print usage")
+    ;
+
+    auto args = options.parse(argc, argv);
+
+    if (args.count("help")) {
+        std::cout << options.help() << std::endl;
+        exit(0);
+	}
+
+    auto domain = args["domain"].as<std::string>();
+    auto subDomain = args["subdomain"].as<std::string>();
+    auto alg = args["alg"].as<std::string>();
+    auto lookaheadDepth = args["lookahead"].as<int>();
+    auto outPerfromence = args["performenceOut"].as<string>();
+    auto outVisual = args["pathOut"].as<string>();
 
     vector<string> bfsConfig{"bfs", "learn", "k-best", "BFS", "normal"};
     vector<string> astarConfig{"a-star", "learn", "k-best", "A*", "normal"};
@@ -116,23 +161,14 @@ vector<string> riskddSquishConfig{
             {"riskddSquish", riskddSquishConfig},
             {"riskdd", riskddConfig}});
 
-    if (algorithmsConfig.find(argv[4]) == algorithmsConfig.end()) {
+    if (algorithmsConfig.find(alg) == algorithmsConfig.end()) {
         cout << "Available algorithm are bfs, astar, fhat, lsslrtastar, "
                 "risk, riskdd"
              << endl;
         exit(1);
     }
 
-    // Get the lookahead depth
-    int lookaheadDepth = stoi(argv[2]);
-
-    // Get the domain type
-    string domain = argv[1];
-
-    // Get sub-domain type
-    string subDomain = argv[3];
-
-    string result = "{ ";
+	ResultContainer res;
 
     if (domain == "SlidingPuzzle") {
 
@@ -146,52 +182,88 @@ vector<string> riskddSquishConfig{
             world = std::make_shared<InverseTilePuzzle>(cin);
         }
 
-        startAlg<SlidingTilePuzzle>(world,
-                algorithmsConfig[argv[4]][0],
-                algorithmsConfig[argv[4]][1],
-                algorithmsConfig[argv[4]][2],
+        res = startAlg<SlidingTilePuzzle>(world,
+                algorithmsConfig[alg][0],
+                algorithmsConfig[alg][1],
+                algorithmsConfig[alg][2],
                 lookaheadDepth,
-                algorithmsConfig[argv[4]][3],
-                result,
+                algorithmsConfig[alg][3],
                 1,
-                algorithmsConfig[argv[4]][4]);
+                algorithmsConfig[alg][4]);
 
     } else if (domain == "TreeWorld") {
-
+    
         std::shared_ptr<TreeWorld> world = std::make_shared<TreeWorld>(cin);
 
-        startAlg<TreeWorld>(world,
-                algorithmsConfig[argv[4]][0],
-                algorithmsConfig[argv[4]][1],
-                algorithmsConfig[argv[4]][2],
+        res = startAlg<TreeWorld>(world,
+                algorithmsConfig[alg][0],
+                algorithmsConfig[alg][1],
+                algorithmsConfig[alg][2],
                 lookaheadDepth,
-                algorithmsConfig[argv[4]][3],
-                result,
+                algorithmsConfig[alg][3],
                 1,
-                algorithmsConfig[argv[4]][4]);
+                algorithmsConfig[alg][4]);
 
 	} else if (domain == "pancake") {
 
 		std::shared_ptr<PancakePuzzle> world = std::make_shared<PancakePuzzle>(cin);
 
-		startAlg<PancakePuzzle>(world,
-				algorithmsConfig[argv[4]][0],
-				algorithmsConfig[argv[4]][1],
-				algorithmsConfig[argv[4]][2],
+		res = startAlg<PancakePuzzle>(world,
+				algorithmsConfig[alg][0],
+				algorithmsConfig[alg][1],
+				algorithmsConfig[alg][2],
 				lookaheadDepth,
-				algorithmsConfig[argv[4]][3],
-				result,
+				algorithmsConfig[alg][3],
 				1,
-				algorithmsConfig[argv[4]][4]);
+				algorithmsConfig[alg][4]);
+        } else if (domain == "racetrack") {
+
+            string mapFile = "/home/aifs1/gu/phd/research/workingPaper/"
+                             "realtime-nancy/worlds/racetrack/map/" +
+                    subDomain + ".track";
+
+            ifstream map(mapFile);
+
+            if (!map.good()) {
+                cout << "map file not exist: " << mapFile << endl;
+                exit(1);
+            }
+
+            std::shared_ptr<RaceTrack> world =
+                    std::make_shared<RaceTrack>(map, cin);
+
+            res = startAlg<RaceTrack>(world,
+                    algorithmsConfig[alg][0],
+                    algorithmsConfig[alg][1],
+                    algorithmsConfig[alg][2],
+                    lookaheadDepth,
+                    algorithmsConfig[alg][3],
+                    1,
+                    algorithmsConfig[alg][4]);
     }else {
         cout << "Available domains are TreeWorld, SlidingPuzzle, pancake" << endl;
         exit(1);
+		res.path.pop();
     }
+	
+    string outString = "{ ";
 
-    result += "\"Lookahead\": " + to_string(lookaheadDepth) + " }";
+    parseResult(res, outString, alg);
 
-    ofstream out(argv[5]);
+    outString += "\"Lookahead\": " + to_string(lookaheadDepth) + " }";
 
-    out << result;
+    ofstream out(outPerfromence);
+
+    out << outString;
     out.close();
+
+	// dumpout solution path
+    if (args.count("pathOut")) {
+        ofstream out(args["pathOut"].as<std::string>());
+        while (!res.path.empty()) {
+            out << res.path.front();
+            res.path.pop();
+        }
+        out.close();
+    }
 }

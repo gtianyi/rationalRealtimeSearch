@@ -511,7 +511,8 @@ public:
 
 
             // Add this step to the path taken so far
-            res.path.push(start->getState().getLabel());
+            //res.path.push(start->getState().getLabel());
+			res.path.push(start->getState().toString());
             res.solutionCost += start->getGValue();
 
             res.lookaheadCpuTime.push_back(
