@@ -346,6 +346,8 @@ public:
 			// otherwise will alway stay? 
 			// would it prefer to move so that be closer to goal
             if (newDX == 0 && newDY == 0) {
+                if (state.getDX() == 0 && state.getDY() == 0)
+                    continue;
                 successors.push_back(
                         State(state.getX(), state.getY(), newDX, newDY));
                 continue;
@@ -358,6 +360,11 @@ public:
                         newDY));
             }
         }
+
+		//air bag
+        if (successors.size() == 0) {
+            successors.push_back(State(state.getX(), state.getY(), 0, 0));
+		}
 
         return successors;
     }

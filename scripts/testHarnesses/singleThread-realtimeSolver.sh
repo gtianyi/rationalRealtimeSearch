@@ -160,7 +160,12 @@ ${subdomain}/${algdir}/${size}/LA${lookahead}-${instance}"
 		  echo "ph" > ${tempfile}
 		  echo "runing LA${lookahead}-${instance}" 
 
-	      timeout 1800 ./../../expansionTests ${domain} ${lookahead} ${subdomain} ${algname} ${outfile} < ${infile}
+	      timeout 1800 ./../../realtimeSolver \
+				  -d ${domain} \
+				  -l ${lookahead} \
+				  -s ${subdomain} \
+				  -a ${algname} \
+				  -o ${outfile} < ${infile}
 
 		  if [ -f ${outfile} -a -f ${tempfile} ]; then
 		     rm ${tempfile}

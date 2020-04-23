@@ -6,6 +6,7 @@ distributions/
 backupTestsAS
 backupTestsDFS
 realtimeSolver
+realtimeSolver.lock
 realtimeSolver-debug
 generateTrees
 lastIncremental

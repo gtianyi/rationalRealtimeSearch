@@ -501,6 +501,7 @@ public:
             // Decision-making Phase
             start = decisionAlgo->backup(open, tlas, start, closed);
 
+
             /*cout << "h " << start->getHValue() << " hat "*/
                  //<< start->getHHatValueFromDist() << endl;
 
@@ -638,6 +639,9 @@ private:
 
         vector<State> children = domain.successors(start->getState());
         res.nodesGenerated += children.size();
+
+        //cout << "cur " << start->getState().toString()
+             //<< " kids: " << children.size() << "\n";
 
         State bestChild;
         Cost bestF = numeric_limits<double>::infinity();

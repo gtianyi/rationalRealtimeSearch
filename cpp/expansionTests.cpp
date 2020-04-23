@@ -88,18 +88,6 @@ ResultContainer startAlg(shared_ptr<Domain> domain_ptr,
 
 int main(int argc, char** argv)
 {
-    if (argc != 6) {
-        cout << "Wrong number of arguments: ./expansionTests.sh <Domain Type> <expansion limit> <sub domain type> <algorithm> <output file> < <domain file>"
-             << endl;
-        cout << "Available domains are TreeWorld, SlidingPuzzle, pancake" << endl;
-        cout << "tree subdomains are na" << endl;
-        cout << "pancake subdomains are regular, heavy" << endl;
-        cout << "Puzzle sub-domains are uniform, heavy, inverse, sroot" << endl;
-        cout << "Available algorithm are bfs, astar, fhat, lsslrtastar, risk, riskdd" << endl;
-        exit(1);
-    }
-
-
     cxxopts::Options options("./realtimeSolver",
             "This is a realtime search program");
 
@@ -139,7 +127,6 @@ int main(int argc, char** argv)
     auto alg = args["alg"].as<std::string>();
     auto lookaheadDepth = args["lookahead"].as<int>();
     auto outPerfromence = args["performenceOut"].as<string>();
-    auto outVisual = args["pathOut"].as<string>();
 
     vector<string> bfsConfig{"bfs", "learn", "k-best", "BFS", "normal"};
     vector<string> astarConfig{"a-star", "learn", "k-best", "A*", "normal"};
@@ -170,7 +157,7 @@ vector<string> riskddSquishConfig{
 
 	ResultContainer res;
 
-    if (domain == "SlidingPuzzle") {
+    if (domain == "tile") {
 
         std::shared_ptr<SlidingTilePuzzle> world;
 
@@ -191,7 +178,7 @@ vector<string> riskddSquishConfig{
                 1,
                 algorithmsConfig[alg][4]);
 
-    } else if (domain == "TreeWorld") {
+    } else if (domain == "randomtree") {
     
         std::shared_ptr<TreeWorld> world = std::make_shared<TreeWorld>(cin);
 
