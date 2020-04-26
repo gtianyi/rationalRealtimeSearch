@@ -248,7 +248,7 @@ public:
                 blockedCells.find(Location(x, y)) == blockedCells.end();
     }
 
-    bool isCollisionFree(int x, int y, int dx, int dy) const {
+    bool isCollisionFree(int x, int y, int dx, int dy, Location& lastLegalLocation) const {
         double distance =
                 round(sqrt(pow((double)dx, 2.0) + pow((double)dy, 2.0)));
 
@@ -269,6 +269,9 @@ public:
                 valid = false;
                 break;
             }
+
+            lastLegalLocation =
+                    Location((int)round(xRunning), (int)round(yRunning));
         }
 
         return valid;
@@ -288,18 +291,26 @@ public:
                 if (state.getDX() == 0 && state.getDY() == 0)
                     continue;
                 State succ(state.getX(), state.getY(), newDX, newDY);
-                predecessorsTable[succ].push_back(state);
                 successors.push_back(succ);
                 continue;
             }
 
-            if (isCollisionFree(state.getX(), state.getY(), newDX, newDY)) {
+            auto lastLegalLocation = Location(state.getX(), state.getY());
+            if (isCollisionFree(state.getX(), state.getY(), newDX, newDY, lastLegalLocation)) {
                 State succ(state.getX() + newDX,
                         state.getY() + newDY,
                         newDX,
                         newDY);
 
-                predecessorsTable[succ].push_back(state);
+                successors.push_back(succ);
+            }
+            else if(lastLegalLocation != Location(state.getX(), state.getY())){
+                // air bag
+                State succ(lastLegalLocation.first,
+                        lastLegalLocation.second,
+                        0,
+                        0);
+
                 successors.push_back(succ);
             }
         }
@@ -307,9 +318,13 @@ public:
 		//air bag
         if (successors.size() == 0) {
             State succ(state.getX(), state.getY(), 0, 0);
-            predecessorsTable[succ].push_back(state);
             successors.push_back(succ);
 		}
+
+        //recording predecessor
+        for(const auto& succ:successors){
+            predecessorsTable[succ].push_back(state);
+        }
 
         return successors;
     }
