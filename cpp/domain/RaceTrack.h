@@ -16,6 +16,7 @@
 #include "../utility/SlidingWindow.h"
 #include "../utility/DiscreteDistributionDD.h"
 #include "../utility/rapidjson/document.h"
+#include "../utility/debug.h"
 
 #include <bitset>
 
@@ -156,6 +157,9 @@ public:
     virtual Cost heuristic(const State& state) {
         // Check if the heuristic of this state has been updated
         if (correctedH.find(state) != correctedH.end()) {
+            DEBUG_MSG(
+                    "find h in table " << state << " h " << correctedH[state]);
+
             return correctedH[state];
         }
 
@@ -270,7 +274,7 @@ public:
         return valid;
     }
 
-    std::vector<State> successors(const State& state) const {
+    std::vector<State> successors(const State& state) {
         std::vector<State> successors;
 
         for (auto action : actions) {
@@ -283,33 +287,38 @@ public:
             if (newDX == 0 && newDY == 0) {
                 if (state.getDX() == 0 && state.getDY() == 0)
                     continue;
-                successors.push_back(
-                        State(state.getX(), state.getY(), newDX, newDY));
+                State succ(state.getX(), state.getY(), newDX, newDY);
+                predecessorsTable[succ].push_back(state);
+                successors.push_back(succ);
                 continue;
             }
 
             if (isCollisionFree(state.getX(), state.getY(), newDX, newDY)) {
-                successors.push_back(State(state.getX() + newDX,
+                State succ(state.getX() + newDX,
                         state.getY() + newDY,
                         newDX,
-                        newDY));
+                        newDY);
+
+                predecessorsTable[succ].push_back(state);
+                successors.push_back(succ);
             }
         }
 
 		//air bag
         if (successors.size() == 0) {
-            successors.push_back(State(state.getX(), state.getY(), 0, 0));
+            State succ(state.getX(), state.getY(), 0, 0);
+            predecessorsTable[succ].push_back(state);
+            successors.push_back(succ);
 		}
 
         return successors;
     }
 
-    std::vector<State> predecessors(const State& state) const {
-        std::vector<State> predecessors;
-
-        //TODO not sure how to do this yet
-
-        return predecessors;
+    const std::vector<State> predecessors(const State& state) const {
+        DEBUG_MSG("preds table size: "<<predecessorsTable.size());
+        if (predecessorsTable.find(state) != predecessorsTable.end())
+            return predecessorsTable.at(state);
+        return vector<State>();
     }
 
     bool safetyPredicate(const State& state) const { return true; }
@@ -642,6 +651,7 @@ private:
     unordered_map<State, Cost, HashState> correctedH;
     unordered_map<State, Cost, HashState> correctedD;
     unordered_map<State, Cost, HashState> correctedDerr;
+    unordered_map<State, vector<State>, HashState> predecessorsTable;
 
     double epsilonHSum;
     double epsilonDSum;
@@ -651,7 +661,6 @@ private:
 
     string expansionPolicy;
     int lookahead;
-
 
     unordered_map<State, DiscreteDistributionDD, HashState> correctedDistribution;
     unordered_map<State, DiscreteDistributionDD, HashState> correctedPostSearchDistribution;

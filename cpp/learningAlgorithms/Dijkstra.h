@@ -3,6 +3,7 @@
 #include <functional>
 #include <memory>
 #include "../utility/PriorityQueue.h"
+#include "../utility/debug.h"
 #include "LearningAlgorithm.h"
 
 using namespace std;
@@ -38,10 +39,14 @@ public:
 			open.pop();
 
 			closed.erase(cur->getState());
+			auto preds = domain.predecessors(cur->getState());
+			DEBUG_MSG("open state: "<<cur->getState()<<"pred size: "<< preds.size());
 
 			// Now get all of the predecessors of cur
-			for (State s : domain.predecessors(cur->getState()))
+			for (const State s : domain.predecessors(cur->getState()))
 			{
+			    DEBUG_MSG("learning state: "<<s);
+
 				typename unordered_map<State, shared_ptr<Node>, Hash>::iterator it = closed.find(s);
 
 				if (it != closed.end() &&

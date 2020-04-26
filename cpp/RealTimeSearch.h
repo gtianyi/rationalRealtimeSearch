@@ -267,6 +267,7 @@ public:
 
         virtual void setBeliefDD(const DiscreteDistributionDD& _belief) {
             DEBUG_MSG( "call set beliefDD from base TLA not TLADD: RealTimeSearch.h:247" );
+            exit(1);
         }
 
 		virtual void setBeliefDD_ps(const DiscreteDistributionDD& _belief) {
@@ -645,6 +646,11 @@ private:
         vector<State> children = domain.successors(start->getState());
         res.nodesGenerated += children.size();
 
+        if (children.size() == 0) {
+            cerr<<"dead end, no TLA kids!\n";
+            exit(1);
+        }
+
         //DEBUG_MSG( "cur " << start->getState().toString()
              //<< " kids: " << children.size() << "\n";
 
@@ -652,7 +658,7 @@ private:
         Cost bestF = numeric_limits<double>::infinity();
 
         for (State child : children) {
-            DEBUG_MSG( "tla kids: " << child);
+            DEBUG_MSG("TLA kid: " << child);
             shared_ptr<Node> childNode = make_shared<Node>(
                     start->getGValue() + domain.getEdgeCost(child),
                     domain.heuristic(child),
@@ -664,9 +670,15 @@ private:
                     start,
                     tlas.size());
 
+            DEBUG_MSG("TLA kid F: " << childNode->getFValue());
+            DEBUG_MSG("TLA kid G: " << childNode->getGValue());
+            DEBUG_MSG("TLA kid H: " << childNode->getHValue());
+
             if (childNode->getFValue() < bestF) {
                 bestF = childNode->getFValue();
                 bestChild = child;
+                DEBUG_MSG("TLA kids copied to best, child" << child);
+                DEBUG_MSG("TLA kids copied to best, best" << bestChild);
             }
 
             // No top level action will ever be a duplicate, so no need to
@@ -691,16 +703,19 @@ private:
 
             // Add this top level action to the list
             tlas.push_back(tla);
-		}
+        }
 
-		// Learn one-step error
-		if (!children.empty())
-		{
-			Cost epsD = (1 + domain.distance(bestChild)) - start->getDValue();
-			Cost epsH = (domain.getEdgeCost(bestChild) + domain.heuristic(bestChild)) - start->getHValue();
+        DEBUG_MSG("best TLA kids " << bestChild);
 
-			domain.pushEpsilonHGlobal(epsH);
-			domain.pushEpsilonDGlobal(epsD);
+        // Learn one-step error
+        if (!children.empty()) {
+            Cost epsD = (1 + domain.distance(bestChild)) - start->getDValue();
+            Cost epsH = (domain.getEdgeCost(bestChild) +
+                                domain.heuristic(bestChild)) -
+                    start->getHValue();
+
+            domain.pushEpsilonHGlobal(epsH);
+            domain.pushEpsilonDGlobal(epsD);
 		}
     }
 
@@ -714,6 +729,11 @@ private:
 
         vector<State> children = domain.successors(start->getState());
         res.nodesGenerated += children.size();
+
+        if (children.size() == 0) {
+            cerr<<"dead end, no TLA kid!\n";
+            exit(1);
+        }
 
         for (State child : children) {
             shared_ptr<Node> childNode = make_shared<Node>(
@@ -729,6 +749,7 @@ private:
             // check.
             // Make a new top level action and push this node onto its open
             shared_ptr<TopLevelAction> tla = make_shared<TopLevelActionDD>();
+
             tla->topLevelNode = childNode;
 
             childNode->hStartDistribution = domain.hstart_distribution(child);
