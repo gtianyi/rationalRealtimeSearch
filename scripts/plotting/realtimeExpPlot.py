@@ -84,7 +84,7 @@ def main():
     ]
 
     # Hard coded result directories
-    domainSize = "50"
+    domainSize = "40"
     # domainSize = "4x4"
     domainType = sys.argv[2]
     subdomainType = sys.argv[3]
@@ -97,7 +97,7 @@ def main():
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        # "risk": "Risk",
+        "risk": "risk",
         # "risk-learnhhat": "Risk",
         # "risk-withassump": "Risk",
         # "risk-cpu-dtb": "Risk",
@@ -118,12 +118,12 @@ def main():
         # "riskddSquish-newP-withassump": "RiskDDSquish",
         # "riskddSquish-newP": "RiskDDSquish",
         # "riskddSquish-1kt": "RiskDDSquish",
-        "lsslrtastar": "LSS-LRTA*",
+        "lsslrtastar": "lsslrtastar",
         # "lsslrtastar-cpu-dtb": "LSS-LRTA*",
         # "riskdd-lssTr": "RiskDD",
         # "riskddSquish-lssTr": "RiskDDSquish"
         # "riskddSquish-cpu-dtb-dumpallcpu": "RiskDDSquish"
-        "riskddSquish": "RiskDDSquish"
+        "riskddSquish": "riskddSquish"
         # "riskddSquish-newP": "RiskDDSquish",
         # "riskddSquish-nop-withassump": "RiskDDSquish"
     }
@@ -132,7 +132,7 @@ def main():
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        # "risk": "Nancy (pers.)",
+        "risk": "Nancy (pers.)",
         # "risk-learnhhat": "Nancy-hhat",
         # "risk-withassump": "Nancy-fix-assumption",
         # "risk-cpu-dtb": "Nancy",
@@ -172,8 +172,8 @@ def main():
     # ]
     algorithm_order = [
         'Nancy (DD)',
-        'LSS-LRTA*'
-        # 'Nancy (pers.)',
+        'LSS-LRTA*',
+        'Nancy (pers.)'
     ]
 
     baseline = "LSS-LRTA*"

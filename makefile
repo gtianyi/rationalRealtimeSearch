@@ -18,5 +18,5 @@ release:
 
 debug:
 	rm -rf realtimeSolver-debug
-	${CXX} -g -std=${STD} ./cpp/expansionTests.cpp -o realtimeSolver-debug
+	${CXX} -g -D DEBUG -std=${STD} ./cpp/expansionTests.cpp -o realtimeSolver-debug
 	chmod a+x realtimeSolver-debug

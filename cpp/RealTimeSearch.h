@@ -28,6 +28,8 @@
 #include <time.h>
 #include <cassert>
 
+#include "utility/debug.h"
+
 using namespace std;
 
 template <class Domain>
@@ -264,23 +266,22 @@ public:
         };
 
         virtual void setBeliefDD(const DiscreteDistributionDD& _belief) {
-            cout << "call set beliefDD from base TLA not TLADD: RealTimeSearch.h:247" << endl;
-			assert(false);
+            DEBUG_MSG( "call set beliefDD from base TLA not TLADD: RealTimeSearch.h:247" );
         }
 
 		virtual void setBeliefDD_ps(const DiscreteDistributionDD& _belief) {
-            cout << "call set beliefDD_ps from base TLA not TLADD: RealTimeSearch.h:252" << endl;
-			assert(false);
+            DEBUG_MSG( "call set beliefDD_ps from base TLA not TLADD: RealTimeSearch.h:252" );
+            exit(1);
         }
 
 		virtual DiscreteDistributionDD getBeliefDD() const {
-            cout << "call get beliefDD from base TLA not TLADD: RealTimeSearch.h:247" << endl;
-			assert(false);
+            DEBUG_MSG( "call get beliefDD from base TLA not TLADD: RealTimeSearch.h:247" );
+            exit(1);
         }
 
 		virtual DiscreteDistributionDD getBeliefDD_ps() const {
-            cout << "call get beliefDD_ps from base TLA not TLADD: RealTimeSearch.h:247" << endl;
-			assert(false);
+            DEBUG_MSG( "call get beliefDD_ps from base TLA not TLADD: RealTimeSearch.h:247" );
+            exit(1);
         }
 
     private:
@@ -372,7 +373,7 @@ public:
         } else {
             expansionAlgo = make_shared<AStar<Domain, Node, TopLevelAction>>(
                     domain, lookahead, "f");
-            cout << "not specified expansion Mudule type, use Astart" << endl;
+            DEBUG_MSG( "not specified expansion Mudule type, use Astart" );
         }
 
         if (learningModule == "none") {
@@ -457,11 +458,13 @@ public:
             // prevent state pruning based on label)
             start->markStart();
 
-			count++;
+            DEBUG_MSG("start: " << start->getState());
+
+            count++;
 
             // if (beliefType == "data") {
-            // cout << "rl loop " << count << "h "
-            //<< start->getFValue() - start->getGValue() << endl;
+            // DEBUG_MSG( "rl loop " << count << "h "
+            //<< start->getFValue() - start->getGValue() );
             //}
 
             // Check if a goal has been reached
@@ -480,17 +483,19 @@ public:
 
             if (beliefType == "normal") {
                 generateTopLevelActions(start, res);
+                DEBUG_MSG("after gen tlas");
                 expansionAlgo->expand(
                         open, closed, tlas, duplicateDetection, res);
+                DEBUG_MSG("after lookahead");
             } else if (beliefType == "data") {
                 generateTopLevelActionsDD(start, res);
                 expansionAlgo->expand(
                         open, closed, tlas, duplicateDetectionDD, res);
             } else {
-                cout << "Realtime search main loop line 370: wrong "
-                        "belief "
-                        "type!!!"
-                     << endl;
+                DEBUG_MSG("Realtime search main loop line 370: wrong "
+                          "belief "
+                          "type!!!");
+                exit(1);
             }
 
             // Check if this is a dead end
@@ -501,11 +506,11 @@ public:
             // Decision-making Phase
             start = decisionAlgo->backup(open, tlas, start, closed);
 
+            DEBUG_MSG( "after decision");
+            /*DEBUG_MSG( "h " << start->getHValue() << " hat "*/
+                 //<< start->getHHatValueFromDist() );
 
-            /*cout << "h " << start->getHValue() << " hat "*/
-                 //<< start->getHHatValueFromDist() << endl;
-
-            //cout << "iteration: " << count << endl;
+            DEBUG_MSG("iteration: " << count );
 
             // Learning Phase
             learningAlgo->learn(open, closed);
@@ -640,13 +645,14 @@ private:
         vector<State> children = domain.successors(start->getState());
         res.nodesGenerated += children.size();
 
-        //cout << "cur " << start->getState().toString()
+        //DEBUG_MSG( "cur " << start->getState().toString()
              //<< " kids: " << children.size() << "\n";
 
         State bestChild;
         Cost bestF = numeric_limits<double>::infinity();
 
         for (State child : children) {
+            DEBUG_MSG( "tla kids: " << child);
             shared_ptr<Node> childNode = make_shared<Node>(
                     start->getGValue() + domain.getEdgeCost(child),
                     domain.heuristic(child),

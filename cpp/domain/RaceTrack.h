@@ -9,6 +9,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <queue>
 #include <vector>
 #include <cassert>
 #include <cmath>
@@ -112,82 +113,11 @@ public:
         /*}*/
     };
 
-    void parseMap(std::ifstream& raceMap) {
-        string line;
-        getline(raceMap, line);
-        stringstream ss(line);
-        ss >> mapWidth;
-
-        getline(raceMap,line);
-
-        stringstream ss2(line);
-        ss2 >> mapHeight;
-
-        for (int y = 0; y < mapHeight; y++) {
-
-            getline(raceMap,line);
-            stringstream ss3(line);
-
-            for (int x = 0; x < mapWidth; x++) {
-                char cell;
-                ss3 >> cell;
-
-                switch (cell) {
-                case '#':
-                    blockedCells.insert(Location(x, y));
-					break;
-                case '*':
-                    finishline.insert(Location(x, y));
-					break;
-                case '@':
-                    startLocation = Location(x, y);
-					break;
-                }
-            }
-        }
-
-		maxXSpeed = mapWidth/2;
-		maxYSpeed=mapHeight/2;
-		maxSpeed=max(maxXSpeed,maxYSpeed);
-
-        startState = State(startLocation.first, startLocation.second, 0, 0);
-        //cout << "size: " << mapWidth << "x" << mapHeight << "\n";
-        //cout << "blocked: " << blockedCells.size() << "\n";
-        //cout << "finish: " << finishline.size() << "\n";
-    }
-
-    void initilaizeActions() {
-        actions = {make_pair(-1, 1),
-                make_pair(0, 1),
-                make_pair(1, 1),
-                make_pair(-1, 0),
-                make_pair(0, 0),
-                make_pair(1, 0),
-                make_pair(-1, -1),
-                make_pair(0, -1),
-                make_pair(1, -1)};
-    }
-
-    void resetInitialState(std::istream& input) {
-        string line;
-		//skip the first line
-        getline(input, line);
-        getline(input, line);
-        stringstream ss(line);
-        int x, y, dx, dy;
-        ss >> x;
-        ss >> y;
-        ss >> dx;
-        ss >> dy;
-
-        startState = State(x, y, dx, dy);
-        //cout << "start" << startState << "\n";
-    }
-
-    RaceTrack(std::ifstream& raceMap, std::istream& initialState) {
+   RaceTrack(std::ifstream& raceMap, std::istream& initialState) {
         parseMap(raceMap);
         resetInitialState(initialState);
 		initilaizeActions();
+		computeDijkstraMap();
     }
 
     bool isGoal(const State& s) const {
@@ -203,7 +133,7 @@ public:
             return correctedD[state];
         }
 
-        Cost d = maxH(state);
+        Cost d = dijkstraMaxH(state);
 
         updateDistance(state, d);
 
@@ -216,7 +146,7 @@ public:
             return correctedDerr[state];
         }
 
-        Cost derr = maxH(state);
+        Cost derr = dijkstraMaxH(state);
 
         updateDistanceErr(state, derr);
 
@@ -229,7 +159,7 @@ public:
             return correctedH[state];
         }
 
-        Cost h = maxH(state);
+        Cost h = dijkstraMaxH(state);
 
         updateHeuristic(state, h);
 
@@ -285,21 +215,26 @@ public:
         correctedH[state] = value;
     }
 
-    Cost maxT(const State& startState, const Location& endLoc) const {
-        return max(abs(startState.getX() - endLoc.first) / maxXSpeed,
-                abs(startState.getY() - endLoc.second) / maxYSpeed);
-    }
+    /*Cost maxT(const State& startState, const Location& endLoc) const {*/
+        //return max(abs(startState.getX() - endLoc.first) / maxXSpeed,
+                //abs(startState.getY() - endLoc.second) / maxYSpeed);
+    //}
 
-    Cost maxH(const State& state) const {
-        Cost c = COST_MAX;
+    //Cost maxH(const State& state) const {
+        //Cost c = COST_MAX;
 
-        for (const auto goalLoc : finishline) {
-            auto newC = maxT(state, goalLoc);
-            if (c > newC)
-                c = newC;
-        }
+        //for (const auto goalLoc : finishline) {
+            //auto newC = maxT(state, goalLoc);
+            //if (c > newC)
+                //c = newC;
+        //}
 
-        return c;
+        //return c;
+    /*}*/
+
+    Cost dijkstraMaxH(const State& state) const {
+        //cout << state;
+        return dijkstraMap[state.getX()][state.getY()] / maxSpeed;
     }
 
     double getBranchingFactor() const { return 9; }
@@ -431,7 +366,7 @@ public:
 			return correctedDistribution[state];
 		}
 
-		Cost h = round(maxH(state));
+		Cost h = round(dijkstraMaxH(state));
 
 		correctedDistribution[state] = DiscreteDistributionDD(h);
 		correctedPostSearchDistribution[state] = DiscreteDistributionDD(h,true);
@@ -447,7 +382,7 @@ public:
 			return correctedDistribution[state];
 		}
 
-		Cost h = round(maxH(state));
+		Cost h = round(dijkstraMaxH(state));
 
 		correctedDistribution[state] = DiscreteDistributionDD(h);
 		correctedPostSearchDistribution[state] = DiscreteDistributionDD(h,true);
@@ -517,9 +452,184 @@ public:
 
 
 
+private:
+    void parseMap(std::ifstream& raceMap) {
+        string line;
+        getline(raceMap, line);
+        stringstream ss(line);
+        ss >> mapWidth;
+
+        getline(raceMap,line);
+
+        stringstream ss2(line);
+        ss2 >> mapHeight;
+
+        for (int y = 0; y < mapHeight; y++) {
+
+            getline(raceMap,line);
+            stringstream ss3(line);
+
+            for (int x = 0; x < mapWidth; x++) {
+                char cell;
+                ss3 >> cell;
+
+                switch (cell) {
+                case '#':
+                    blockedCells.insert(Location(x, y));
+					break;
+                case '*':
+                    finishline.insert(Location(x, y));
+					break;
+                case '@':
+                    startLocation = Location(x, y);
+					break;
+                }
+            }
+        }
+
+        maxXSpeed = mapWidth / 2;
+        maxYSpeed = mapHeight / 2;
+        maxSpeed = max(maxXSpeed, maxYSpeed);
+
+        startState = State(startLocation.first, startLocation.second, 0, 0);
+        //cout << "size: " << mapWidth << "x" << mapHeight << "\n";
+        //cout << "blocked: " << blockedCells.size() << "\n";
+        //cout << "finish: " << finishline.size() << "\n";
+    }
+
+   void initilaizeActions() {
+        actions = {make_pair(-1, 1),
+                make_pair(0, 1),
+                make_pair(1, 1),
+                make_pair(-1, 0),
+                make_pair(0, 0),
+                make_pair(1, 0),
+                make_pair(-1, -1),
+                make_pair(0, -1),
+                make_pair(1, -1)};
+    }
+
+    void resetInitialState(std::istream& input) {
+        string line;
+		//skip the first line
+        getline(input, line);
+        getline(input, line);
+        stringstream ss(line);
+        int x, y, dx, dy;
+        ss >> x;
+        ss >> y;
+        ss >> dx;
+        ss >> dy;
+
+        startState = State(x, y, dx, dy);
+        //cout << "start" << startState << "\n";
+    }
+
+    void computeDijkstraMap() {
+		vector<int> col(mapHeight, INT_MAX);
+        dijkstraMap = vector<vector<int>>(mapWidth, col);
+
+        for (const auto& g : finishline) {
+            dijkstraOneGoal(g, dijkstraMap);
+        }
+
+		// visualize the dijkstra map (for debug usage)
+        /*vector<int> rotateCol(mapWidth, INT_MAX);*/
+        //vector<vector<int>> rotatedMap(mapHeight, rotateCol);
+        //for (int i = 0; i < rotatedMap.size(); i++) {
+            //for (int j = 0; j < rotateCol.size(); j++) {
+                //rotatedMap[i][j] = dijkstraMap[j][i];
+            //}
+        //}
+
+        //for (auto r : rotatedMap) {
+            //for (auto c : r) {
+                //if (c > 100000)
+                    //cout << std::setw(5) << "x";
+                //else
+                    //cout << std::setw(5) << c;
+            //}
+            //cout << "\n";
+        /*}*/
+    }
+
+    void dijkstraOneGoal(const Location goal, vector<vector<int>>& dijkstraMap) {
+        DijkstraNode start(goal, 0);
+
+		priority_queue<DijkstraNode, vector<DijkstraNode>, CompareCost> open;
+		//priority_queue<DijkstraNode> open;
+        unordered_set<Location, pair_hash> closed;
+
+        open.push(start);
+        closed.insert(start.loc);
+
+        while (!open.empty()) {
+            auto n = open.top();
+            open.pop();
+
+            if (dijkstraMap[n.loc.first][n.loc.second] > n.cost) {
+                dijkstraMap[n.loc.first][n.loc.second] = n.cost;
+            }
+
+            auto kids = getLegalKids(n);
+
+            for (auto kid : kids) {
+                if (closed.find(kid.loc) == closed.end()) {
+                    open.push(kid);
+                    closed.insert(kid.loc);
+                }
+            }
+        }
+    }
+
+    struct DijkstraNode {
+        Location loc;
+        int cost;
+
+        DijkstraNode(Location l, int c) : loc(l), cost(c) {}
+		
+    };
+
+	struct CompareCost {
+		bool operator()(DijkstraNode const& n1, DijkstraNode const& n2) {
+			// return "true" if "n1" is ordered
+			// before "n2" in a max heap, for example:
+			// be careful, min heap should be return false, for example:
+			// here is min heap for cost
+			return n1.cost > n2.cost;
+		}
+	};
+
+    vector<DijkstraNode> getLegalKids(DijkstraNode n) {
+
+        vector<DijkstraNode> ret;
+        if (isLegalLocation(n.loc.first + 1, n.loc.second)) {
+            Location loc(n.loc.first + 1, n.loc.second);
+            ret.push_back(DijkstraNode(loc, n.cost + 1));
+        }
+
+        if (isLegalLocation(n.loc.first, n.loc.second + 1)) {
+            Location loc(n.loc.first, n.loc.second + 1);
+            ret.push_back(DijkstraNode(loc, n.cost + 1));
+        }
+
+        if (isLegalLocation(n.loc.first - 1, n.loc.second)) {
+            Location loc(n.loc.first - 1, n.loc.second);
+            ret.push_back(DijkstraNode(loc, n.cost + 1));
+        }
+
+        if (isLegalLocation(n.loc.first, n.loc.second - 1)) {
+            Location loc(n.loc.first, n.loc.second - 1);
+            ret.push_back(DijkstraNode(loc, n.cost + 1));
+        }
+
+		return ret;
+    }
+
     std::unordered_set<Location,pair_hash> blockedCells;
     std::unordered_set<Location,pair_hash> finishline;
 	vector<pair<int,int>> actions;
+	vector<vector<int>> dijkstraMap;
     int mapWidth;
     int mapHeight;
 	double maxXSpeed;

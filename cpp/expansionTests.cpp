@@ -219,15 +219,15 @@ vector<string> riskddSquishConfig{
             std::shared_ptr<RaceTrack> world =
                     std::make_shared<RaceTrack>(map, cin);
 
-            res = startAlg<RaceTrack>(world,
-                    algorithmsConfig[alg][0],
-                    algorithmsConfig[alg][1],
-                    algorithmsConfig[alg][2],
-                    lookaheadDepth,
-                    algorithmsConfig[alg][3],
-                    1,
-                    algorithmsConfig[alg][4]);
-    }else {
+			res = startAlg<RaceTrack>(world,
+					algorithmsConfig[alg][0],
+					algorithmsConfig[alg][1],
+					algorithmsConfig[alg][2],
+					lookaheadDepth,
+					algorithmsConfig[alg][3],
+					1,
+					algorithmsConfig[alg][4]);
+	}else {
         cout << "Available domains are TreeWorld, SlidingPuzzle, pancake" << endl;
         exit(1);
 		res.path.pop();
@@ -235,7 +235,7 @@ vector<string> riskddSquishConfig{
 	
     string outString = "{ ";
 
-    parseResult(res, outString, alg);
+	parseResult(res, outString, alg);
 
     outString += "\"Lookahead\": " + to_string(lookaheadDepth) + " }";
 
