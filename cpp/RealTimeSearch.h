@@ -374,7 +374,7 @@ public:
         } else {
             expansionAlgo = make_shared<AStar<Domain, Node, TopLevelAction>>(
                     domain, lookahead, "f");
-            DEBUG_MSG( "not specified expansion Mudule type, use Astart" );
+            DEBUG_MSG( "not specified expansion module type, use Astart" );
         }
 
         if (learningModule == "none") {
@@ -513,7 +513,7 @@ public:
 
             DEBUG_MSG("iteration: " << count );
 
-            // Learning Phase
+            // LearninH Phase
             learningAlgo->learn(open, closed);
 
 
@@ -658,7 +658,7 @@ private:
         Cost bestF = numeric_limits<double>::infinity();
 
         for (State child : children) {
-            DEBUG_MSG("TLA kid: " << child);
+            //DEBUG_MSG("TLA kid: " << child);
             shared_ptr<Node> childNode = make_shared<Node>(
                     start->getGValue() + domain.getEdgeCost(child),
                     domain.heuristic(child),
@@ -670,15 +670,15 @@ private:
                     start,
                     tlas.size());
 
-            DEBUG_MSG("TLA kid F: " << childNode->getFValue());
-            DEBUG_MSG("TLA kid G: " << childNode->getGValue());
-            DEBUG_MSG("TLA kid H: " << childNode->getHValue());
+            //DEBUG_MSG("TLA kid F: " << childNode->getFValue());
+            //DEBUG_MSG("TLA kid G: " << childNode->getGValue());
+            //DEBUG_MSG("TLA kid H: " << childNode->getHValue());
 
             if (childNode->getFValue() < bestF) {
                 bestF = childNode->getFValue();
                 bestChild = child;
-                DEBUG_MSG("TLA kids copied to best, child" << child);
-                DEBUG_MSG("TLA kids copied to best, best" << bestChild);
+                //DEBUG_MSG("TLA kids copied to best, child" << child);
+                //DEBUG_MSG("TLA kids copied to best, best" << bestChild);
             }
 
             // No top level action will ever be a duplicate, so no need to
@@ -705,7 +705,7 @@ private:
             tlas.push_back(tla);
         }
 
-        DEBUG_MSG("best TLA kids " << bestChild);
+        //DEBUG_MSG("best TLA kids " << bestChild);
 
         // Learn one-step error
         if (!children.empty()) {

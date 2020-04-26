@@ -157,8 +157,8 @@ public:
     virtual Cost heuristic(const State& state) {
         // Check if the heuristic of this state has been updated
         if (correctedH.find(state) != correctedH.end()) {
-            DEBUG_MSG(
-                    "find h in table " << state << " h " << correctedH[state]);
+            //DEBUG_MSG(
+                    //"find h in table " << state << " h " << correctedH[state]);
 
             return correctedH[state];
         }
@@ -315,7 +315,7 @@ public:
     }
 
     const std::vector<State> predecessors(const State& state) const {
-        DEBUG_MSG("preds table size: "<<predecessorsTable.size());
+        //DEBUG_MSG("preds table size: "<<predecessorsTable.size());
         if (predecessorsTable.find(state) != predecessorsTable.end())
             return predecessorsTable.at(state);
         return vector<State>();
