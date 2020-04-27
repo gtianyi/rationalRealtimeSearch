@@ -431,13 +431,13 @@ public:
     string getDistributionFile() const {
         return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/"
                "results/racetrack/sampleData/"
-               "barto-bigger-wastar-2--1-statSummary-d.json";
+               "barto-big-wastar-2--1-statSummary-d.json";
     }
 
     string getDistributionFile_ps() const {
         return "/home/aifs1/gu/phd/research/workingPaper/realtime-nancy/"
                "results/racetrack/sampleData/"
-               "barto-bigger-wastar-2--1-statSummary-d.json";
+               "barto-big-wastar-2--1-statSummary-d.json";
     }
 
     void readDistributionData(
