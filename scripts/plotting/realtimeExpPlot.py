@@ -89,9 +89,9 @@ def main():
     # domainSize = "4x4"
     domainType = sys.argv[2]
     subdomainType = sys.argv[3]
-    limits = [3, 10, 30, 100, 300, 1000]
+    # limits = [3, 10, 30, 100, 300, 1000]
     # limits = [10, 30, 100, 300, 1000]
-    # limits = [30, 100, 300, 1000]
+    limits = [30, 100, 300, 1000]
     # limits = [30]
     # limits = [100, 300, 1000]
     algorithms_data = {
@@ -172,6 +172,7 @@ def main():
     # 'Nancy (pers-hhat.)'
     # ]
     algorithm_order = ['Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)']
+    # algorithm_order = ['Nancy (DD)', 'LSS-LRTA*']
 
     baseline = "LSS-LRTA*"
 
