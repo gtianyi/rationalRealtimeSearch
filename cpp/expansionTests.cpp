@@ -191,18 +191,24 @@ vector<string> riskddSquishConfig{
                 1,
                 algorithmsConfig[alg][4]);
 
-	} else if (domain == "pancake") {
+    } else if (domain == "pancake") {
+        std::shared_ptr<PancakePuzzle> world =
+                std::make_shared<PancakePuzzle>(cin);
 
-		std::shared_ptr<PancakePuzzle> world = std::make_shared<PancakePuzzle>(cin);
+        if (subDomain == "heavy") {
+            world->setVariant(1);
+        }else if (subDomain == "sumheavy") {
+            world->setVariant(2);
+        }
 
-		res = startAlg<PancakePuzzle>(world,
-				algorithmsConfig[alg][0],
-				algorithmsConfig[alg][1],
-				algorithmsConfig[alg][2],
-				lookaheadDepth,
-				algorithmsConfig[alg][3],
-				1,
-				algorithmsConfig[alg][4]);
+        res = startAlg<PancakePuzzle>(world,
+                algorithmsConfig[alg][0],
+                algorithmsConfig[alg][1],
+                algorithmsConfig[alg][2],
+                lookaheadDepth,
+                algorithmsConfig[alg][3],
+                1,
+                algorithmsConfig[alg][4]);
         } else if (domain == "racetrack") {
 
             string mapFile = "/home/aifs1/gu/phd/research/workingPaper/"
