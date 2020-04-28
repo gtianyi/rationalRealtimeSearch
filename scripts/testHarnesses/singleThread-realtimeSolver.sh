@@ -130,6 +130,28 @@ last=$(( $first + $n_of_i ))
 
 ###############################################
 
+infile=""
+outfile=""
+
+infile_path="../../../worlds/${domain}"
+outfile_path="../../results/${domain}/expansionTests/NancyDD/${subdomain}/algdir"
+
+
+if [ "$domain" == "tile" ]; then
+  infile="${infile_path}/instance-${size}x${size}.st"
+  outfile_path="${outfile_path}/${size}"
+fi
+
+if [ "$domain" == "pancake" ]; then
+  infile="${infile_path}/instance-${size}.pan"
+  outfile_path="${outfile_path}/${size}"
+fi
+
+if [ "$domain" == "racetrack" ]; then
+  infile="${infile_path}/${subdomain}-instance.init"
+fi
+
+
 trap "exit" INT
 
 for algid in "${!algorithms[@]}"; do 
@@ -139,21 +161,20 @@ for algid in "${!algorithms[@]}"; do
 	echo $algname
 	echo $algdir
 
+    outfile_path_alg="${outfile_path/algdir/$algdir}"
+    mkdir -p ${outfile_path_alg}
+
     for lookahead in "${lookaheads[@]}"; do
       echo "lookahead $lookahead"
-	  mkdir -p ../../results/${domain}/expansionTests/NancyDD/${subdomain}/${algdir}/${size}
-	  #mkdir -p ../../results/SlidingTilePuzzle/expansionTests/NancyDD/${subdomain}/${algname}-nop/${size}x${size}
       instance=$first
       while ((instance < last))
       do
-	    infile="../../../worlds/${domain}/${instance}-${size}.pan"
-		#file="../../worlds/pancake/${instance}-${size}x${size}.st"
-		file_name="../../results/${domain}/expansionTests/NancyDD/\
-${subdomain}/${algdir}/${size}/LA${lookahead}-${instance}"
-		outfile="${file_name}.json"
-		tempfile="${file_name}.temp"
+
+        infile_instance="${infile/instance/$instance}"
+        outfile_instance="${outfile_path_alg}/LA${lookahead}-${instance}.json"
+	    tempfile="${outfile_instance}.temp"
         		  
-	    if [ -f ${outfile} ] || [ -f ${tempfile} ]; then 
+	    if [ -f ${outfile_instance} ] || [ -f ${tempfile} ]; then 
 	      let instance++
 	    else
 
@@ -165,9 +186,9 @@ ${subdomain}/${algdir}/${size}/LA${lookahead}-${instance}"
 				  -l ${lookahead} \
 				  -s ${subdomain} \
 				  -a ${algname} \
-				  -o ${outfile} < ${infile}
+				  -o ${outfile_instance} < ${infile_instance}
 
-		  if [ -f ${outfile} -a -f ${tempfile} ]; then
+		  if [ -f ${outfile_instance} -a -f ${tempfile} ]; then
 		     rm ${tempfile}
 	      fi
 

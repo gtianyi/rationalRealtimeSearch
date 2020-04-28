@@ -5,6 +5,7 @@ Author: Tianyi Gu
 Date: 08/15/2019
 Update: 10/15/2019
 Update: 04/18/2020
+Update: 04/27/2020
 '''
 
 #!/usr/bin/env python
@@ -65,11 +66,11 @@ def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
     return
 
 
-def makeCoverageTable(dataframe, subdomainType):
+def makeCoverageTable(dataframe, domainType, subdomainType):
     grp = dataframe.groupby(['Node Expansion Limit',
                              'Algorithm'])['Solution Cost'].count()
     print(grp)
-    grp.to_csv("../../plots/" + subdomainType + "/coverage-" + subdomainType +
+    grp.to_csv("../../plots/" + domainType + "/coverage-" + subdomainType +
                ".csv")
 
 
@@ -84,7 +85,7 @@ def main():
     ]
 
     # Hard coded result directories
-    domainSize = "40"
+    domainSize = "-1"
     # domainSize = "4x4"
     domainType = sys.argv[2]
     subdomainType = sys.argv[3]
@@ -170,11 +171,7 @@ def main():
     # 'Nancy (pers-fix-assumption.)', 'Nancy (pers-fix-assumption-hhat.)',
     # 'Nancy (pers-hhat.)'
     # ]
-    algorithm_order = [
-        'Nancy (DD)',
-        'LSS-LRTA*',
-        'Nancy (pers.)'
-    ]
+    algorithm_order = ['Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)']
 
     baseline = "LSS-LRTA*"
 
@@ -186,18 +183,19 @@ def main():
 
     print("reading in data...")
 
+
+    inPath = "../../results/" + domainType + "/expansionTests/NancyDD/" + \
+        subdomainType + '/alg'
+
+    if domainType == "tile" or domainType == "pancake":
+        inPath = inPath + '/' + domainSize
+
     for alg in algorithms:
-        for jsonFile in os.listdir(
-                # "../../results/SlidingTilePuzzle/expansionTests/NancyDD/" +
-                "../../results/" + domainType + "/expansionTests/NancyDD/" +
-                subdomainType + '/' + alg + '/' + domainSize):
+        inPath_alg = inPath.replace('alg', alg)
+        for jsonFile in os.listdir(inPath_alg):
             if jsonFile[-5:] != ".json":
                 continue
-            with open(
-                    # "../../results/SlidingTilePuzzle/expansionTests/NancyDD/" +
-                    "../../results/" + domainType +
-                    "/expansionTests/NancyDD/" + subdomainType + '/' + alg +
-                    '/' + domainSize + "/" + jsonFile) as json_data:
+            with open(inPath_alg + "/" + jsonFile) as json_data:
 
                 resultData = json.load(json_data)
                 if float(resultData[algorithms_data[alg]]) != -1.0:
@@ -246,12 +244,12 @@ def main():
     out_dir = "../../plots/" + domainType
 
     if not os.path.exists(out_dir):
-        mkdir(out_dir)
+        os.mkdir(out_dir)
 
     out_file = out_dir + '/' + domainType + "-" + subdomainType + "-" + domainSize + '-' + nowstr
 
     if sys.argv[1] == "coverage":
-        makeCoverageTable(rawdf, subdomainType)
+        makeCoverageTable(rawdf, domainType, subdomainType)
 
     elif sys.argv[1] == "pairwise":
         makeDifferencePlot(13, 10, "Node Expansion Limit",
