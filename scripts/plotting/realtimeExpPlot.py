@@ -85,13 +85,13 @@ def main():
     ]
 
     # Hard coded result directories
-    domainSize = "-1"
+    domainSize = "10"
     # domainSize = "4x4"
     domainType = sys.argv[2]
     subdomainType = sys.argv[3]
-    # limits = [3, 10, 30, 100, 300, 1000]
+    limits = [3, 10, 30, 100, 300, 1000]
     # limits = [10, 30, 100, 300, 1000]
-    limits = [30, 100, 300, 1000]
+    # limits = [30, 100, 300, 1000]
     # limits = [30]
     # limits = [100, 300, 1000]
     algorithms_data = {
@@ -197,7 +197,6 @@ def main():
             if jsonFile[-5:] != ".json":
                 continue
             with open(inPath_alg + "/" + jsonFile) as json_data:
-
                 resultData = json.load(json_data)
                 if float(resultData[algorithms_data[alg]]) != -1.0:
                     instance.append(str(jsonFile))
