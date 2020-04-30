@@ -85,19 +85,20 @@ def main():
     ]
 
     # Hard coded result directories
-    domainSize = "10"
+    domainSize = "40"
     # domainSize = "4x4"
     domainType = sys.argv[2]
     subdomainType = sys.argv[3]
-    limits = [3, 10, 30, 100, 300, 1000]
+    # limits = [3, 10, 30, 100, 300, 1000]
     # limits = [10, 30, 100, 300, 1000]
-    # limits = [30, 100, 300, 1000]
+    limits = [30, 100, 300, 1000]
     # limits = [30]
     # limits = [100, 300, 1000]
     algorithms_data = {
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
+        # "risk": "Risk",
         "risk": "risk",
         # "risk-learnhhat": "Risk",
         # "risk-withassump": "Risk",
@@ -119,12 +120,14 @@ def main():
         # "riskddSquish-newP-withassump": "RiskDDSquish",
         # "riskddSquish-newP": "RiskDDSquish",
         # "riskddSquish-1kt": "RiskDDSquish",
+        # "lsslrtastar": "LSS-LRTA*",
         "lsslrtastar": "lsslrtastar",
         # "lsslrtastar-cpu-dtb": "LSS-LRTA*",
         # "riskdd-lssTr": "RiskDD",
         # "riskddSquish-lssTr": "RiskDDSquish"
         # "riskddSquish-cpu-dtb-dumpallcpu": "RiskDDSquish"
         "riskddSquish": "riskddSquish"
+        # "riskddSquish": "RiskDDSquish"
         # "riskddSquish-newP": "RiskDDSquish",
         # "riskddSquish-nop-withassump": "RiskDDSquish"
     }
