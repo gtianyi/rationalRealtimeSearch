@@ -9,7 +9,7 @@ make
 # TO RUN
 ## Single Run (solve one problem instance)
 Usage:
-  ./realtimeSolver [OPTION...] < <input file>
+  ./realtimeSolver [OPTION...] < [input file]
 
  -d, --domain arg          domain type: randomtree, tile, pancake, racetrack\
                                 (default: racetrack)\
