@@ -11,13 +11,13 @@ make
 Usage:
   ./realtimeSolver [OPTION...] < <input file>
 
- -d, --domain arg          domain type: randomtree, tile, pancake, racetrack
-                                (default: racetrack)
- -s, --subdomain arg       puzzle type: uniform, inverse, heavy, sqrt;
-                           pancake type: regular, heavy;racetrack map :
+ -d, --domain arg          domain type: randomtree, tile, pancake, racetrack\
+                                (default: racetrack)\
+ -s, --subdomain arg       puzzle type: uniform, inverse, heavy, sqrt;\
+                           pancake type: regular, heavy;racetrack map :\
                            barto-bigger, hanse-bigger-double, uniform (default:
-                           barto-bigger)
- -a, --alg arg             realtime algorithm: bfs, astar, fhat,
+                           barto-bigger)\
+ -a, --alg arg             realtime algorithm: bfs, astar, fhat,\
                            lsslrtastar, risk, riskdd, riskddSquish (default: risk)
  -l, --lookahead arg       expansion limit (default: 100)
  -o, --performenceOut arg  performence Out file (default: out.txt)
