@@ -28,7 +28,7 @@ Usage:
 
 ## Run batch of experiments 
 ```console
-cd sciptt/testHarnesses
+cd scipts/testHarnesses
 ```
 
 ```console
