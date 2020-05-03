@@ -106,6 +106,8 @@ private:
 			open.swapComparator(Node::compareNodesF);
 		else if (sortingFunction == "fhat")
 			open.swapComparator(Node::compareNodesFHat);
+		else if (sortingFunction == "lowerconfidence")
+			open.swapComparator(Node::compareNodesLC);
 	}
 
 protected:

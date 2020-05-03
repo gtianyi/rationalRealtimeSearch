@@ -233,6 +233,27 @@ public:
             }
             return n1->getHHatValue() < n2->getHHatValue();
         }
+
+        static double getLowerConfidence(const shared_ptr<Node> n) {
+            double f = n->getFValue();
+            double mean = n->getFHatValue();
+            if (f == mean) {
+                return f;
+            }
+            double error = mean - f;
+            double stdDev = error / 2.0;
+            double var = pow(stdDev, 2);
+			// 1.96 is the Z value from the Z table to get the 2.5 confidence
+			return max(f, mean - (1.96 * var));
+        }
+
+        static bool compareNodesLC(const shared_ptr<Node> n1, const shared_ptr<Node> n2) {
+            // Lower confidence interval
+            if (getLowerConfidence(n1) == getLowerConfidence(n2)) {
+                return n1->getGValue() > n2->getGValue();
+            }
+            return getLowerConfidence(n1) < getLowerConfidence(n2);
+        }
     };
 
     struct TopLevelAction {
@@ -371,6 +392,9 @@ public:
         }  else if (expansionModule == "riskDDSquish") {
             expansionAlgo = make_shared<RiskDDSquish<Domain, Node, TopLevelAction>>(
                     domain, lookahead, 1);
+        }   else if (expansionModule == "ie") {
+            expansionAlgo = make_shared<AStar<Domain, Node, TopLevelAction>>(
+                    domain, lookahead, "lowerconfidence");
         } else {
             expansionAlgo = make_shared<AStar<Domain, Node, TopLevelAction>>(
                     domain, lookahead, "f");

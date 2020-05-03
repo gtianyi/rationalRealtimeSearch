@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 						"racetrack map : barto-bigger, hanse-bigger-double, uniform", 
 		 cxxopts::value<std::string>()->default_value("barto-bigger"))
 
-        ("a,alg", "realtime algorithm: bfs, astar, fhat, lsslrtastar, risk, riskdd, riskddSquish", 
+        ("a,alg", "realtime algorithm: bfs, astar, fhat, lsslrtastar, risk, riskdd, riskddSquish, ie", 
 		 cxxopts::value<std::string>()->default_value("risk"))
 
         ("l,lookahead", "expansion limit", 
@@ -137,9 +137,12 @@ int main(int argc, char** argv)
     vector<string> riskPersistConfig{"risk", "learn", "k-best-persist", "PRisk", "normal"};
     vector<string> riskddConfig{
             "riskDD", "learnDD", "nancyDD", "RiskDD", "data"};
-vector<string> riskddSquishConfig{
+    vector<string> riskddSquishConfig{
             "riskDDSquish", "learnDD", "nancyDD", "RiskDDSquish", "data"};
+    vector<string> intervalEstimationConfig{"ie", "learn", "k-best", "IE", "normal"};
+
     unordered_map<string, vector<string>> algorithmsConfig({{"bfs", bfsConfig},
+            {"ie", intervalEstimationConfig},
             {"astar", astarConfig},
             {"fhat", fhatConfig},
             {"lsslrtastar", lsslrtastarConfig},
