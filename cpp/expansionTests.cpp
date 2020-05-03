@@ -93,7 +93,7 @@ int main(int argc, char** argv)
 
     options.add_options()
 
-		("d,domain", "domain type: randomtree, tile, pancake, racetrack", 
+		("d,domain", "domain type: treeWorld, slidingTile, pancake, racetrack", 
 		 cxxopts::value<std::string>()->default_value("racetrack"))
 
 		("s,subdomain", "puzzle type: uniform, inverse, heavy, sqrt; "
@@ -160,7 +160,7 @@ int main(int argc, char** argv)
 
 	ResultContainer res;
 
-    if (domain == "tile") {
+    if (domain == "slidingTile") {
 
         std::shared_ptr<SlidingTilePuzzle> world;
 
@@ -181,7 +181,7 @@ int main(int argc, char** argv)
                 1,
                 algorithmsConfig[alg][4]);
 
-    } else if (domain == "randomtree") {
+    } else if (domain == "treeWorld") {
     
         std::shared_ptr<TreeWorld> world = std::make_shared<TreeWorld>(cin);
 

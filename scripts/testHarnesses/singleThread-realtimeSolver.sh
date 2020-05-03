@@ -4,11 +4,11 @@ print_usage(){
   echo "./singleThread-realtimeSolver.sh"
   echo "[-f instance]                    default: 1"
   echo "[-n # of instances to test]      default: 100"
-  echo "[-d domain]                      default: pancake"
-  echo "[-s subdomain]                   default: regular"
+  echo "[-d domain]                      default: pancake [slidingTile, racetrack, pancake]" 
+  echo "[-s subdomain]                   default: regular [uniform, heavy, barto-big...]"
   echo "[-z domain size]                 default: 16"
   echo "[-a algorithm ]"
-  echo " support list,eg: -a a1 -a a2    default: risk, riskddSquish, lsslrtastar"
+  echo " support list,eg: -a a1 -a a2    default: risk, riskddSquish, lsslrtastar, ie"
   echo "[-l lookahead, ]"
   echo " support list,eg: -l 10 -l 30    default: 3, 10, 30, 100, 300, 1000"
   echo "[-e algorithm extention          default: null]"
@@ -27,7 +27,7 @@ n_of_i=100
 domain="pancake"
 subdomain="regular"
 size="32"
-algorithms=("risk" "riskddSquish" "lsslrtastar")
+algorithms=("risk" "riskddSquish" "lsslrtastar" "ie")
 lookaheads=(3 10 30 100 300 1000)
 maxProcs=1
 extention=""
@@ -137,7 +137,7 @@ infile_path="../../../worlds/${domain}"
 outfile_path="../../results/${domain}/expansionTests/NancyDD/${subdomain}/algdir"
 
 
-if [ "$domain" == "tile" ]; then
+if [ "$domain" == "slidingTile" ]; then
   infile="${infile_path}/instance-${size}x${size}.st"
   outfile_path="${outfile_path}/${size}"
 fi

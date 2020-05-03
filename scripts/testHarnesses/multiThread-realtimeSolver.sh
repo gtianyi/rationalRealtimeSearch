@@ -7,7 +7,7 @@ print_usage(){
   echo "[-s subdomain]                   default: regular"
   echo "[-z domain size]                 default: 16"
   echo "[-a algorithm ]"
-  echo " support list,eg: -a a1 -a a2    default: risk, riskddSquish, lsslrtastar"
+  echo " support list,eg: -a a1 -a a2    default: risk, riskddSquish, lsslrtastar, ie"
   echo "[-l lookahead, ]"
   echo " support list,eg: -l 10 -l 30    default: 3, 10, 30, 100, 300, 1000"
   echo "[-e algorithm extention          default: null]"
