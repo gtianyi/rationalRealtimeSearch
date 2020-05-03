@@ -27,8 +27,11 @@ Usage:
 ```
 
 ## Run batch of experiments 
+```console
 cd sciptt/testHarnesses
+```
 
+```console
 ./multiThread-realtimeSolver.sh 
 [-f instance]                    default: 1
 [-n # of instances to test]      default: 100
@@ -42,3 +45,4 @@ cd sciptt/testHarnesses
 [-e algorithm extention          default: null]
 [-t thread number]               default: 1
 [-h help]
+```
