@@ -153,7 +153,7 @@ int main(int argc, char** argv)
 
     if (algorithmsConfig.find(alg) == algorithmsConfig.end()) {
         cout << "Available algorithm are bfs, astar, fhat, lsslrtastar, "
-                "risk, riskdd"
+                "risk, riskdd, ie"
              << endl;
         exit(1);
     }
