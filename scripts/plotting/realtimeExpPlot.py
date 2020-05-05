@@ -85,7 +85,7 @@ def main():
     ]
 
     # Hard coded result directories
-    domainSize = "40"
+    domainSize = "4"
     # domainSize = "4x4"
     domainType = sys.argv[2]
     subdomainType = sys.argv[3]
@@ -95,6 +95,7 @@ def main():
     # limits = [30]
     # limits = [100, 300, 1000]
     algorithms_data = {
+        "ie": "ie",
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
@@ -133,6 +134,7 @@ def main():
     }
 
     algorithms = OrderedDict({
+        "ie": "IE",
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
@@ -174,7 +176,7 @@ def main():
     # 'Nancy (pers-fix-assumption.)', 'Nancy (pers-fix-assumption-hhat.)',
     # 'Nancy (pers-hhat.)'
     # ]
-    algorithm_order = ['Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)']
+    algorithm_order = ['IE', 'Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)']
     # algorithm_order = ['Nancy (DD)', 'LSS-LRTA*']
 
     baseline = "LSS-LRTA*"
@@ -191,7 +193,7 @@ def main():
     inPath = "../../results/" + domainType + "/expansionTests/NancyDD/" + \
         subdomainType + '/alg'
 
-    if domainType == "tile" or domainType == "pancake":
+    if domainType == "slidingTile" or domainType == "pancake":
         inPath = inPath + '/' + domainSize
 
     for alg in algorithms:
