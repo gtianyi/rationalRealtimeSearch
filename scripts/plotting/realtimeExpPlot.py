@@ -85,7 +85,7 @@ def main():
     ]
 
     # Hard coded result directories
-    domainSize = "4"
+    domainSize = "40"
     # domainSize = "4x4"
     domainType = sys.argv[2]
     subdomainType = sys.argv[3]
@@ -96,6 +96,7 @@ def main():
     # limits = [100, 300, 1000]
     algorithms_data = {
         "ie": "ie",
+        "ie-nancy": "ie",
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
@@ -135,6 +136,7 @@ def main():
 
     algorithms = OrderedDict({
         "ie": "IE",
+        "ie-nancy": "IE-Nancy",
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
@@ -176,7 +178,9 @@ def main():
     # 'Nancy (pers-fix-assumption.)', 'Nancy (pers-fix-assumption-hhat.)',
     # 'Nancy (pers-hhat.)'
     # ]
-    algorithm_order = ['IE', 'Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)']
+    algorithm_order = [
+        'IE', 'IE-Nancy', 'Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)'
+    ]
     # algorithm_order = ['Nancy (DD)', 'LSS-LRTA*']
 
     baseline = "LSS-LRTA*"

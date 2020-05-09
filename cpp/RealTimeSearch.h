@@ -19,6 +19,7 @@
 #include "expansionAlgorithms/DepthFirst.h"
 #include "expansionAlgorithms/Risk.h"
 #include "expansionAlgorithms/RiskDD.h"
+#include "expansionAlgorithms/RiskIE.h"
 #include "expansionAlgorithms/RiskDD_squish.h"
 #include "learningAlgorithms/LearningAlgorithm.h"
 #include "learningAlgorithms/Dijkstra.h"
@@ -265,7 +266,8 @@ public:
                 Cost h_TLA;
 
 
-        TopLevelAction() { open_TLA.swapComparator(Node::compareNodesFHat); }
+        //TopLevelAction() { open_TLA.swapComparator(Node::compareNodesFHat); }
+        TopLevelAction() { open_TLA.swapComparator(Node::compareNodesLC); }
 
         TopLevelAction(const TopLevelAction& tla) { copy(tla); }
 
@@ -393,8 +395,10 @@ public:
             expansionAlgo = make_shared<RiskDDSquish<Domain, Node, TopLevelAction>>(
                     domain, lookahead, 1);
         }   else if (expansionModule == "ie") {
-            expansionAlgo = make_shared<AStar<Domain, Node, TopLevelAction>>(
-                    domain, lookahead, "lowerconfidence");
+            expansionAlgo = make_shared<RiskIE<Domain, Node, TopLevelAction>>(
+                    domain, lookahead);
+            //expansionAlgo = make_shared<AStar<Domain, Node, TopLevelAction>>(
+                    //domain, lookahead, "lowerconfidence");
         } else {
             expansionAlgo = make_shared<AStar<Domain, Node, TopLevelAction>>(
                     domain, lookahead, "f");
