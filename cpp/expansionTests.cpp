@@ -237,9 +237,8 @@ int main(int argc, char** argv)
 					1,
 					algorithmsConfig[alg][4]);
 	}else {
-        cout << "Available domains are TreeWorld, SlidingPuzzle, pancake" << endl;
+        cout << "Available domains are TreeWorld, slidingTile, pancake, racetrack" << endl;
         exit(1);
-		res.path.pop();
     }
 	
     string outString = "{ ";
