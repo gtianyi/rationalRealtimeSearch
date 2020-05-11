@@ -1,4 +1,6 @@
+#!/usr/bin/env python
 '''
+python2 script
 plotting code for generate nancydd related plots
 
 Author: Tianyi Gu
@@ -6,103 +8,47 @@ Date: 08/15/2019
 Update: 10/15/2019
 Update: 04/18/2020
 Update: 04/27/2020
+Update: 05/11/2020
 '''
 
-#!/usr/bin/env python
+__author__ = 'TianyiGu'
 
-__author__ = 'tianyigu'
-
+import argparse
 import json
 import os
-
-import sys
-from datetime import datetime
 from collections import OrderedDict
+# import sys
+from datetime import datetime
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
 
 
-def printUsage():
-    print "usage: python expansionTestsPlot.py <plot type> <domain type> <subdomain type>"
-    print "plot type: coverage, pairwise, solutioncost"
-    print "domain type: slidingtilepuzzle, pancake"
-    print "tile sub type: uniform heavy inverse"
-    print "pancake sub type: regular, heavy"
-
-
-def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
-                       orderList, hueOrderList, xLabel, yLabel, outputName,
-                       markerList):
-    sns.set(rc={
-        'figure.figsize': (width, height),
-        'font.size': 27,
-        'text.color': 'black'
-    })
-    ax = sns.pointplot(x=xAxis,
-                       y=yAxis,
-                       hue=hue,
-                       order=orderList,
-                       hue_order=hueOrderList,
-                       data=dataframe,
-                       ci=95,
-                       errwidth=3,
-                       join=False,
-                       dodge=dodge,
-                       palette="Set2",
-                       markers=markerList)
-    ax.tick_params(colors='black', labelsize=12)
-    plt.ylabel(yLabel, color='black', fontsize=18)
-    plt.xlabel(xLabel, color='black', fontsize=18)
-
-    plt.setp(ax.get_legend().get_texts(), fontsize='18')  # for legend text
-    plt.setp(ax.get_legend().get_title(), fontsize='18')  # for legend title
-
-    plt.savefig(outputName, bbox_inches="tight", pad_inches=0)
-    plt.close()
-    plt.clf()
-    plt.cla()
-    return
-
-
-def makeCoverageTable(dataframe, domainType, subdomainType):
-    grp = dataframe.groupby(['Node Expansion Limit',
-                             'Algorithm'])['Solution Cost'].count()
-    print(grp)
-    grp.to_csv("../../plots/" + domainType + "/coverage-" + subdomainType +
-               ".csv")
-
-
-def main():
-    if len(sys.argv) != 4:
-        printUsage()
-        return
-
-    markers = [
-        "o", "v", "s", "<", "p", "h", "^", "D", "X", ">", "o", "v", "s", "<",
-        "p", "h", "^", "D", "X", ">"
-    ]
-
-    # Hard coded result directories
-    domainSize = "4"
-    # domainSize = "4x4"
-    domainType = sys.argv[2]
-    subdomainType = sys.argv[3]
+def configure(args):
     # limits = [3, 10, 30, 100, 300, 1000]
     # limits = [10, 30, 100, 300, 1000]
     limits = [30, 100, 300, 1000]
     # limits = [30]
     # limits = [100, 300, 1000]
+
     algorithms_data = {
         "ie": "ie",
         "ie-nancy": "ie",
         "ie-nancyAll": "ie",
+        "ie-nancy-tlaopen": "ie",
+        "ie--as": "ie",
+        "risk": "risk",
+        "lsslrtastar": "lsslrtastar",
+        "riskddSquish": "riskddSquish"
+    }
+
+    algorithms_data_old = {
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        # "risk": "Risk",
-        "risk": "risk",
+        "risk": "Risk",
         # "risk-learnhhat": "Risk",
         # "risk-withassump": "Risk",
         # "risk-cpu-dtb": "Risk",
@@ -123,22 +69,25 @@ def main():
         # "riskddSquish-newP-withassump": "RiskDDSquish",
         # "riskddSquish-newP": "RiskDDSquish",
         # "riskddSquish-1kt": "RiskDDSquish",
-        # "lsslrtastar": "LSS-LRTA*",
-        "lsslrtastar": "lsslrtastar",
+        "lsslrtastar": "LSS-LRTA*",
         # "lsslrtastar-cpu-dtb": "LSS-LRTA*",
         # "riskdd-lssTr": "RiskDD",
         # "riskddSquish-lssTr": "RiskDDSquish"
         # "riskddSquish-cpu-dtb-dumpallcpu": "RiskDDSquish"
-        "riskddSquish": "riskddSquish"
-        # "riskddSquish": "RiskDDSquish"
+        "riskddSquish": "RiskDDSquish"
         # "riskddSquish-newP": "RiskDDSquish",
         # "riskddSquish-nop-withassump": "RiskDDSquish"
     }
+
+    if args.old_data:
+        algorithms_data.update(algorithms_data_old)
 
     algorithms = OrderedDict({
         "ie": "IE",
         "ie-nancy": "IE-Nancy-TLA",
         "ie-nancyAll": "IE-Nancy-TLAAndOpen",
+        "ie-nancy-tlaopen": "IE-Nancy-Open",
+        "ie--as": "IE-AS",
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
@@ -181,11 +130,104 @@ def main():
     # 'Nancy (pers-hhat.)'
     # ]
     algorithm_order = [
-        'IE', 'IE-Nancy-TLA', 'IE-Nancy-TLAAndOpen', 'Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)'
+        'IE', 'IE-AS', 'IE-Nancy-Open', 'IE-Nancy-TLA', 'IE-Nancy-TLAAndOpen',
+        'Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)'
     ]
     # algorithm_order = ['Nancy (DD)', 'LSS-LRTA*']
 
     baseline = "LSS-LRTA*"
+
+    return limits, algorithms_data, algorithms, algorithm_order, baseline
+
+
+def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
+                       orderList, hueOrderList, xLabel, yLabel, outputName,
+                       markerList):
+    sns.set(rc={
+        'figure.figsize': (width, height),
+        'font.size': 27,
+        'text.color': 'black'
+    })
+    ax = sns.pointplot(x=xAxis,
+                       y=yAxis,
+                       hue=hue,
+                       order=orderList,
+                       hue_order=hueOrderList,
+                       data=dataframe,
+                       ci=95,
+                       errwidth=3,
+                       join=False,
+                       dodge=dodge,
+                       palette="Set2",
+                       markers=markerList)
+    ax.tick_params(colors='black', labelsize=12)
+    plt.ylabel(yLabel, color='black', fontsize=18)
+    plt.xlabel(xLabel, color='black', fontsize=18)
+
+    plt.setp(ax.get_legend().get_texts(), fontsize='18')  # for legend text
+    plt.setp(ax.get_legend().get_title(), fontsize='18')  # for legend title
+
+    plt.savefig(outputName, bbox_inches="tight", pad_inches=0)
+    plt.close()
+    plt.clf()
+    plt.cla()
+    return
+
+
+def makeCoverageTable(dataframe, domainType, subdomainType, size):
+    grp = dataframe.groupby(['Node Expansion Limit',
+                             'Algorithm'])['Solution Cost'].count()
+    print(grp)
+    grp.to_csv("../../plots/" + domainType + "/coverage-" + subdomainType +
+               "-" + size + ".csv")
+
+
+def parseArugments():
+
+    parser = argparse.ArgumentParser(description='realtimeExpPlot')
+
+    parser.add_argument(
+        '-d',
+        action='store',
+        dest='domain',
+        help='domain: slidingTile(default), pancake, racetrack',
+        default='slidingTile')
+
+    parser.add_argument(
+        '-s',
+        action='store',
+        dest='subdomain',
+        help='subdomain: tile: uniform(default), heavy, inverse; \
+        pancake: regular, heavy; \
+        racetrack : barto-bigger, hanse-bigger-double, uniform',
+        default='uniform')
+
+    parser.add_argument('-z',
+                        action='store',
+                        dest='size',
+                        help='domain size (default: 4)',
+                        default='4')
+
+    parser.add_argument(
+        '-t',
+        action='store',
+        dest='plotType',
+        help='plot type, pairwise(default), solutioncost, coverage',
+        default='pairwise')
+
+    parser.add_argument('-o',
+                        action='store_true',
+                        dest='old_data',
+                        help='Set old data switch to true',
+                        default=False)
+
+    return parser
+
+
+def readData(args, algorithms, algorithms_data, baseline):
+    domainSize = args.size
+    domainType = args.domain
+    subdomainType = args.subdomain
 
     instance = []
     lookAheadVals = []
@@ -194,7 +236,6 @@ def main():
     differenceCost = []
 
     print("reading in data...")
-
 
     inPath = "../../results/" + domainType + "/expansionTests/NancyDD/" + \
         subdomainType + '/alg'
@@ -247,8 +288,20 @@ def main():
     df["Algorithm Cost - " + baseline + " Cost"] = differenceCost
 
     # print df
+    return df, rawdf
 
+
+def plotting(args, parser, df, rawdf, baseline, limits, algorithm_order):
     print("building plots...")
+
+    domainSize = args.size
+    domainType = args.domain
+    subdomainType = args.subdomain
+
+    markers = [
+        "o", "v", "s", "<", "p", "h", "^", "D", "X", ">", "o", "v", "s", "<",
+        "p", "h", "^", "D", "X", ">"
+    ]
 
     nowstr = datetime.now().strftime("%d%m%Y-%H%M")
 
@@ -259,10 +312,10 @@ def main():
 
     out_file = out_dir + '/' + domainType + "-" + subdomainType + "-" + domainSize + '-' + nowstr
 
-    if sys.argv[1] == "coverage":
-        makeCoverageTable(rawdf, domainType, subdomainType)
+    if args.plotType == "coverage":
+        makeCoverageTable(rawdf, domainType, subdomainType, domainSize)
 
-    elif sys.argv[1] == "pairwise":
+    elif args.plotType == "pairwise":
         makeDifferencePlot(13, 10, "Node Expansion Limit",
                            "Algorithm Cost - " + baseline + " Cost", df, 0.35,
                            "Algorithm", limits, algorithm_order,
@@ -270,14 +323,26 @@ def main():
                            "Algorithm Cost - " + baseline + " Cost",
                            out_file + "-pairwise.eps", markers)
 
-    elif sys.argv[1] == "solutioncost":
-        makeDifferencePlot(13, 10, "Node Expansion Limit",
-                           "Solution Cost", df, 0.35, "Algorithm", limits,
-                           algorithms.values(), "Node Expansion Limit",
-                           "Solution Cost", out_file + "-solutioncost.png",
-                           markers)
+    elif args.plotType == "solutioncost":
+        makeDifferencePlot(13, 10, "Node Expansion Limit", "Solution Cost", df,
+                           0.35, "Algorithm", limits, algorithm_order,
+                           "Node Expansion Limit", "Solution Cost",
+                           out_file + "-solutioncost.png", markers)
     else:
-        printUsage()
+        parser.print_help()
+
+
+def main():
+    parser = parseArugments()
+    args = parser.parse_args()
+    print(args)
+
+    limits, algorithms_data, algorithms, algorithm_order, baseline = configure(
+        args)
+
+    df, rawdf = readData(args, algorithms, algorithms_data, baseline)
+
+    plotting(args, parser, df, rawdf, baseline, limits, algorithm_order)
 
 
 if __name__ == '__main__':
