@@ -8,6 +8,8 @@ backupTestsDFS
 realtimeSolver
 realtimeSolver.lock
 realtimeSolver-debug
+thrt
+thrt-debug
 generateTrees
 lastIncremental
 *.txt

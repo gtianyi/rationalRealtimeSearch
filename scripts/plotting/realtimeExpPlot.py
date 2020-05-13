@@ -35,9 +35,9 @@ def configure(args):
 
     algorithms_data = {
         "ie": "ie",
-        "ie-nancy": "ie",
+        # "ie-nancy": "ie",
         "ie-nancyAll": "ie",
-        "ie-nancy-tlaopen": "ie",
+        # "ie-nancy-tlaopen": "ie",
         "ie--as": "ie",
         "risk": "risk",
         "lsslrtastar": "lsslrtastar",
@@ -84,9 +84,9 @@ def configure(args):
 
     algorithms = OrderedDict({
         "ie": "IE",
-        "ie-nancy": "IE-Nancy-TLA",
+        # "ie-nancy": "IE-Nancy-TLA",
         "ie-nancyAll": "IE-Nancy-TLAAndOpen",
-        "ie-nancy-tlaopen": "IE-Nancy-Open",
+        # "ie-nancy-tlaopen": "IE-Nancy-Open",
         "ie--as": "IE-AS",
         # "astar": "A*",
         # "fhat": "F-Hat",
@@ -130,7 +130,8 @@ def configure(args):
     # 'Nancy (pers-hhat.)'
     # ]
     algorithm_order = [
-        'IE', 'IE-AS', 'IE-Nancy-Open', 'IE-Nancy-TLA', 'IE-Nancy-TLAAndOpen',
+        # 'IE', 'IE-AS', 'IE-Nancy-Open', 'IE-Nancy-TLA', 'IE-Nancy-TLAAndOpen',
+        'IE', 'IE-AS', 'IE-Nancy-TLAAndOpen',
         'Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)'
     ]
     # algorithm_order = ['Nancy (DD)', 'LSS-LRTA*']
