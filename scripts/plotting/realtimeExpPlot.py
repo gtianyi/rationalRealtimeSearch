@@ -34,12 +34,13 @@ def configure(args):
     # limits = [100, 300, 1000]
 
     algorithms_data = {
+        "thts-WAS": "thts-WAS",
         "ie": "ie",
         # "ie-nancy": "ie",
-        "ie-nancyAll": "ie",
+        # "ie-nancyAll": "ie",
         # "ie-nancy-tlaopen": "ie",
-        "ie--as": "ie",
-        "risk": "risk",
+        # "ie--as": "ie",
+        # "risk": "risk",
         "lsslrtastar": "lsslrtastar",
         "riskddSquish": "riskddSquish"
     }
@@ -83,15 +84,16 @@ def configure(args):
         algorithms_data.update(algorithms_data_old)
 
     algorithms = OrderedDict({
+        "thts-WAS": "THTS-WA*",
         "ie": "IE",
         # "ie-nancy": "IE-Nancy-TLA",
-        "ie-nancyAll": "IE-Nancy-TLAAndOpen",
+        # "ie-nancyAll": "IE-Nancy-TLAAndOpen",
         # "ie-nancy-tlaopen": "IE-Nancy-Open",
-        "ie--as": "IE-AS",
+        # "ie--as": "IE-AS",
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        "risk": "Nancy (pers.)",
+        # "risk": "Nancy (pers.)",
         # "risk-learnhhat": "Nancy-hhat",
         # "risk-withassump": "Nancy-fix-assumption",
         # "risk-cpu-dtb": "Nancy",
@@ -131,8 +133,10 @@ def configure(args):
     # ]
     algorithm_order = [
         # 'IE', 'IE-AS', 'IE-Nancy-Open', 'IE-Nancy-TLA', 'IE-Nancy-TLAAndOpen',
-        'IE', 'IE-AS', 'IE-Nancy-TLAAndOpen',
-        'Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)'
+        # 'IE', 'IE-AS', 'IE-Nancy-TLAAndOpen',
+        'IE', 'THTS-WA*',
+        # 'Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)'
+        'Nancy (DD)', 'LSS-LRTA*'
     ]
     # algorithm_order = ['Nancy (DD)', 'LSS-LRTA*']
 

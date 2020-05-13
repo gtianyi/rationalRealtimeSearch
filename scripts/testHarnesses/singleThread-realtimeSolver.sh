@@ -8,7 +8,7 @@ print_usage(){
   echo "[-s subdomain]                   default: regular [uniform, heavy, barto-big...]"
   echo "[-z domain size]                 default: 16"
   echo "[-a algorithm ]"
-  echo " support list,eg: -a a1 -a a2    default: risk, riskddSquish, lsslrtastar, ie"
+  echo " support list,eg: -a a1 -a a2    default: risk, riskddSquish, lsslrtastar, ie, thts-WAS, thts-GUCTS"
   echo "[-l lookahead, ]"
   echo " support list,eg: -l 10 -l 30    default: 3, 10, 30, 100, 300, 1000"
   echo "[-e algorithm extention          default: null]"
@@ -164,6 +164,15 @@ for algid in "${!algorithms[@]}"; do
     outfile_path_alg="${outfile_path/algdir/$algdir}"
     mkdir -p ${outfile_path_alg}
 
+    executable="./../../realtimeSolver"
+
+    if [[ $algname == *"thts"* ]]; then
+        executable="./../../thrt"
+    fi
+
+    algname=${algname:5}
+    echo ${algname}
+
     for lookahead in "${lookaheads[@]}"; do
       echo "lookahead $lookahead"
       instance=$first
@@ -181,7 +190,7 @@ for algid in "${!algorithms[@]}"; do
 		  echo "ph" > ${tempfile}
 		  echo "runing LA${lookahead}-${instance}" 
 
-	      timeout 1800 ./../../realtimeSolver \
+	      timeout 1800 ${executable} \
 				  -d ${domain} \
 				  -l ${lookahead} \
 				  -s ${subdomain} \
