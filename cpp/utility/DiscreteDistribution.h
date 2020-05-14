@@ -532,6 +532,7 @@ public:
 
     set<ProbabilityNode>::iterator end() const { return distribution.end(); }
 
+    int getDistSize() const { return distribution.size(); }
 
     DiscreteDistribution(const DiscreteDistribution& rhs) {
         if (&rhs == this) {

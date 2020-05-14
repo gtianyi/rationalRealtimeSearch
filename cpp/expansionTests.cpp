@@ -3,14 +3,15 @@
 #include <fstream>
 #include "RealTimeSearch.h"
 #include "utility/DiscreteDistributionDD.h"
-#include "decisionAlgorithms/KBestBackup.h"
-#include "expansionAlgorithms/AStar.h"
-#include "expansionAlgorithms/BreadthFirst.h"
-#include "expansionAlgorithms/DepthFirst.h"
-#include "expansionAlgorithms/Risk.h"
-#include "expansionAlgorithms/RiskDD.h"
-#include "learningAlgorithms/Ignorance.h"
-#include "learningAlgorithms/Dijkstra.h"
+//#include "decisionAlgorithms/KBestBackup.h"
+//#include "decisionAlgorithms/NancyBackup.h"
+/*#include "expansionAlgorithms/AStar.h"*/
+//#include "expansionAlgorithms/BreadthFirst.h"
+//#include "expansionAlgorithms/DepthFirst.h"
+//#include "expansionAlgorithms/Risk.h"
+//#include "expansionAlgorithms/RiskDD.h"
+//#include "learningAlgorithms/Ignorance.h"
+/*#include "learningAlgorithms/Dijkstra.h"*/
 #include "domain/TreeWorld.h"
 #include "domain/HeavyTilePuzzle.h"
 #include "domain/InverseTilePuzzle.h"
@@ -128,18 +129,18 @@ int main(int argc, char** argv)
     auto lookaheadDepth = args["lookahead"].as<int>();
     auto outPerfromence = args["performenceOut"].as<string>();
 
-    vector<string> bfsConfig{"bfs", "learn", "k-best", "BFS", "normal"};
-    vector<string> astarConfig{"a-star", "learn", "k-best", "A*", "normal"};
-    vector<string> fhatConfig{"f-hat", "learn", "k-best", "F-Hat", "normal"};
+    vector<string> bfsConfig{"bfs", "learn", "nancy", "BFS", "normal"};
+    vector<string> astarConfig{"a-star", "learn", "nancy", "A*", "normal"};
+    vector<string> fhatConfig{"f-hat", "learn", "nancy", "F-Hat", "normal"};
     vector<string> lsslrtastarConfig{
             "a-star", "learn", "minimin", "LSS-LRTA*", "normal"};
-    vector<string> riskConfig{"risk", "learn", "k-best", "Risk", "normal"};
-    vector<string> riskPersistConfig{"risk", "learn", "k-best-persist", "PRisk", "normal"};
+    vector<string> riskConfig{"risk", "learn", "nancy", "Risk", "normal"};
+    vector<string> riskPersistConfig{"risk", "learn", "nancy-persist", "PRisk", "normal"};
     vector<string> riskddConfig{
             "riskDD", "learnDD", "nancyDD", "RiskDD", "data"};
     vector<string> riskddSquishConfig{
             "riskDDSquish", "learnDD", "nancyDD", "RiskDDSquish", "data"};
-    vector<string> intervalEstimationConfig{"ie", "learn", "k-best", "IE", "normal"};
+    vector<string> intervalEstimationConfig{"ie", "learn", "nancy", "IE", "normal"};
 
     unordered_map<string, vector<string>> algorithmsConfig({{"bfs", bfsConfig},
             {"ie", intervalEstimationConfig},

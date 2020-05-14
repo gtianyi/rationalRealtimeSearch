@@ -9,8 +9,9 @@
 #include "utility/PriorityQueue.h"
 #include "utility/ResultContainer.h"
 #include "decisionAlgorithms/DecisionAlgorithm.h"
-#include "decisionAlgorithms/KBestBackup.h"
-#include "decisionAlgorithms/KbestBackupPersistency.h"
+#include "decisionAlgorithms/KBestBackup_faster.h"
+//#include "decisionAlgorithms/NancyBackup.h"
+//#include "decisionAlgorithms/KbestBackupPersistency.h"
 #include "decisionAlgorithms/NancyDDDecision.h"
 #include "decisionAlgorithms/ScalarBackup.h"
 #include "expansionAlgorithms/ExpansionAlgorithm.h"
@@ -52,6 +53,7 @@ public:
         int owningTLA;
         bool open;
         int delayCntr;
+        //shared_ptr<DiscreteDistribution> distribution;
         DiscreteDistribution distribution;
         DiscreteDistributionDD hStartDistribution;
         DiscreteDistributionDD hStartDistribution_ps;
@@ -87,6 +89,10 @@ public:
         DiscreteDistributionDD getHstartDistribution_ps() const {
             return hStartDistribution_ps;
         }
+
+        /*shared_ptr<DiscreteDistribution> getAssumptionDistribution() const{*/
+            //return distribution;
+        /*}*/
 
         void setHValue(Cost val) { h = val; }
         void setGValue(Cost val) { g = val; }
@@ -263,7 +269,7 @@ public:
         Cost expectedMinimumPathCost;
         shared_ptr<Node> topLevelNode;
         vector<shared_ptr<Node>> kBestNodes;
-                Cost h_TLA;
+        Cost h_TLA;
 
 
         TopLevelAction() { open_TLA.swapComparator(Node::compareNodesFHat); }
@@ -280,11 +286,14 @@ public:
 
         Cost getF_TLA() const { return this->topLevelNode->getGValue() + h_TLA; }
 
+        //shared_ptr<DiscreteDistribution> getBelief() { return belief; };
         DiscreteDistribution getBelief() { return belief; };
 
+        //void squishBelief(double factor) { belief->squish(factor); };
         void squishBelief(double factor) { belief.squish(factor); };
 
-        void setBelief(const DiscreteDistribution& _belief) {
+        //void setBelief(shared_ptr<DiscreteDistribution> _belief) {
+        void setBelief(DiscreteDistribution _belief) {
             belief = _belief;
         };
 
@@ -309,14 +318,15 @@ public:
         }
 
     private:
+        //shared_ptr<DiscreteDistribution> belief;
         DiscreteDistribution belief;
 
         void copy(const TopLevelAction& tla) {
             open_TLA = tla.open_TLA;
             expectedMinimumPathCost = tla.expectedMinimumPathCost;
             topLevelNode = tla.topLevelNode;
-            kBestNodes = tla.kBestNodes;
             belief = tla.belief;
+            kBestNodes = tla.kBestNodes;
             h_TLA = tla.h_TLA;
         }
     };
@@ -428,14 +438,18 @@ public:
             decisionAlgo =
                     make_shared<ScalarBackup<Domain, Node, TopLevelAction>>(
                             "bellman");
-        } else if (decisionModule == "k-best") {
+        } else if (decisionModule == "nancy") {
             decisionAlgo =
+                    //make_shared<NancyBackup<Domain, Node, TopLevelAction>>(
+                            //domain, lookahead);
                     make_shared<KBestBackup<Domain, Node, TopLevelAction>>(
-                            domain, k, lookahead);
-        } else if (decisionModule == "k-best-persist") {
+                            domain, 1, lookahead);
+        } else if (decisionModule == "nancy-persist") {
             decisionAlgo =
-                    make_shared<KBestBackupPersistency<Domain, Node, TopLevelAction>>(
-                            domain, k, lookahead);
+                    //make_shared<NancyBackup<Domain, Node, TopLevelAction>>(
+                            //domain, lookahead);
+                    make_shared<KBestBackup<Domain, Node, TopLevelAction>>(
+                            domain, 1, lookahead);
         } else if (decisionModule == "nancyDD") {
             decisionAlgo = make_shared<
                     NancyDDDecision<Domain, Node, TopLevelAction>>(
@@ -487,7 +501,7 @@ public:
             // prevent state pruning based on label)
             start->markStart();
 
-            DEBUG_MSG("start: " << start->getState());
+            //DEBUG_MSG("start: " << start->getState());
 
             count++;
 
@@ -512,10 +526,10 @@ public:
 
             if (beliefType == "normal") {
                 generateTopLevelActions(start, res);
-                DEBUG_MSG("after gen tlas");
+                //DEBUG_MSG("after gen tlas");
                 expansionAlgo->expand(
                         open, closed, tlas, duplicateDetection, res);
-                DEBUG_MSG("after lookahead");
+                //DEBUG_MSG("after lookahead");
             } else if (beliefType == "data") {
                 generateTopLevelActionsDD(start, res);
                 expansionAlgo->expand(
@@ -535,7 +549,7 @@ public:
             // Decision-making Phase
             start = decisionAlgo->backup(open, tlas, start, closed);
 
-            DEBUG_MSG( "after decision");
+            //DEBUG_MSG( "after decision");
             /*DEBUG_MSG( "h " << start->getHValue() << " hat "*/
                  //<< start->getHHatValueFromDist() );
 
@@ -715,14 +729,13 @@ private:
             shared_ptr<TopLevelAction> tla = make_shared<TopLevelAction>();
             tla->topLevelNode = childNode;
 
-            childNode->distribution = DiscreteDistribution(100,
-                    childNode->getFValue(),
-                    childNode->getFHatValue(),
-                    childNode->getDValue(),
-                    childNode->getFHatValue() - childNode->getFValue());
+         /*   childNode->distribution = make_shared<DiscreteDistribution>(100,*/
+                    //childNode->getFValue(),
+                    //childNode->getFHatValue(),
+                    //childNode->getDValue(),
+                    //childNode->getFHatValue() - childNode->getFValue());
 
-            tla->expectedMinimumPathCost =
-                    childNode->distribution.expectedCost();
+            tla->expectedMinimumPathCost = childNode->getFHatValue();
 
             // Push this node onto open and closed
             closed[child] = childNode;
@@ -785,7 +798,7 @@ private:
             childNode->hStartDistribution_ps = domain.hstart_distribution_ps(child);
 
             tla->expectedMinimumPathCost =
-                    childNode->distribution.expectedCost() +
+                    childNode->hStartDistribution.expectedCost() +
                     childNode->getGValue();
 
 			tla->h_TLA  = childNode->getHValue();
