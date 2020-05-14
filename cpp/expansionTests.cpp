@@ -3,15 +3,6 @@
 #include <fstream>
 #include "RealTimeSearch.h"
 #include "utility/DiscreteDistributionDD.h"
-//#include "decisionAlgorithms/KBestBackup.h"
-//#include "decisionAlgorithms/NancyBackup.h"
-/*#include "expansionAlgorithms/AStar.h"*/
-//#include "expansionAlgorithms/BreadthFirst.h"
-//#include "expansionAlgorithms/DepthFirst.h"
-//#include "expansionAlgorithms/Risk.h"
-//#include "expansionAlgorithms/RiskDD.h"
-//#include "learningAlgorithms/Ignorance.h"
-/*#include "learningAlgorithms/Dijkstra.h"*/
 #include "domain/TreeWorld.h"
 #include "domain/HeavyTilePuzzle.h"
 #include "domain/InverseTilePuzzle.h"
