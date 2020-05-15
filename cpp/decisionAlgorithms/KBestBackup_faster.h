@@ -5,7 +5,6 @@
 #include <memory>
 #include "../utility/PriorityQueue.h"
 #include "DecisionAlgorithm.h"
-#include"../utility/DiscreteDistribution.h"
 
 using namespace std;
 
@@ -41,32 +40,6 @@ public:
     }
 
 protected:
-    void csernaBackup(shared_ptr<TopLevelAction> tla) {
-        // We assume in k-best that only the k-best nodes matter.
-        if (!tla->kBestNodes.empty()) {
-            // Perform Cserna Backups on k-best nodes
-            /*while (tla->kBestNodes.size() > 1) {*/
-                //// Take the first two and do a Cserna backup...
-                //tla->kBestNodes[0]->distribution =
-                        //tla->kBestNodes[0]->distribution *
-                        //tla->kBestNodes[1]->distribution;
-                //// Remove the other used in the backup
-                //tla->kBestNodes.erase(remove(tla->kBestNodes.begin(),
-                                             //tla->kBestNodes.end(),
-                                             //tla->kBestNodes[1]),
-                        //tla->kBestNodes.end());
-            /*}*/
-
-            // Get the expected value of the resulting Cserna Distribution
-            tla->expectedMinimumPathCost =
-                    tla->kBestNodes[0]->distribution->expectedCost();
-            //tla->setBelief(tla->kBestNodes[0]->distribution);
-        } else {
-            // If nothing was expanded under this TLA, use the expected value of
-            // the TLA
-            tla->expectedMinimumPathCost = numeric_limits<double>::infinity();
-        }
-    }
 
     void kBestDecision(vector<shared_ptr<TopLevelAction>>& tlas) {
         // The K-Best decision assumes that the only nodes within the subtrees
@@ -75,29 +48,19 @@ protected:
         for (auto tla : tlas) {
             tla->kBestNodes.clear();
 
-            // If this TLA has unique, probably optimal subtrees beneath it, it
-            // is valid
+            shared_ptr<Node> best = tla->open_TLA.top();
+            tla->open_TLA.pop();
 
-            int i = 0;
-            // Add to the best k nodes while i < k and non-selected nodes exist
-            // on the frontier
-            while (i < k && !tla->open_TLA.empty()) {
-                shared_ptr<Node> best = tla->open_TLA.top();
-                tla->open_TLA.pop();
+            // Make this node's PDF a discrete distribution...
+            best->distribution = DiscreteDistribution(100,
+                    best->getFValue(),
+                    best->getFHatValue(),
+                    best->getDValue(),
+                    best->getFHatValue() - best->getFValue());
 
-                // Make this node's PDF a discrete distribution...
-                best->distribution = make_shared<DiscreteDistribution>(100,
-                        best->getFValue(),
-                        best->getFHatValue(),
-                        best->getDValue(),
-                        best->getFHatValue() - best->getFValue());
-
-                tla->kBestNodes.push_back(best);
-                i++;
-            }
-
-            // Now that k-best are selected, perform Cserna backup
-            csernaBackup(tla);
+            tla->kBestNodes.push_back(best);
+            tla->expectedMinimumPathCost =
+                    tla->kBestNodes[0]->distribution.expectedCost();
         }
     }
 

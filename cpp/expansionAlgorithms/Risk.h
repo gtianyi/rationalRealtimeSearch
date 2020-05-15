@@ -40,7 +40,7 @@ public:
 			// If it isn't? Wouldn't we only need to update the TLA of the node we expanded last iteration?
 			// In a tree, yes. But in a graph, this could have placed nodes onto the open lists of other TLAs.
 			// Therefore, the beliefs of all TLAs should be updated before every expansion.
-			kBestDecision(tlas);
+            kBestDecision(tlas);
 
 			// Simulate expansion of best node under each TLA
 			int chosenTLAIndex = simulateExpansion(tlas);
@@ -237,67 +237,38 @@ private:
 		}
 
 		return risk;
-	}
+        }
 
-	void csernaBackup(shared_ptr<TopLevelAction> tla)
-	{
-		// We assume in k-best that only the k-best nodes matter.
-		if (!tla->kBestNodes.empty())
-		{
-			// Perform Cserna Backups on k-best nodes
-			while (tla->kBestNodes.size() > 1)
-			{
-				// Take the first two and do a Cserna backup...
-				tla->kBestNodes[0]->distribution = tla->kBestNodes[0]->distribution * tla->kBestNodes[1]->distribution;
-				// Remove the other used in the backup
-				tla->kBestNodes.erase(remove(tla->kBestNodes.begin(), tla->kBestNodes.end(), tla->kBestNodes[1]), tla->kBestNodes.end());
-			}
+        void kBestDecision(vector<shared_ptr<TopLevelAction>>& tlas) {
+            // The K-Best decision assumes that the only nodes within the
+            // subtrees of the TLAs are the k-best frontier nodes
+            // on their opened lists. Find them.
+            for (auto tla : tlas) {
+                tla->kBestNodes.clear();
 
-			// Get the expected value of the resulting Cserna Distribution
-			tla->expectedMinimumPathCost = tla->kBestNodes[0]->distribution.expectedCost();
-			tla->setBelief(tla->kBestNodes[0]->distribution);
-		}
-		else
-		{
-			// If nothing was expanded under this TLA, use the expected value of the TLA
-			tla->expectedMinimumPathCost = numeric_limits<double>::infinity();
-		}
-	}
+                shared_ptr<Node> best = tla->open_TLA.top();
+                tla->open_TLA.pop();
 
-	void kBestDecision(vector<shared_ptr<TopLevelAction>>& tlas)
-	{
-		// The K-Best decision assumes that the only nodes within the subtrees of the TLAs are the k-best frontier nodes
-		// on their opened lists. Find them.
-		for (auto tla : tlas)
-		{
-			tla->kBestNodes.clear();
+                // Make this node's PDF a discrete distribution...
+                best->distribution = DiscreteDistribution(100,
+                        best->getFValue(),
+                        best->getFHatValue(),
+                        best->getDValue(),
+                        best->getFHatValue() - best->getFValue());
 
-			// If this TLA has unique, probably optimal subtrees beneath it, it is valid
+                tla->kBestNodes.push_back(best);
 
-			int i = 0;
-			// Add to the best k nodes while i < k and non-selected nodes exist on the frontier
-			while (i < k && !tla->open_TLA.empty())
-			{
-				shared_ptr<Node> best = tla->open_TLA.top();
-				tla->open_TLA.pop();
+                // Now put the nodes back in the top level open list
+                for (shared_ptr<Node> n : tla->kBestNodes) {
+                    tla->open_TLA.push(n);
+                }
 
-				// Make this node's PDF a discrete distribution...
-				best->distribution = DiscreteDistribution(100, best->getFValue(), best->getFHatValue(),
-					best->getDValue(), best->getFHatValue() - best->getFValue());
-
-				tla->kBestNodes.push_back(best);
-				i++;
-			}
-
-			// Now put the nodes back in the top level open list
-			for (shared_ptr<Node> n : tla->kBestNodes)
-			{
-				tla->open_TLA.push(n);
-			}
-
-			// Now that k-best are selected, perform Cserna backup
-			csernaBackup(tla);
-		}
+                // Now that k-best are selected, perform Cserna backup
+                // csernaBackup(tla);
+                tla->expectedMinimumPathCost =
+                        tla->kBestNodes[0]->distribution.expectedCost();
+                tla->setBelief(tla->kBestNodes[0]->distribution);
+            }
 	}
 
 protected:
