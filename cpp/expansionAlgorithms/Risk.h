@@ -129,12 +129,12 @@ private:
 
 		// Start by identifying alpha: the TLA with lowest expected cost
 		int alphaTLA = 0;
-		double alphaExpectedCost = tlas[0]->getBelief().expectedCost();
+		double alphaExpectedCost = tlas[0]->expectedMinimumPathCost;
 		for (int i = 1; i < tlas.size(); i++)
 		{
-			if (tlas[i]->getBelief().expectedCost() < alphaExpectedCost)
+			if (tlas[i]->expectedMinimumPathCost < alphaExpectedCost)
 			{
-				alphaExpectedCost = tlas[i]->getBelief().expectedCost();
+				alphaExpectedCost = tlas[i]->expectedMinimumPathCost;
 				alphaTLA = i;
 			}
 		}
@@ -250,11 +250,11 @@ private:
                 //tla->open_TLA.pop();
 
                 // Make this node's PDF a discrete distribution...
-                best->distribution = DiscreteDistribution(100,
-                        best->getFValue(),
-                        best->getFHatValue(),
-                        best->getDValue(),
-                        best->getFHatValue() - best->getFValue());
+               /* best->distribution = DiscreteDistribution(100,*/
+                        //best->getFValue(),
+                        //best->getFHatValue(),
+                        //best->getDValue(),
+                        //best->getFHatValue() - best->getFValue());
 
                 //tla->kBestNodes.push_back(best);
 
@@ -266,7 +266,7 @@ private:
                 // Now that k-best are selected, perform Cserna backup
                 // csernaBackup(tla);
                 tla->expectedMinimumPathCost = best->getFHatValue();
-                tla->setBelief(best->distribution);
+                tla->setBelief(best);
             }
 	}
 

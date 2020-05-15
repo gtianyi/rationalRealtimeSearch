@@ -294,8 +294,12 @@ public:
         void squishBelief(double factor) { belief.squish(factor); };
 
         //void setBelief(shared_ptr<DiscreteDistribution> _belief) {
-        void setBelief(DiscreteDistribution _belief) {
-            belief = _belief;
+        void setBelief(shared_ptr<Node> best) {
+            belief = DiscreteDistribution(100,
+                    best->getFValue(),
+                    best->getFHatValue(),
+                    best->getDValue(),
+                    best->getFHatValue() - best->getFValue());
         };
 
         virtual void setBeliefDD(const DiscreteDistributionDD& _belief) {
