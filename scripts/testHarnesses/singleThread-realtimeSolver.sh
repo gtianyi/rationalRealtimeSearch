@@ -168,11 +168,10 @@ for algid in "${!algorithms[@]}"; do
 
     if [[ $algname == *"thts"* ]]; then
         executable="./../../thrt"
+        algname=${algname:5}
+        echo ${algname}
     fi
-
-    algname=${algname:5}
-    echo ${algname}
-
+    
     for lookahead in "${lookaheads[@]}"; do
       echo "lookahead $lookahead"
       instance=$first
