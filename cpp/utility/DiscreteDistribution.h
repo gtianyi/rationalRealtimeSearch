@@ -46,7 +46,7 @@ public:
     };
 
 	~DiscreteDistribution(){
-			distribution.clear();
+			//distribution.clear();
 	}
 
 private:
@@ -408,7 +408,7 @@ public:
             return *this;
         }
 
-        distribution.clear();
+        //distribution.clear();
 
         distribution = rhs.distribution;
         maxSamples = rhs.maxSamples;
@@ -482,7 +482,7 @@ public:
         // to the mean.
         if (factor == 1) {
 			newDistribution.insert(ProbabilityNode(mean, 1.0));
-            distribution.clear();
+            //distribution.clear();
             distribution = newDistribution;
 
             return *this;
@@ -511,7 +511,7 @@ public:
             newDistribution.insert(ProbabilityNode(shiftedCost, n.probability));
         }
 
-        distribution.clear();
+        //distribution.clear();
         distribution = newDistribution;
 
         /*
@@ -539,7 +539,7 @@ public:
             return ;
         }
 
-        distribution.clear();
+        //distribution.clear();
 
         distribution = rhs.distribution;
         maxSamples = rhs.maxSamples;
