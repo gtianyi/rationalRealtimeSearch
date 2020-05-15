@@ -46,21 +46,21 @@ protected:
         // of the TLAs are the k-best frontier nodes
         // on their opened lists. Find them.
         for (auto tla : tlas) {
-            tla->kBestNodes.clear();
+            /*tla->kBestNodes.clear();*/
 
-            shared_ptr<Node> best = tla->open_TLA.top();
-            tla->open_TLA.pop();
+            //shared_ptr<Node> best = tla->open_TLA.top();
+            //tla->open_TLA.pop();
 
-            // Make this node's PDF a discrete distribution...
-            best->distribution = DiscreteDistribution(100,
-                    best->getFValue(),
-                    best->getFHatValue(),
-                    best->getDValue(),
-                    best->getFHatValue() - best->getFValue());
+            //// Make this node's PDF a discrete distribution...
+            //best->distribution = DiscreteDistribution(100,
+                    //best->getFValue(),
+                    //best->getFHatValue(),
+                    //best->getDValue(),
+                    //best->getFHatValue() - best->getFValue());
 
-            tla->kBestNodes.push_back(best);
+            //tla->kBestNodes.push_back(best);
             tla->expectedMinimumPathCost =
-                    tla->kBestNodes[0]->distribution.expectedCost();
+                    tla->open_TLA.top()->getFHatValue();
         }
     }
 

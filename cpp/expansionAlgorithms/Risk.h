@@ -244,10 +244,10 @@ private:
             // subtrees of the TLAs are the k-best frontier nodes
             // on their opened lists. Find them.
             for (auto tla : tlas) {
-                tla->kBestNodes.clear();
+                //tla->kBestNodes.clear();
 
                 shared_ptr<Node> best = tla->open_TLA.top();
-                tla->open_TLA.pop();
+                //tla->open_TLA.pop();
 
                 // Make this node's PDF a discrete distribution...
                 best->distribution = DiscreteDistribution(100,
@@ -256,18 +256,17 @@ private:
                         best->getDValue(),
                         best->getFHatValue() - best->getFValue());
 
-                tla->kBestNodes.push_back(best);
+                //tla->kBestNodes.push_back(best);
 
                 // Now put the nodes back in the top level open list
-                for (shared_ptr<Node> n : tla->kBestNodes) {
-                    tla->open_TLA.push(n);
-                }
+                /*for (shared_ptr<Node> n : tla->kBestNodes) {*/
+                    //tla->open_TLA.push(n);
+                /*}*/
 
                 // Now that k-best are selected, perform Cserna backup
                 // csernaBackup(tla);
-                tla->expectedMinimumPathCost =
-                        tla->kBestNodes[0]->distribution.expectedCost();
-                tla->setBelief(tla->kBestNodes[0]->distribution);
+                tla->expectedMinimumPathCost = best->getFHatValue();
+                tla->setBelief(best->distribution);
             }
 	}
 
