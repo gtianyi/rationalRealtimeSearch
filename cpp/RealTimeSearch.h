@@ -269,8 +269,9 @@ public:
         PriorityQueue<shared_ptr<Node>> open_TLA;
         Cost expectedMinimumPathCost;
         shared_ptr<Node> topLevelNode;
-        vector<shared_ptr<Node>> kBestNodes;
+        //vector<shared_ptr<Node>> kBestNodes;
         Cost h_TLA;
+        DiscreteDistribution belief;
 
 
         TopLevelAction() { open_TLA.swapComparator(Node::compareNodesFHat); }
@@ -288,7 +289,8 @@ public:
         Cost getF_TLA() const { return this->topLevelNode->getGValue() + h_TLA; }
 
         //shared_ptr<DiscreteDistribution> getBelief() { return belief; };
-        DiscreteDistribution getBelief() { return belief; };
+        //DiscreteDistribution getBelief() { return belief; };
+        //double getBeliefExpectedCost() { return belief.expectedCost(); };
 
         //void squishBelief(double factor) { belief->squish(factor); };
         void squishBelief(double factor) { belief.squish(factor); };
@@ -324,14 +326,13 @@ public:
 
     private:
         //shared_ptr<DiscreteDistribution> belief;
-        DiscreteDistribution belief;
 
         void copy(const TopLevelAction& tla) {
             open_TLA = tla.open_TLA;
             expectedMinimumPathCost = tla.expectedMinimumPathCost;
             topLevelNode = tla.topLevelNode;
             belief = tla.belief;
-            kBestNodes = tla.kBestNodes;
+            //kBestNodes = tla.kBestNodes;
             h_TLA = tla.h_TLA;
         }
     };

@@ -129,12 +129,12 @@ private:
 
 		// Start by identifying alpha: the TLA with lowest expected cost
 		int alphaTLA = 0;
-		double alphaExpectedCost = tlas[0]->expectedMinimumPathCost;
+		double alphaExpectedCost = tlas[0]->belief.expectedCost();
 		for (int i = 1; i < tlas.size(); i++)
 		{
-			if (tlas[i]->expectedMinimumPathCost < alphaExpectedCost)
+			if (tlas[i]->belief.expectedCost() < alphaExpectedCost)
 			{
-				alphaExpectedCost = tlas[i]->expectedMinimumPathCost;
+				alphaExpectedCost = tlas[i]->belief.expectedCost();
 				alphaTLA = i;
 			}
 		}
@@ -212,7 +212,7 @@ private:
 		double risk = 0;
 
 		// Perform numerical integration to calculate risk associated with taking alpha as the expansion
-		for (auto& alpha : squishedTopLevelActions[alphaIndex].getBelief())
+		for (auto& alpha : squishedTopLevelActions[alphaIndex].belief)
 		{
 			for (int tla = 0; tla < squishedTopLevelActions.size(); tla++)
 			{
@@ -221,7 +221,7 @@ private:
 					continue;
 
 				// Integrate over values in beta belief
-				for (auto& beta : squishedTopLevelActions[tla].getBelief())
+				for (auto& beta : squishedTopLevelActions[tla].belief)
 				{
 					// Only use beta costs less than alpha cost in risk analysis
 					if (beta.cost < alpha.cost)
