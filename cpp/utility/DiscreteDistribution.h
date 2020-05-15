@@ -70,6 +70,7 @@ private:
     set<ProbabilityNode> distribution;
     int maxSamples;
     double var;
+    double mean;
 
     double probabilityDensityFunction(double x, double mu, double var) {
         return ((1 / sqrt(2 * M_PI * var)) *
@@ -175,7 +176,7 @@ public:
             double mean,
             double d,
             double error)
-            : maxSamples(maxSamples) {
+            : maxSamples(maxSamples), mean(mean) {
         // This is a goal node, belief is a spike at true value
         if (d == 0) {
             distribution.insert(ProbabilityNode(mean, 1.0));
@@ -394,13 +395,14 @@ public:
 
     // could optimize code here, comment by tianyi
     double expectedCost() const {
-        double E = 0.0;
+        /*double E = 0.0;*/
 
-        for (ProbabilityNode n : distribution) {
-            E += n.cost * n.probability;
-        }
+        //for (ProbabilityNode n : distribution) {
+            //E += n.cost * n.probability;
+        //}
 
-        return E;
+        /*return E;*/
+        return mean;
     }
 
     DiscreteDistribution& operator=(const DiscreteDistribution& rhs) {
@@ -412,6 +414,7 @@ public:
 
         distribution = rhs.distribution;
         maxSamples = rhs.maxSamples;
+        mean = rhs.mean;
 
         return *this;
     }
@@ -476,7 +479,7 @@ public:
 
     DiscreteDistribution& squish(double factor) {
         set<ProbabilityNode> newDistribution;
-        double mean = expectedCost();
+        //double mean = expectedCost();
 
         // If the squish factor is 1, all values in distribution will be moved
         // to the mean.
@@ -543,5 +546,6 @@ public:
 
         distribution = rhs.distribution;
         maxSamples = rhs.maxSamples;
+        mean=rhs.mean;
     }
 };

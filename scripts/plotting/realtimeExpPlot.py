@@ -15,6 +15,7 @@ __author__ = 'TianyiGu'
 
 import argparse
 import json
+import math
 import os
 from collections import OrderedDict
 # import sys
@@ -34,14 +35,14 @@ def configure(args):
     # limits = [100, 300, 1000]
 
     algorithms_data = {
-        "thts-WAS": "thts-WAS",
-        "ie": "ie",
+        # "thts-WAS": "thts-WAS",
+        # "ie": "ie",
         "risk-fast": "risk",
         # "ie-nancy": "ie",
         # "ie-nancyAll": "ie",
         # "ie-nancy-tlaopen": "ie",
         # "ie--as": "ie",
-        "risk": "risk",
+        # "risk": "risk",
         "lsslrtastar": "lsslrtastar",
         "riskddSquish": "riskddSquish"
     }
@@ -50,7 +51,7 @@ def configure(args):
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        "risk": "Risk",
+        # "risk": "Risk",
         # "risk-learnhhat": "Risk",
         # "risk-withassump": "Risk",
         # "risk-cpu-dtb": "Risk",
@@ -85,9 +86,9 @@ def configure(args):
         algorithms_data.update(algorithms_data_old)
 
     algorithms = OrderedDict({
-        "thts-WAS": "THTS-WA*",
-        "ie": "IE",
-        "risk-fast": "Nancy (pers.)-fast",
+        # "thts-WAS": "THTS-WA*",
+        # "ie": "IE",
+        "risk-fast": "Nancy (pers.)",
         # "ie-nancy": "IE-Nancy-TLA",
         # "ie-nancyAll": "IE-Nancy-TLAAndOpen",
         # "ie-nancy-tlaopen": "IE-Nancy-Open",
@@ -95,7 +96,7 @@ def configure(args):
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        "risk": "Nancy (pers.)",
+        # "risk": "Nancy (pers.)",
         # "risk-learnhhat": "Nancy-hhat",
         # "risk-withassump": "Nancy-fix-assumption",
         # "risk-cpu-dtb": "Nancy",
@@ -136,12 +137,12 @@ def configure(args):
     algorithm_order = [
         # 'IE', 'IE-AS', 'IE-Nancy-Open', 'IE-Nancy-TLA', 'IE-Nancy-TLAAndOpen',
         # 'IE', 'IE-AS', 'IE-Nancy-TLAAndOpen',
-        'IE',
-        'THTS-WA*',
+        # 'IE',
+        # 'THTS-WA*',
         # 'Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)'
         'Nancy (DD)',
         'LSS-LRTA*',
-        'Nancy (pers.)-fast',
+        # 'Nancy (pers.)-fast',
         'Nancy (pers.)'
     ]
     # algorithm_order = ['Nancy (DD)', 'LSS-LRTA*']
@@ -191,6 +192,69 @@ def makeCoverageTable(dataframe, domainType, subdomainType, size):
     print(grp)
     grp.to_csv("../../plots/" + domainType + "/coverage-" + subdomainType +
                "-" + size + ".csv")
+
+
+def getCpuStatistics(rawdf, limits):
+
+    cpudf = rawdf[rawdf["Node Expansion Limit"].isin(limits)]
+
+    ret_sol_cost = cpudf.groupby([
+        "Node Expansion Limit", "Algorithm"
+    ])['Solution Cost'].agg(['mean', 'count', 'std'
+                             ]).add_suffix('_solution_cost').reset_index()
+
+    ret_cpu95 = cpudf.groupby(["Node Expansion Limit",
+                               "Algorithm"])['cpu95'].agg(
+                                   ['mean', 'count',
+                                    'std']).add_suffix('_cpu95').reset_index()
+
+    ci95_solution_cost = []
+    ci95_cpu95 = []
+
+    for i in ret_sol_cost.index:
+        c = ret_sol_cost.loc[i]["count_solution_cost"]
+        s = ret_sol_cost.loc[i]["std_solution_cost"]
+
+        ci95_solution_cost.append(1.96 * s / math.sqrt(c))
+
+        c = ret_cpu95.loc[i]["count_cpu95"]
+        s = ret_cpu95.loc[i]["std_cpu95"]
+
+        ci95_cpu95.append(1.96 * s / math.sqrt(c))
+
+    ret_sol_cost['ci95_solution_cost'] = ci95_solution_cost
+    ret_sol_cost['ci95_cpu95'] = ci95_cpu95
+    ret_sol_cost["mean_cpu95"] = ret_cpu95["mean_cpu95"].values
+
+    return ret_sol_cost
+
+
+def makeCpuPlot(width, height, xAxis, yAxis, xerr, yerr, dataframe, hue,
+                xLabel, yLabel, outputName):
+    sns.set(rc={
+        'figure.figsize': (width, height),
+        'font.size': 27,
+        'text.color': 'black'
+    })
+
+    g = sns.FacetGrid(data=dataframe, hue=hue, height=height)
+    g.map(plt.errorbar, xAxis, yAxis, xerr, yerr, fmt='o',
+          elinewidth=3).set(xscale="log")
+    # g.map(plt.errorbar, xAxis, yAxis, xerr, yerr, fmt='o',
+          # elinewidth=3)
+    g.add_legend()
+
+    # ax.tick_params(colors='black', labelsize=12)
+    plt.ylabel(yLabel, color='black')
+    # plt.ylabel(yLabel, color='black', fontsize=18)
+    # plt.xlabel(xLabel, color='black', fontsize=18)
+    plt.xlabel(xLabel, color='black')
+    # plt.savefig(outputName, bbox_inches="tight", pad_inches=0)
+    plt.savefig(outputName)
+    plt.close()
+    plt.clf()
+    plt.cla()
+    return
 
 
 def parseArugments():
@@ -245,6 +309,7 @@ def readData(args, algorithms, algorithms_data, baseline):
     algorithm = []
     solutionCost = []
     differenceCost = []
+    cpu95 = []
 
     print("reading in data...")
 
@@ -266,12 +331,14 @@ def readData(args, algorithms, algorithms_data, baseline):
                     lookAheadVals.append(resultData["Lookahead"])
                     algorithm.append(algorithms[alg])
                     solutionCost.append(resultData[algorithms_data[alg]])
+                    cpu95.append(resultData["cpu-percentiles"][94])
 
     rawdf = pd.DataFrame({
         "instance": instance,
         "Node Expansion Limit": lookAheadVals,
         "Solution Cost": solutionCost,
-        "Algorithm": algorithm
+        "Algorithm": algorithm,
+        "cpu95": cpu95
     })
 
     df = pd.DataFrame()
@@ -339,6 +406,14 @@ def plotting(args, parser, df, rawdf, baseline, limits, algorithm_order):
                            0.35, "Algorithm", limits, algorithm_order,
                            "Node Expansion Limit", "Solution Cost",
                            out_file + "-solutioncost.png", markers)
+
+    elif args.plotType == "cpu":
+        cpudf = getCpuStatistics(rawdf, limits)
+        makeCpuPlot(13, 10, "mean_cpu95", "mean_solution_cost",
+                    "ci95_solution_cost", "ci95_cpu95", cpudf,
+                    "Algorithm", "cpu95", "Solution Cost",
+                    out_file + nowstr + "-cpu.png")
+
     else:
         parser.print_help()
 
