@@ -250,8 +250,8 @@ def makeCpuPlot(width, height, xAxis, yAxis, xerr, yerr, dataframe, hue,
         plt.setp(ax.get_legend().get_texts(), fontsize=18)  # for legend text
         plt.setp(ax.get_legend().get_title(), fontsize=18)  # for legend title
 
-    plt.ylabel(yLabel, color='black')
-    plt.xlabel(xLabel, color='black')
+    plt.ylabel(yLabel, color='black', fontsize=18)
+    plt.xlabel(xLabel, color='black', fontsize=18)
     plt.savefig(outputName, bbox_inches="tight", pad_inches=0)
     plt.savefig(outputName.replace(".eps", ".png"),
                 bbox_inches="tight",
@@ -415,7 +415,7 @@ def plotting(args, parser, df, rawdf, baseline, limits, algorithm_order):
         cpudf = getCpuStatistics(rawdf, limits)
         makeCpuPlot(13, 10, "mean_cpu95", "mean_solution_cost",
                     "ci95_solution_cost", "ci95_cpu95", cpudf, "Algorithm",
-                    "cpu95(second)", "Solution Cost",
+                    "95 percentile of cpu time per iteration (seconds)", "Solution Cost",
                     out_file + nowstr + "-cpu.eps")
 
     else:
