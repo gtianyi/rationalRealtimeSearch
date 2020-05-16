@@ -12,7 +12,7 @@ clean:
 release:
 	if [ ! -f realtimeSolver.lock ]; then \
 		rm -rf realtimeSolver; \
-		${CXX} -o3 -std=${STD} ./cpp/expansionTests.cpp -o realtimeSolver ;\
+		${CXX} -o3 -std=${STD} ./cpp/main.cpp -o realtimeSolver ;\
 		chmod a+x ./realtimeSolver ;\
 	else\
 		echo "the release executable is running!!! Try make debug" ; \
@@ -20,7 +20,7 @@ release:
 
 debug:
 	rm -rf realtimeSolver-debug
-	${CXX} -g -D DEBUG -std=${STD} ./cpp/expansionTests.cpp -o realtimeSolver-debug
+	${CXX} -g -D DEBUG -std=${STD} ./cpp/main.cpp -o realtimeSolver-debug
 	chmod a+x realtimeSolver-debug
 
 thrt: ./cpp/trialBased/trialbasedTestRT.cpp ./cpp/trialBased/TrialBasedRealTimeSearch.h
