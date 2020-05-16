@@ -93,16 +93,16 @@ int main(int argc, char** argv)
         cxxopts::value<std::string>()->default_value("barto-bigger"))
 
         ("a,alg", "realtime algorithm: bfs, astar, fhat, lsslrtastar, risk, riskdd, riskddSquish, ie", 
-		cxxopts::value<std::string>()->default_value("risk"))
+        cxxopts::value<std::string>()->default_value("risk"))
 
-		("l,lookahead", "expansion limit", 
-		cxxopts::value<int>()->default_value("100"))
-		("o,performenceOut", "performence Out file",
-		 cxxopts::value<std::string>()->default_value("out.txt"))
+        ("l,lookahead", "expansion limit", 
+        cxxopts::value<int>()->default_value("100"))
+        ("o,performenceOut", "performence Out file",
+        cxxopts::value<std::string>()->default_value("out.txt"))
 
-		("v,pathOut", "path Out file", cxxopts::value<std::string>()) 
+        ("v,pathOut", "path Out file", cxxopts::value<std::string>()) 
 
-		("h,help", "Print usage")
+        ("h,help", "Print usage")
     ;
 
     auto args = options.parse(argc, argv);
