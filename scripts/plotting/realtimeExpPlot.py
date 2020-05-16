@@ -180,6 +180,9 @@ def makeDifferencePlot(width, height, xAxis, yAxis, dataframe, dodge, hue,
     plt.setp(ax.get_legend().get_title(), fontsize='18')  # for legend title
 
     plt.savefig(outputName, bbox_inches="tight", pad_inches=0)
+    plt.savefig(outputName.replace(".eps", ".png"),
+                bbox_inches="tight",
+                pad_inches=0)
     plt.close()
     plt.clf()
     plt.cla()
@@ -237,25 +240,26 @@ def makeCpuPlot(width, height, xAxis, yAxis, xerr, yerr, dataframe, hue,
         'text.color': 'black'
     })
 
-    g = sns.FacetGrid(data=dataframe, hue=hue, height=height)
+    g = sns.FacetGrid(data=dataframe, hue=hue, height=height, legend_out=False)
     g.map(plt.errorbar, xAxis, yAxis, xerr, yerr, fmt='o',
           elinewidth=3).set(xscale="log")
-    # g.map(plt.errorbar, xAxis, yAxis, xerr, yerr, fmt='o',
-          # elinewidth=3)
+
     g.add_legend()
 
-    # ax.tick_params(colors='black', labelsize=12)
+    for ax in g.axes.flat:
+        plt.setp(ax.get_legend().get_texts(), fontsize=18)  # for legend text
+        plt.setp(ax.get_legend().get_title(), fontsize=18)  # for legend title
+
     plt.ylabel(yLabel, color='black')
-    # plt.ylabel(yLabel, color='black', fontsize=18)
-    # plt.xlabel(xLabel, color='black', fontsize=18)
     plt.xlabel(xLabel, color='black')
-    # plt.savefig(outputName, bbox_inches="tight", pad_inches=0)
-    plt.savefig(outputName)
+    plt.savefig(outputName, bbox_inches="tight", pad_inches=0)
+    plt.savefig(outputName.replace(".eps", ".png"),
+                bbox_inches="tight",
+                pad_inches=0)
     plt.close()
     plt.clf()
     plt.cla()
     return
-
 
 def parseArugments():
 
@@ -410,9 +414,9 @@ def plotting(args, parser, df, rawdf, baseline, limits, algorithm_order):
     elif args.plotType == "cpu":
         cpudf = getCpuStatistics(rawdf, limits)
         makeCpuPlot(13, 10, "mean_cpu95", "mean_solution_cost",
-                    "ci95_solution_cost", "ci95_cpu95", cpudf,
-                    "Algorithm", "cpu95", "Solution Cost",
-                    out_file + nowstr + "-cpu.png")
+                    "ci95_solution_cost", "ci95_cpu95", cpudf, "Algorithm",
+                    "cpu95(second)", "Solution Cost",
+                    out_file + nowstr + "-cpu.eps")
 
     else:
         parser.print_help()
