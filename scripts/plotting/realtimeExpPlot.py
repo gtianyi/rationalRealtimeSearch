@@ -35,14 +35,14 @@ def configure(args):
     # limits = [100, 300, 1000]
 
     algorithms_data = {
-        # "thts-WAS": "thts-WAS",
+        "thts-WAS": "thts-WAS",
         # "ie": "ie",
-        "risk-fast": "risk",
+        # "risk-fast": "risk",
         # "ie-nancy": "ie",
         # "ie-nancyAll": "ie",
         # "ie-nancy-tlaopen": "ie",
         # "ie--as": "ie",
-        # "risk": "risk",
+        "risk": "risk",
         "lsslrtastar": "lsslrtastar",
         "riskddSquish": "riskddSquish"
     }
@@ -51,7 +51,7 @@ def configure(args):
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        # "risk": "Risk",
+        "risk": "Risk",
         # "risk-learnhhat": "Risk",
         # "risk-withassump": "Risk",
         # "risk-cpu-dtb": "Risk",
@@ -86,9 +86,9 @@ def configure(args):
         algorithms_data.update(algorithms_data_old)
 
     algorithms = OrderedDict({
-        # "thts-WAS": "THTS-WA*",
+        "thts-WAS": "THTS-WA*",
         # "ie": "IE",
-        "risk-fast": "Nancy (pers.)",
+        # "risk-fast": "Nancy (pers.)",
         # "ie-nancy": "IE-Nancy-TLA",
         # "ie-nancyAll": "IE-Nancy-TLAAndOpen",
         # "ie-nancy-tlaopen": "IE-Nancy-Open",
@@ -96,7 +96,7 @@ def configure(args):
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        # "risk": "Nancy (pers.)",
+        "risk": "Nancy (pers.)",
         # "risk-learnhhat": "Nancy-hhat",
         # "risk-withassump": "Nancy-fix-assumption",
         # "risk-cpu-dtb": "Nancy",
@@ -138,7 +138,7 @@ def configure(args):
         # 'IE', 'IE-AS', 'IE-Nancy-Open', 'IE-Nancy-TLA', 'IE-Nancy-TLAAndOpen',
         # 'IE', 'IE-AS', 'IE-Nancy-TLAAndOpen',
         # 'IE',
-        # 'THTS-WA*',
+        'THTS-WA*',
         # 'Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)'
         'Nancy (DD)',
         'LSS-LRTA*',
@@ -261,6 +261,7 @@ def makeCpuPlot(width, height, xAxis, yAxis, xerr, yerr, dataframe, hue,
     plt.cla()
     return
 
+
 def parseArugments():
 
     parser = argparse.ArgumentParser(description='realtimeExpPlot')
@@ -335,15 +336,19 @@ def readData(args, algorithms, algorithms_data, baseline):
                     lookAheadVals.append(resultData["Lookahead"])
                     algorithm.append(algorithms[alg])
                     solutionCost.append(resultData[algorithms_data[alg]])
-                    cpu95.append(resultData["cpu-percentiles"][94])
+                    if args.plotType == "cpu":
+                        cpu95.append(resultData["cpu-percentiles"][94])
 
     rawdf = pd.DataFrame({
         "instance": instance,
         "Node Expansion Limit": lookAheadVals,
         "Solution Cost": solutionCost,
         "Algorithm": algorithm,
-        "cpu95": cpu95
+        # "cpu95": cpu95
     })
+
+    if args.plotType == "cpu":
+        rawdf["cpu95"] = cpu95
 
     df = pd.DataFrame()
     df["instance"] = np.nan
@@ -415,8 +420,8 @@ def plotting(args, parser, df, rawdf, baseline, limits, algorithm_order):
         cpudf = getCpuStatistics(rawdf, limits)
         makeCpuPlot(13, 10, "mean_cpu95", "mean_solution_cost",
                     "ci95_solution_cost", "ci95_cpu95", cpudf, "Algorithm",
-                    "95 percentile of cpu time per iteration (seconds)", "Solution Cost",
-                    out_file + nowstr + "-cpu.eps")
+                    "95 percentile of cpu time per iteration (seconds)",
+                    "Solution Cost", out_file + nowstr + "-cpu.eps")
 
     else:
         parser.print_help()
