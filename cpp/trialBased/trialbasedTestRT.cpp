@@ -8,6 +8,7 @@
 #include "../domain/HeavyTilePuzzle_sai.h"
 #include "../domain/InverseTilePuzzle_sai.h"
 #include "../domain/PancakePuzzle.h"
+#include "../domain/RaceTrack_thts.h"
 #include "../domain/TreeWorld.h"
 #include "../domain/SqrtTilePuzzle_sai.h"
 #include "../utility/cxxopts/include/cxxopts.hpp"
@@ -22,13 +23,12 @@ int main(int argc, char** argv) {
 
     options.add_options()
 
-		("d,domain", "domain type: treeWorld, slidingTile, pancake", 
-		//("d,domain", "domain type: treeWorld, slidingTile, pancake, racetrack", 
+        ("d,domain", "domain type: treeWorld, slidingTile, pancake, racetrack", 
 		 cxxopts::value<std::string>()->default_value("slidingTile"))
 
 		("s,subdomain", "puzzle type: uniform, inverse, heavy, sqrt; "
-		                "pancake type: regular, heavy;",
-						//"racetrack map : barto-bigger, hanse-bigger-double, uniform", 
+		                "pancake type: regular, heavy;"
+                        "racetrack map : barto-big, barto-bigger, hanse-bigger-double, uniform-small", 
 		 cxxopts::value<std::string>()->default_value("uniform"))
 
         ("a,alg", "thts algorithm: WAS, GUCTS", 
@@ -102,6 +102,25 @@ int main(int argc, char** argv) {
     } else if (domain == "treeWorld"){
         TreeWorld world = TreeWorld(cin);
         THTS_RT <TreeWorld> thts(world, algorithm, lookahead, greedyOneStep, hLearning);
+
+        thts.setRecordPlan(check);
+
+        res = thts.getPlan();
+    }  else if (domain == "racetrack"){
+        string mapFile = "/home/aifs1/gu/phd/research/workingPaper/"
+                         "realtime-nancy/worlds/racetrack/map/" +
+                subDomain + ".track";
+
+        ifstream map(mapFile);
+
+        if (!map.good()) {
+            cout << "map file not exist: " << mapFile << endl;
+            exit(1);
+            }
+
+        RaceTrack world = RaceTrack(map, cin);
+
+        THTS_RT <RaceTrack> thts(world, algorithm, lookahead, greedyOneStep, hLearning);
 
         thts.setRecordPlan(check);
 
