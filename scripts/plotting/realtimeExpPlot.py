@@ -35,7 +35,7 @@ def configure(args):
     # limits = [100, 300, 1000]
 
     algorithms_data = {
-        # "thts-WAS": "thts-WAS",
+        "thts-WAS": "thts-WAS",
         "ie": "ie",
         "risk-fast": "risk",
         # "ie-nancy": "ie",
@@ -86,7 +86,7 @@ def configure(args):
         algorithms_data.update(algorithms_data_old)
 
     algorithms = OrderedDict({
-        # "thts-WAS": "THTS-WA*",
+        "thts-WAS": "THTS-WA*",
         "ie": "IE",
         # "risk-fast": "Nancy (pers.)",
         "risk-fast": "Nancy",
@@ -145,7 +145,7 @@ def configure(args):
         'Nancy (DD)',
         # 'Nancy (pers.)-fast',
         'Nancy',
-        # 'THTS-WA*',
+        'THTS-WA*',
         'LSS-LRTA*'
     ]
     # algorithm_order = ['Nancy (DD)', 'LSS-LRTA*']
