@@ -36,22 +36,22 @@ def configure(args):
 
     algorithms_data = {
         # "thts-WAS": "thts-WAS",
-        # "ie": "ie",
-        # "risk-fast": "risk",
+        "ie": "ie",
+        "risk-fast": "risk",
         # "ie-nancy": "ie",
         # "ie-nancyAll": "ie",
         # "ie-nancy-tlaopen": "ie",
         # "ie--as": "ie",
         # "risk": "risk",
-        # "lsslrtastar": "lsslrtastar",
-        # "riskddSquish": "riskddSquish"
+        "lsslrtastar": "lsslrtastar",
+        "riskddSquish": "riskddSquish"
     }
 
     algorithms_data_old = {
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        # "risk": "Risk",
+        "risk": "Risk",
         # "risk-learnhhat": "Risk",
         # "risk-withassump": "Risk",
         # "risk-cpu-dtb": "Risk",
@@ -59,7 +59,7 @@ def configure(args):
         # "riskdd-cpu-dtb": "RiskDD",
         # "riskdd-nopersist": "RiskDD",
         # "riskdd": "RiskDD",
-        "prisk": "PRisk",
+        # "prisk": "PRisk",
         # "prisk-nop-learnhhat": "PRisk",
         # "prisk-withassump": "PRisk",
         # "prisk-withassump": "PRisk",
@@ -87,8 +87,9 @@ def configure(args):
 
     algorithms = OrderedDict({
         # "thts-WAS": "THTS-WA*",
-        # "ie": "IE",
+        "ie": "IE",
         # "risk-fast": "Nancy (pers.)",
+        "risk-fast": "Nancy",
         # "ie-nancy": "IE-Nancy-TLA",
         # "ie-nancyAll": "IE-Nancy-TLAAndOpen",
         # "ie-nancy-tlaopen": "IE-Nancy-Open",
@@ -97,6 +98,7 @@ def configure(args):
         # "fhat": "F-Hat",
         # "bfs": "BFS",
         # "risk": "Nancy (pers.)",
+        # "risk": "Nancy",
         # "risk-learnhhat": "Nancy-hhat",
         # "risk-withassump": "Nancy-fix-assumption",
         # "risk-cpu-dtb": "Nancy",
@@ -105,7 +107,7 @@ def configure(args):
         # "riskdd-cpu-dtb": "Nancy (DD PE)",
         # "riskdd-nopersist": "Nancy (DD PE Nper)",
         # "prisk": "Nancy (pers.)",
-        "prisk": "Nancy",
+        # "prisk": "Nancy",
         # "prisk-withassump-learnhhat": "Nancy (pers-fix-assumption-hhat.)",
         # "prisk-nop-learnhhat": "Nancy (pers-hhat.)",
         # "prisk-withassump": "Nancy (pers-fix-assumption.)",
@@ -138,13 +140,13 @@ def configure(args):
     algorithm_order = [
         # 'IE', 'IE-AS', 'IE-Nancy-Open', 'IE-Nancy-TLA', 'IE-Nancy-TLAAndOpen',
         # 'IE', 'IE-AS', 'IE-Nancy-TLAAndOpen',
-        # 'IE',
-        # 'THTS-WA*',
+        'IE',
         # 'Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)'
         'Nancy (DD)',
-        'LSS-LRTA*',
         # 'Nancy (pers.)-fast',
-        'Nancy'
+        'Nancy',
+        # 'THTS-WA*',
+        'LSS-LRTA*'
     ]
     # algorithm_order = ['Nancy (DD)', 'LSS-LRTA*']
 
@@ -233,15 +235,19 @@ def getCpuStatistics(rawdf, limits):
     return ret_sol_cost
 
 
-def makeCpuPlot(width, height, xAxis, yAxis, xerr, yerr, dataframe, hue,
-                xLabel, yLabel, outputName):
+def makeCpuPlot(aspect, height, xAxis, yAxis, xerr, yerr, dataframe, hue,
+                hue_order_list, xLabel, yLabel, outputName):
     sns.set(rc={
-        'figure.figsize': (width, height),
         'font.size': 27,
         'text.color': 'black'
     })
 
-    g = sns.FacetGrid(data=dataframe, hue=hue, height=height, legend_out=False)
+    g = sns.FacetGrid(data=dataframe,
+                      hue=hue,
+                      hue_order=hue_order_list,
+                      aspect=aspect,
+                      height=height,
+                      legend_out=False)
     g.map(plt.errorbar, xAxis, yAxis, xerr, yerr, fmt='o',
           elinewidth=3).set(xscale="log")
 
@@ -280,7 +286,7 @@ def parseArugments():
         dest='subdomain',
         help='subdomain: tile: uniform(default), heavy, inverse; \
         pancake: regular, heavy; \
-        racetrack : barto-bigger, hanse-bigger-double, uniform',
+        racetrack : barto-big,uniform-small, barto-bigger, hanse-bigger-double',
         default='uniform')
 
     parser.add_argument('-z',
@@ -409,6 +415,12 @@ def plotting(args, parser, df, rawdf, baseline, limits, algorithm_order):
 
     out_dir = "../../plots/" + domainType
 
+    width = 13
+    height = 10
+
+    if domainType == "pancake":
+        width = 8.5
+
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
 
@@ -418,7 +430,7 @@ def plotting(args, parser, df, rawdf, baseline, limits, algorithm_order):
         makeCoverageTable(rawdf, domainType, subdomainType, domainSize)
 
     elif args.plotType == "pairwise":
-        makeDifferencePlot(13, 10, "Node Expansion Limit",
+        makeDifferencePlot(width, height, "Node Expansion Limit",
                            "Algorithm Cost - " + baseline + " Cost", df, 0.35,
                            "Algorithm", limits, algorithm_order,
                            "Node Expansion Limit",
@@ -433,8 +445,14 @@ def plotting(args, parser, df, rawdf, baseline, limits, algorithm_order):
 
     elif args.plotType == "cpu":
         cpudf = getCpuStatistics(rawdf, limits)
-        makeCpuPlot(13, 10, "mean_cpu95", "mean_solution_cost",
+
+        aspect = 1
+        if domainType == "pancake":
+            aspect = 0.8
+
+        makeCpuPlot(aspect, height, "mean_cpu95", "mean_solution_cost",
                     "ci95_solution_cost", "ci95_cpu95", cpudf, "Algorithm",
+                    algorithm_order,
                     "95 percentile of cpu time per iteration (seconds)",
                     "Solution Cost", out_file + nowstr + "-cpu.eps")
 
