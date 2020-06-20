@@ -35,23 +35,23 @@ def configure(args):
     # limits = [100, 300, 1000]
 
     algorithms_data = {
-        "thts-WAS": "thts-WAS",
+        # "thts-WAS": "thts-WAS",
         # "ie": "ie",
         # "risk-fast": "risk",
         # "ie-nancy": "ie",
         # "ie-nancyAll": "ie",
         # "ie-nancy-tlaopen": "ie",
         # "ie--as": "ie",
-        "risk": "risk",
-        "lsslrtastar": "lsslrtastar",
-        "riskddSquish": "riskddSquish"
+        # "risk": "risk",
+        # "lsslrtastar": "lsslrtastar",
+        # "riskddSquish": "riskddSquish"
     }
 
     algorithms_data_old = {
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        "risk": "Risk",
+        # "risk": "Risk",
         # "risk-learnhhat": "Risk",
         # "risk-withassump": "Risk",
         # "risk-cpu-dtb": "Risk",
@@ -59,7 +59,7 @@ def configure(args):
         # "riskdd-cpu-dtb": "RiskDD",
         # "riskdd-nopersist": "RiskDD",
         # "riskdd": "RiskDD",
-        # "prisk": "PRisk",
+        "prisk": "PRisk",
         # "prisk-nop-learnhhat": "PRisk",
         # "prisk-withassump": "PRisk",
         # "prisk-withassump": "PRisk",
@@ -86,7 +86,7 @@ def configure(args):
         algorithms_data.update(algorithms_data_old)
 
     algorithms = OrderedDict({
-        "thts-WAS": "THTS-WA*",
+        # "thts-WAS": "THTS-WA*",
         # "ie": "IE",
         # "risk-fast": "Nancy (pers.)",
         # "ie-nancy": "IE-Nancy-TLA",
@@ -96,7 +96,7 @@ def configure(args):
         # "astar": "A*",
         # "fhat": "F-Hat",
         # "bfs": "BFS",
-        "risk": "Nancy (pers.)",
+        # "risk": "Nancy (pers.)",
         # "risk-learnhhat": "Nancy-hhat",
         # "risk-withassump": "Nancy-fix-assumption",
         # "risk-cpu-dtb": "Nancy",
@@ -105,6 +105,7 @@ def configure(args):
         # "riskdd-cpu-dtb": "Nancy (DD PE)",
         # "riskdd-nopersist": "Nancy (DD PE Nper)",
         # "prisk": "Nancy (pers.)",
+        "prisk": "Nancy",
         # "prisk-withassump-learnhhat": "Nancy (pers-fix-assumption-hhat.)",
         # "prisk-nop-learnhhat": "Nancy (pers-hhat.)",
         # "prisk-withassump": "Nancy (pers-fix-assumption.)",
@@ -138,12 +139,12 @@ def configure(args):
         # 'IE', 'IE-AS', 'IE-Nancy-Open', 'IE-Nancy-TLA', 'IE-Nancy-TLAAndOpen',
         # 'IE', 'IE-AS', 'IE-Nancy-TLAAndOpen',
         # 'IE',
-        'THTS-WA*',
+        # 'THTS-WA*',
         # 'Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)'
         'Nancy (DD)',
         'LSS-LRTA*',
         # 'Nancy (pers.)-fast',
-        'Nancy (pers.)'
+        'Nancy'
     ]
     # algorithm_order = ['Nancy (DD)', 'LSS-LRTA*']
 
@@ -301,6 +302,13 @@ def parseArugments():
                         help='Set old data switch to true',
                         default=False)
 
+    parser.add_argument('-b',
+                        action='store_true',
+                        dest='before_clean',
+                        help='Set before clean switch to true, \
+                        it would use very old data beofre we cleaned up codebase',
+                        default=False)
+
     return parser
 
 
@@ -318,11 +326,18 @@ def readData(args, algorithms, algorithms_data, baseline):
 
     print("reading in data...")
 
-    inPath = "../../results/" + domainType + "/expansionTests/NancyDD/" + \
+    domainDir = domainType
+    domainSizeDir = domainSize
+    if domainType == "slidingTile" and args.before_clean:
+        domainDir = "SlidingTilePuzzle"
+        domainSizeDir = str(domainSize) + "x" + str(domainSize)
+
+
+    inPath = "../../results/" + domainDir + "/expansionTests/NancyDD/" + \
         subdomainType + '/alg'
 
     if domainType == "slidingTile" or domainType == "pancake":
-        inPath = inPath + '/' + domainSize
+        inPath = inPath + '/' + domainSizeDir
 
     for alg in algorithms:
         inPath_alg = inPath.replace('alg', alg)
