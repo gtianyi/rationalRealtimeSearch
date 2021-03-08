@@ -2,7 +2,7 @@
 
 This is a real-time solver framework. We implement algorithms such as LSSLRTA*, Nancy, Data-Driven Nancy.
 
-#Paper
+# Paper
 [1] Maximilian Fickert, Tianyi Gu, Leonhard Staut, Wheeler Ruml, Joerg Hoffmann, and Marek Petrik, Beliefs We Can Believe In: Replacing Assumptions with Data in Real-Time Search. Proceedings of the Thirty-fourth AAAI Conference on Artificial Intelligence (AAAI-20), 2020.
 
 [[pdf]](http://cs.unh.edu/~tg1034/publication/DDNancy.pdf) [[slides]](http://cs.unh.edu/~tg1034/slides/DDNancy_slides.pdf) [[poster]](http://cs.unh.edu/~tg1034/slides/DDNancy_poster.pdf)
@@ -11,11 +11,11 @@ This is a real-time solver framework. We implement algorithms such as LSSLRTA*, 
 
 [[pdf]](http://cs.unh.edu/~tg1034/publication/DDNancy-PRL.pdf) [[talk]](https://youtu.be/4f1ual5R4s0) [[slides]](http://cs.unh.edu/~tg1034/slides/prl_nancy_slides.pdf) [[poster]](http://cs.unh.edu/~tg1034/slides/prl_nancy_poster.pdf)
 
-#How to build
+# How to build
 
 make
 
-#How to run
+# How to run
 ## Single Run (solve one problem instance)
 ```console
 Usage:
