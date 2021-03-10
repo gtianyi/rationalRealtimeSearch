@@ -55,3 +55,6 @@ cd scipts/testHarnesses
 [-t thread number]               default: 1
 [-h help]
 ```
+
+# Problem Instances
+All the instances can be found [here](https://github.com/gtianyi/searchDomainInstanceFiles)
