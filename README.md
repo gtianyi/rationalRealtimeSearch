@@ -56,5 +56,8 @@ cd scipts/testHarnesses
 [-h help]
 ```
 
+# Training Repo
+Source of offline training is avaiable [here](https://github.com/gtianyi/rationalRealtimeSearch-training)
+
 # Problem Instances
 All the instances can be found [here](https://github.com/gtianyi/searchDomainInstanceFiles)
