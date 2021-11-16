@@ -140,13 +140,13 @@ def configure(args):
     algorithm_order = [
         # 'IE', 'IE-AS', 'IE-Nancy-Open', 'IE-Nancy-TLA', 'IE-Nancy-TLAAndOpen',
         # 'IE', 'IE-AS', 'IE-Nancy-TLAAndOpen',
+        'LSS-LRTA*',
+        'THTS-WA*',
+        'Nancy (DD)',
         'IE',
         # 'Nancy (DD)', 'LSS-LRTA*', 'Nancy (pers.)'
-        'Nancy (DD)',
         # 'Nancy (pers.)-fast',
-        'Nancy',
-        'THTS-WA*',
-        'LSS-LRTA*'
+        'Nancy'
     ]
     # algorithm_order = ['Nancy (DD)', 'LSS-LRTA*']
 
@@ -418,8 +418,8 @@ def plotting(args, parser, df, rawdf, baseline, limits, algorithm_order):
     width = 13
     height = 10
 
-    if domainType == "pancake":
-        width = 8.5
+    # if domainType == "pancake":
+        # width = 8.5
 
     if not os.path.exists(out_dir):
         os.mkdir(out_dir)
